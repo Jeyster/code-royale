@@ -70,5 +70,11 @@ public final class StructuresUtils {
     	return structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()
     			&& structure.getParam1() < structure.getMaxMineProduction();
     }
+    
+    public static boolean isTowerOwnedByMeNotFullLife(Structure structure) {
+    	final int MAX_TOWER_LIFE = 750;
+    	return structure.getStructureTypeId() == StructureType.TOWER.getStructureTypeId()
+    			&& structure.getParam1() < MAX_TOWER_LIFE;
+    }
 
 }

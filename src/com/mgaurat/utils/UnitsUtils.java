@@ -16,7 +16,7 @@ public final class UnitsUtils {
 	private UnitsUtils() {
 	}
 	
-	public static Map<UnitType, List<Unit>> getUnitsByType(Scanner in, int numUnits) {
+	public static Map<UnitType, List<Unit>> getUnitsByTypeFromTurnInput(Scanner in, int numUnits) {
 		Map<UnitType, List<Unit>> unitsByType = buildUnitsByType();
 		List<Unit> queens = unitsByType.get(UnitType.QUEEN);
 		List<Unit> knights = unitsByType.get(UnitType.KNIGHT);

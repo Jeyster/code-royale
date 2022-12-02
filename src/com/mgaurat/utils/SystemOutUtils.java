@@ -39,8 +39,11 @@ public final class SystemOutUtils {
 	public static void printTrainAction(int siteId) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TRAIN");
-		sb.append(" ");
-		sb.append(siteId);
+		
+		if (siteId > 0) {
+			sb.append(" ");
+			sb.append(siteId);			
+		}
 		
 		System.out.println(sb.toString());
 	}

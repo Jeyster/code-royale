@@ -36,14 +36,14 @@ class Player {
             Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
 
             int numUnits = in.nextInt();
-            Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByType(in, numUnits);
+            Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByTypeFromTurnInput(in, numUnits);
             Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
             Coordinates myQueenCoordinates = myQueen.getCoordinates();
 
             // Choose a target Site :
-            final int MAX_GOLD_PRODUCTION = 10;
-            Site targetedSite = SitesUtils.getSiteToTarget(sitesById, myQueenCoordinates, touchedSite, MAX_GOLD_PRODUCTION);
-            int targetedSiteId = targetedSite.getId();
+            final int MAX_GOLD_PRODUCTION = 8;
+//            Site targetedSite = SitesUtils.getSiteToTarget(sitesById, myQueenCoordinates, touchedSite, MAX_GOLD_PRODUCTION);
+//            int targetedSiteId = targetedSite.getId();
             
             // 1) First turn action is to BUILD if possible. Else is MOVE.
             //		a) BUILD when touching the targeted Site :
@@ -54,28 +54,59 @@ class Player {
             //			- if already build a sufficient number of TOWER (MAX_TOWER_NUMBER), move back to the KNIGHT BARRACKS
             //			- else move to the targeted site
             
-            final int MAX_TOWER_NUMBER = 6;
-            if (touchedSite == targetedSiteId) {
-            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
+            final int MAX_TOWER_NUMBER = 4;
+            Site targetedSite;
+            int targetedSiteId;
+            if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
+            	targetedSite = SitesUtils.getNearestSiteNotOwned(sites, myQueenCoordinates);
+            	targetedSiteId = targetedSite.getId();
+            	if (touchedSite != targetedSiteId) {
+                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+            	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.BARRACKS, UnitType.KNIGHT);
-            	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
+            	}
+        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
+            	targetedSite = SitesUtils.getNearestSiteNotOwned(sites, myQueenCoordinates);
+            	targetedSiteId = targetedSite.getId();
+            	if (touchedSite != targetedSiteId) {
+                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+            	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.MINE, null);
+            	}
+            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) == MAX_TOWER_NUMBER) {
+            	targetedSite = SitesUtils.getNearestSiteNotOwned(sites, myQueenCoordinates);
+            	targetedSiteId = targetedSite.getId();
+            	if (touchedSite != targetedSiteId) {
+                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
             	}
-            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) == MAX_TOWER_NUMBER) {
+        	} else {
             	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sites);
             	SystemOutUtils.printMoveAction(knightBarrack.getCoordinates());
-            } else {	
-            	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
-            }
+        	}
+            
+//            if (touchedSite == targetedSiteId) {
+//            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
+//            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.BARRACKS, UnitType.KNIGHT);
+//            	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
+//            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.MINE, null);
+//            	} else {
+//            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
+//            	}
+//            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) == MAX_TOWER_NUMBER) {
+//            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sites);
+//            	SystemOutUtils.printMoveAction(knightBarrack.getCoordinates());
+//            } else {	
+//            	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//            }
 
             // 2) Second turn action is to TRAIN :
             //		- if there is a site available for training, do it
             //		- else train nothing
             Site siteToTrain = SitesUtils.getASiteToTrain(sites);
             if (siteToTrain != null) {
-                SystemOutUtils.printTrainAction(targetedSiteId);
+                SystemOutUtils.printTrainAction(siteToTrain.getId());
             } else {
                 SystemOutUtils.printTrainAction(0);
             }
@@ -254,6 +285,7 @@ class Unit {
 
 enum Owner {
 	
+	NOBODY(-1),
 	ALLY(0),
 	ENEMY(1);
 	
@@ -412,6 +444,24 @@ final class SitesUtils {
         return nearestSite;
     }
     
+    public static Site getNearestSiteNotOwned(Collection<Site> sites, Coordinates myQueenCoordinates) {
+        Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {            
+            if (site.getStructure().getOwner() != Owner.NOBODY.getOwnerId()) {
+            	siteCoordinates = site.getCoordinates();
+            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+            	if (distanceToSite < distanceToNearestSite) {
+            		distanceToNearestSite = distanceToSite;
+            		nearestSite = site;
+            	}            	
+            }
+        }
+        return nearestSite;
+    }
+    
     public static Site getNearestSiteNotOwnedByMe(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
@@ -524,7 +574,7 @@ final class UnitsUtils {
 	private UnitsUtils() {
 	}
 	
-	public static Map<UnitType, List<Unit>> getUnitsByType(Scanner in, int numUnits) {
+	public static Map<UnitType, List<Unit>> getUnitsByTypeFromTurnInput(Scanner in, int numUnits) {
 		Map<UnitType, List<Unit>> unitsByType = buildUnitsByType();
 		List<Unit> queens = unitsByType.get(UnitType.QUEEN);
 		List<Unit> knights = unitsByType.get(UnitType.KNIGHT);

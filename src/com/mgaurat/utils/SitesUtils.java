@@ -101,6 +101,43 @@ public final class SitesUtils {
         return nearestSite;
     }
     
+    public static Site getNearestFreeSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
+        Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {            
+            if (site.getStructure().getOwner() == Owner.NOBODY.getOwnerId()) {
+            	siteCoordinates = site.getCoordinates();
+            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+            	if (distanceToSite < distanceToNearestSite) {
+            		distanceToNearestSite = distanceToSite;
+            		nearestSite = site;
+            	}            	
+            }
+        }
+        return nearestSite;
+    }
+    
+    public static Site getNearestSiteNotOwnedToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates) {
+        Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {            
+            if (site.getStructure().getOwner() == Owner.NOBODY.getOwnerId()
+            		&& site.getStructure().getMineGold() != 0) {
+            	siteCoordinates = site.getCoordinates();
+            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+            	if (distanceToSite < distanceToNearestSite) {
+            		distanceToNearestSite = distanceToSite;
+            		nearestSite = site;
+            	}            	
+            }
+        }
+        return nearestSite;
+    }
+    
     public static Site getNearestSiteNotOwnedByMe(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
