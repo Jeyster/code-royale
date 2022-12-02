@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.mgaurat.enums.StructureType;
 import com.mgaurat.enums.UnitType;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
 import com.mgaurat.utils.SitesUtils;
 import com.mgaurat.utils.StructuresUtils;
+import com.mgaurat.utils.SystemOutUtils;
 import com.mgaurat.utils.UnitsUtils;
 
 class Player {
@@ -33,38 +35,45 @@ class Player {
             Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
             Coordinates myQueenCordinates = myQueen.getCoordinates();
 
-            // First line: A valid queen action
-            // Second line: A set of training instructions
-            //System.out.println("WAIT");
-            Site nearestSiteToMoveOn;
-            if (SitesUtils.isAtLeastOneSiteOwned(sites)) {
-            	nearestSiteToMoveOn = SitesUtils.getNearestSiteNotOwned(sites, myQueenCordinates);
+            // Choose a target Site :
+            //	- if no Site owned by me, choose the nearest
+            //	- else choose the nearest not owned by me
+            Site targetedSite;
+            if (SitesUtils.isAtLeastOneSiteOwnedByMe(sites)) {
+            	targetedSite = SitesUtils.getNearestSiteNotOwnedByMe(sites, myQueenCordinates);
             } else {
-            	nearestSiteToMoveOn = SitesUtils.getNearestSite(sites, myQueenCordinates);            	
+            	targetedSite = SitesUtils.getNearestSite(sites, myQueenCordinates);            	
             }
-            int nearestSiteId = nearestSiteToMoveOn.getId();
-            Coordinates nearestSiteCoordinates = nearestSiteToMoveOn.getCoordinates();
-            int xTarget = nearestSiteCoordinates.getX();
-            int yTarget = nearestSiteCoordinates.getY();
+            int targetedSiteId = targetedSite.getId();
             
-            if (touchedSite == nearestSiteId) {
+            // 1) First turn action is to BUILD if possible. Else is MOVE.
+            //		a) BUILD when touching the targeted Site :
+            //			- if I don't owned a Knight Barrack, build it
+            //			- else build a Tower
+            //		b) else MOVE :
+            //			- if already build a sufficient number of Structures, move back to the Knight Barrack
+            //			- else move to the targeted site
+            if (touchedSite == targetedSiteId) {
             	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
-            		System.out.println("BUILD " + nearestSiteId + " BARRACKS-KNIGHT");
+            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.BARRACKS, UnitType.KNIGHT);
             	} else {
-            		System.out.println("BUILD " + nearestSiteId + " TOWER");
+            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
             	}
             } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sitesById) == 6) {
             	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sitesById);
-                System.out.println("MOVE " + knightBarrack.getCoordinates().getX() + " " + knightBarrack.getCoordinates().getY());
+            	SystemOutUtils.printMoveAction(knightBarrack.getCoordinates());
             } else {	
-                System.out.println("MOVE " + xTarget + " " + yTarget);
+            	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
             }
 
+            // 2) Second turn action is to TRAIN :
+            //		- if there is a site available for training, do it
+            //		- else train nothing
             Site siteToTrain = SitesUtils.getASiteToTrain(sites);
             if (siteToTrain != null) {
-                System.out.println("TRAIN " + siteToTrain.getId());
+                SystemOutUtils.printTrainAction(targetedSiteId);
             } else {
-                System.out.println("TRAIN 0");
+                SystemOutUtils.printTrainAction(0);
             }
         }
     }

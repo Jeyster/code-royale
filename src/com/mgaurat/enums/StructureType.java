@@ -3,7 +3,7 @@ package com.mgaurat.enums;
 public enum StructureType {
 	
 	TOWER(1),
-	BARRACK(2);
+	BARRACKS(2);
 	
 	private int structureTypeId;
 

@@ -16,7 +16,7 @@ public final class StructuresUtils {
         for (int i = 0; i < sites.size(); i++) {
         	site = sites.get(i);
         	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()
+        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()
         			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
         		return true;
         	}
@@ -29,7 +29,7 @@ public final class StructuresUtils {
         for (int i = 0; i < sites.size(); i++) {
         	site = sites.get(i);
         	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()
+        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()
         			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
         		return site;
         	}

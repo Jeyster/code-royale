@@ -72,7 +72,7 @@ public final class SitesUtils {
         return nearestSite;
     }
     
-    public static Site getNearestSiteNotOwned(Collection<Site> sites, Coordinates myQueenCoordinates) {
+    public static Site getNearestSiteNotOwnedByMe(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
         double distanceToNearestSite = Double.MAX_VALUE;
@@ -90,7 +90,7 @@ public final class SitesUtils {
         return nearestSite;
     }
     
-    public static boolean isAtLeastOneSiteOwned(Collection<Site> sites) {
+    public static boolean isAtLeastOneSiteOwnedByMe(Collection<Site> sites) {
         for (Site site : sites) {            
         	if (site.getStructure().isOwnedByMe()) {
         		return true;
@@ -104,7 +104,7 @@ public final class SitesUtils {
         for (Site site : sites) {            
         	if (site.getStructure().isOwnedByMe() 
         			&& site.getStructure().getParam1() == 0 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()) {
+        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()) {
         		return site;
         	}
         }
