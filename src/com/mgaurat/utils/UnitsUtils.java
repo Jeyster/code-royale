@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.mgaurat.enums.Owner;
-import com.mgaurat.enums.UnitType;
+import com.mgaurat.enums.OwnerEnum;
+import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Unit;
 
@@ -16,12 +16,12 @@ public final class UnitsUtils {
 	private UnitsUtils() {
 	}
 	
-	public static Map<UnitType, List<Unit>> getUnitsByTypeFromTurnInput(Scanner in, int numUnits) {
-		Map<UnitType, List<Unit>> unitsByType = buildUnitsByType();
-		List<Unit> queens = unitsByType.get(UnitType.QUEEN);
-		List<Unit> knights = unitsByType.get(UnitType.KNIGHT);
-		List<Unit> archers = unitsByType.get(UnitType.ARCHER);
-		List<Unit> giants = unitsByType.get(UnitType.GIANT);
+	public static Map<UnitEnum, List<Unit>> getUnitsByTypeFromTurnInput(Scanner in, int numUnits) {
+		Map<UnitEnum, List<Unit>> unitsByType = buildUnitsByType();
+		List<Unit> queens = unitsByType.get(UnitEnum.QUEEN);
+		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
+		List<Unit> archers = unitsByType.get(UnitEnum.ARCHER);
+		List<Unit> giants = unitsByType.get(UnitEnum.GIANT);
 		
 		Coordinates unitCoordinates;
 		Unit unit;
@@ -35,13 +35,13 @@ public final class UnitsUtils {
 
             unit = new Unit(unitCoordinates, owner, unitType, health);
             
-            if (unitType == UnitType.QUEEN.getUnitTypeId()) {
+            if (unitType == UnitEnum.QUEEN.getId()) {
 				queens.add(unit);
-			} else if (unitType == UnitType.KNIGHT.getUnitTypeId()) {
+			} else if (unitType == UnitEnum.KNIGHT.getId()) {
 				knights.add(unit);
-			} else if (unitType == UnitType.ARCHER.getUnitTypeId()) {
+			} else if (unitType == UnitEnum.ARCHER.getId()) {
 				archers.add(unit);
-			} else if (unitType == UnitType.GIANT.getUnitTypeId()) {
+			} else if (unitType == UnitEnum.GIANT.getId()) {
 				giants.add(unit);
 			}
         }
@@ -49,25 +49,25 @@ public final class UnitsUtils {
         return unitsByType;
 	}
 	
-	private static Map<UnitType, List<Unit>> buildUnitsByType() {
-		Map<UnitType, List<Unit>> unitsByType = new HashMap<>();
+	private static Map<UnitEnum, List<Unit>> buildUnitsByType() {
+		Map<UnitEnum, List<Unit>> unitsByType = new HashMap<>();
 		List<Unit> queens = new ArrayList<>();
 		List<Unit> knights = new ArrayList<>();
 		List<Unit> archers = new ArrayList<>();
 		List<Unit> giants = new ArrayList<>();
 		
-		unitsByType.put(UnitType.QUEEN, queens);
-		unitsByType.put(UnitType.KNIGHT, knights);
-		unitsByType.put(UnitType.ARCHER, archers);
-		unitsByType.put(UnitType.GIANT, giants);
+		unitsByType.put(UnitEnum.QUEEN, queens);
+		unitsByType.put(UnitEnum.KNIGHT, knights);
+		unitsByType.put(UnitEnum.ARCHER, archers);
+		unitsByType.put(UnitEnum.GIANT, giants);
 		
 		return unitsByType;
 	}
 	
-	public static Unit getMyQueen(Map<UnitType, List<Unit>> unitsByType) {
-		List<Unit> queens = unitsByType.get(UnitType.QUEEN);
+	public static Unit getMyQueen(Map<UnitEnum, List<Unit>> unitsByType) {
+		List<Unit> queens = unitsByType.get(UnitEnum.QUEEN);
 		for (Unit queen : queens) {
-			if (queen.getOwner() == Owner.ALLY.getOwnerId()) {
+			if (queen.getOwner() == OwnerEnum.ALLY.getId()) {
 				return queen;
 			}
 		}

@@ -2,8 +2,8 @@ package com.mgaurat.utils;
 
 import java.util.Collection;
 
-import com.mgaurat.enums.StructureType;
-import com.mgaurat.enums.UnitType;
+import com.mgaurat.enums.StructureEnum;
+import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
 
@@ -17,8 +17,8 @@ public final class StructuresUtils {
         for (Site site : sites) {
         	structure = site.getStructure();
         	if (structure.isOwnedByMe() 
-        			&& structure.getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()
-        			&& structure.getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+        			&& structure.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+        			&& structure.getParam2() == UnitEnum.KNIGHT.getId()) {
         		return true;
         	}
         }
@@ -30,8 +30,8 @@ public final class StructuresUtils {
         for (Site site : sites) {
         	structure = site.getStructure();
         	if (structure.isOwnedByMe() 
-        			&& structure.getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()
-        			&& structure.getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+        			&& structure.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+        			&& structure.getParam2() == UnitEnum.KNIGHT.getId()) {
         		return site;
         	}
         }
@@ -44,7 +44,7 @@ public final class StructuresUtils {
         for (Site site : sites) {
         	structure = site.getStructure();
         	if (structure.isOwnedByMe() 
-        			&& structure.getStructureTypeId() == StructureType.TOWER.getStructureTypeId()) {
+        			&& structure.getStructureTypeId() == StructureEnum.TOWER.getId()) {
         		towerNumber++;
         	}
         }
@@ -58,7 +58,7 @@ public final class StructuresUtils {
     	for (Site site : sites) {
         	structure = site.getStructure();
     		if (structure.isOwnedByMe()
-    			&& structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()) {
+    			&& structure.getStructureTypeId() == StructureEnum.MINE.getId()) {
     			currentGoldProduction += structure.getParam1();
     		}
     	}
@@ -67,13 +67,13 @@ public final class StructuresUtils {
     }
     
     public static boolean isMineOwnedByMeNotInFullProduction(Structure structure) {
-    	return structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()
+    	return structure.getStructureTypeId() == StructureEnum.MINE.getId()
     			&& structure.getParam1() < structure.getMaxMineProduction();
     }
     
     public static boolean isTowerOwnedByMeNotFullLife(Structure structure) {
     	final int MAX_TOWER_LIFE = 750;
-    	return structure.getStructureTypeId() == StructureType.TOWER.getStructureTypeId()
+    	return structure.getStructureTypeId() == StructureEnum.TOWER.getId()
     			&& structure.getParam1() < MAX_TOWER_LIFE;
     }
 

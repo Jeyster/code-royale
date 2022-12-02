@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.mgaurat.enums.Owner;
-import com.mgaurat.enums.StructureType;
+import com.mgaurat.enums.OwnerEnum;
+import com.mgaurat.enums.StructureEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
@@ -56,35 +56,6 @@ public final class SitesUtils {
 		return sitesById.values();
 	}
 	
-	/**
-	 * Choose a Site to target :
-	 * 	- if at least one Site owned by me :
-	 * 		- if my QUEEN touched a MINE of mine that is not in full production and my total gold production is not reached, choose it
-	 *  	- else choose the nearest not owned by me
-	 *  - else choose the nearest
-	 *  
-	 * @param sites
-	 * @param myQueenCoordinates
-	 * @return
-	 */
-	public static Site getSiteToTarget(Map<Integer, Site> sitesById, Coordinates myQueenCoordinates, int touchedSite, int maxGoldProduction) {
-		Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
-		Site targetedSite;
-        if (SitesUtils.isAtLeastOneSiteOwnedByMe(sites)) {
-        	if (touchedSite != -1 
-        			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())
-        			&& StructuresUtils.getCurrentGoldProduction(sites) < maxGoldProduction) {
-        		targetedSite = sitesById.get(touchedSite);
-        	} else {
-        		targetedSite = SitesUtils.getNearestSiteNotOwnedByMe(sites, myQueenCoordinates);        		
-        	}
-        } else {
-        	targetedSite = SitesUtils.getNearestSite(sites, myQueenCoordinates);            	
-        }
-        
-        return targetedSite;
-	}
-	
     public static Site getNearestSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
@@ -107,7 +78,7 @@ public final class SitesUtils {
         double distanceToNearestSite = Double.MAX_VALUE;
         Coordinates siteCoordinates;
         for (Site site : sites) {            
-            if (site.getStructure().getOwner() == Owner.NOBODY.getOwnerId()) {
+            if (site.getStructure().getOwner() == OwnerEnum.NOBODY.getId()) {
             	siteCoordinates = site.getCoordinates();
             	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
             	if (distanceToSite < distanceToNearestSite) {
@@ -125,7 +96,7 @@ public final class SitesUtils {
         double distanceToNearestSite = Double.MAX_VALUE;
         Coordinates siteCoordinates;
         for (Site site : sites) {            
-            if (site.getStructure().getOwner() == Owner.NOBODY.getOwnerId()
+            if (site.getStructure().getOwner() == OwnerEnum.NOBODY.getId()
             		&& site.getStructure().getMineGold() != 0) {
             	siteCoordinates = site.getCoordinates();
             	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
@@ -144,7 +115,7 @@ public final class SitesUtils {
         double distanceToNearestSite = Double.MAX_VALUE;
         Coordinates siteCoordinates;
         for (Site site : sites) {            
-            if (site.getStructure().getOwner() != Owner.ALLY.getOwnerId()) {
+            if (site.getStructure().getOwner() != OwnerEnum.ALLY.getId()) {
             	siteCoordinates = site.getCoordinates();
             	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
             	if (distanceToSite < distanceToNearestSite) {
@@ -170,7 +141,7 @@ public final class SitesUtils {
         for (Site site : sites) {            
         	if (site.getStructure().isOwnedByMe() 
         			&& site.getStructure().getParam1() == 0 
-        			&& site.getStructure().getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()) {
+        			&& site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
         		return site;
         	}
         }

@@ -1,7 +1,7 @@
 package com.mgaurat.utils;
 
-import com.mgaurat.enums.StructureType;
-import com.mgaurat.enums.UnitType;
+import com.mgaurat.enums.StructureEnum;
+import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 
 public final class SystemOutUtils {
@@ -9,7 +9,7 @@ public final class SystemOutUtils {
 	private SystemOutUtils() {
 	}
 	
-	public static void printBuildAction(int targetedSiteId, StructureType structureType, UnitType unitType) {
+	public static void printBuildAction(int targetedSiteId, StructureEnum structureType, UnitEnum unitType) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("BUILD");
 		sb.append(" ");

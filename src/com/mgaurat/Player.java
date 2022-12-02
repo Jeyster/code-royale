@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.mgaurat.enums.StructureType;
-import com.mgaurat.enums.UnitType;
+import com.mgaurat.enums.StructureEnum;
+import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
@@ -31,7 +31,7 @@ class Player {
             Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
 
             int numUnits = in.nextInt();
-            Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByTypeFromTurnInput(in, numUnits);
+            Map<UnitEnum, List<Unit>> unitsByType = UnitsUtils.getUnitsByTypeFromTurnInput(in, numUnits);
             Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
             Coordinates myQueenCoordinates = myQueen.getCoordinates();
             
@@ -55,7 +55,7 @@ class Player {
             final int MIN_GOLD_PRODUCTION = 5;
             final int MAX_GOLD_PRODUCTION = 8;
             final int MIN_TOWER_NUMBER = 3;
-            final int MAX_TOWER_NUMBER = 4;
+            final int MAX_TOWER_NUMBER = 6;
             Site targetedSite;
             int targetedSiteId;
             if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
@@ -64,58 +64,58 @@ class Player {
             	if (touchedSite != targetedSiteId) {
                 	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
             	} else {
-            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.BARRACKS, UnitType.KNIGHT);
+            		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
         	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MIN_GOLD_PRODUCTION) {
         		if (touchedSite != -1 
         			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())) {
-            		SystemOutUtils.printBuildAction(touchedSite, StructureType.MINE, null);
+            		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         		} else {
         			targetedSite = SitesUtils.getNearestSiteNotOwnedToBuildAMine(sites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
         			} else {
-        				SystemOutUtils.printBuildAction(targetedSiteId, StructureType.MINE, null);
+        				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         			}        			
         		}
             } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) < MIN_TOWER_NUMBER) {
         		if (touchedSite != -1 
             			&& StructuresUtils.isTowerOwnedByMeNotFullLife(sitesById.get(touchedSite).getStructure())) {
-                		SystemOutUtils.printBuildAction(touchedSite, StructureType.TOWER, null);
+                		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
         		} else {
         			targetedSite = SitesUtils.getNearestFreeSite(sites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
         			} else {
-        				SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
+        				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         			}        			
         		}
         	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
         		if (touchedSite != -1 
         			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())) {
-            		SystemOutUtils.printBuildAction(touchedSite, StructureType.MINE, null);
+            		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         		} else {
         			targetedSite = SitesUtils.getNearestSiteNotOwnedToBuildAMine(sites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
         			} else {
-        				SystemOutUtils.printBuildAction(targetedSiteId, StructureType.MINE, null);
+        				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         			}        			
         		}
             } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) < MAX_TOWER_NUMBER) {
         		if (touchedSite != -1 
             			&& StructuresUtils.isTowerOwnedByMeNotFullLife(sitesById.get(touchedSite).getStructure())) {
-                		SystemOutUtils.printBuildAction(touchedSite, StructureType.TOWER, null);
+                		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
         		} else {
         			targetedSite = SitesUtils.getNearestFreeSite(sites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
         			} else {
-        				SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
+        				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         			}        			
         		}
         	} else {
