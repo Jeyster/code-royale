@@ -1,5 +1,7 @@
 package com.mgaurat.model;
 
+import com.mgaurat.enums.Owner;
+
 /**
  * Structure that is built on a Site.
  * 
@@ -65,6 +67,10 @@ public class Structure {
 
 	public int getParam2() {
 		return param2;
+	}
+	
+	public boolean isOwnedByMe() {
+		return getOwner() == Owner.ALLY.getOwnerId();
 	}
 
 }
