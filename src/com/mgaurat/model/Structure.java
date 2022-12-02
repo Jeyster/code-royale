@@ -10,47 +10,51 @@ import com.mgaurat.enums.Owner;
  */
 public class Structure {
 	
-    // Not used yet
-    private int ignore1;
-    private int ignore2;
+    // Gold left in a MINE (-1 if unknown or N/A)
+    private int mineGold;
+    
+    // Maximum MINE gold production (-1 if unknown or N/A)
+    private int maxMineProduction;
     
     // -1 : nothing is built
-    // 1 : Tower 
-    // 2 : Barrack
+    // 0 : MINE
+    // 1 : TOWER 
+    // 2 : BARRACKS
     int structureType;
     
     // -1 : nothing is built
-    // 0 : ally structure
-    // 1 : enemy structure
+    // 0 : ALLY structure
+    // 1 : ENEMY structure
     int owner;
     
     // if nothing is built = -1
-    // if Tower = life points
-    // if Barrack = turns left before TRAIN ending (0 if ready to TRAIN)
+    // if MINE = current gold production (-1 if ENEMY MINE)
+    // if TOWER = life points
+    // if BARRACKS = turns left before TRAIN ending (0 if ready to TRAIN)
     int param1;
     
-    // if nothing is built = -1
-    // if Tower = range radius
-    // if Barrack = 0 if it produces KNIGHT
+    // if nothing or a MINE is built = -1
+    // if TOWER = range radius
+    // if BARRACKS = 0 if it produces KNIGHT
     //            = 1 if it produces ARCHER
     //            = 2 if it produces GIANT
     int param2;
 
-	public Structure(int ignore1, int ignore2, int structureType, int owner, int param1, int param2) {
-		this.ignore1 = ignore1;
-		this.ignore2 = ignore2;
+	public Structure(int mineGold, int maxMineProduction, int structureType, int owner, int param1, int param2) {
+		this.mineGold = mineGold;
+		this.maxMineProduction = maxMineProduction;
 		this.structureType = structureType;
 		this.owner = owner;
 		this.param1 = param1;
 		this.param2 = param2;
 	}
 
-	public int getIgnore1() {
-		return ignore1;
+	public int getMineGold() {
+		return mineGold;
 	}
 
-	public int getIgnore2() {
-		return ignore2;
+	public int getMaxMineProduction() {
+		return maxMineProduction;
 	}
 
 	public int getStructureType() {
