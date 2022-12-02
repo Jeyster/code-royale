@@ -1,50 +1,46 @@
 package com.mgaurat;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 import com.mgaurat.enums.UnitType;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
-import com.mgaurat.utils.GameBoardUtil;
+import com.mgaurat.utils.SitesUtils;
+import com.mgaurat.utils.StructuresUtils;
+import com.mgaurat.utils.UnitsUtils;
 
-import java.io.*;
-import java.math.*;
-
-/**
- * Auto-generated code below aims at helping you parse
- * the standard input according to the problem statement.
- **/
 class Player {
 
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
         int numSites = in.nextInt();
 
-        Map<Integer, Site> sitesById = GameBoardUtil.getSitesFromInitialInput(in, numSites);
+        Map<Integer, Site> sitesById = SitesUtils.getSitesFromInitialInput(in, numSites);
 
         // game loop
         while (true) {
             int gold = in.nextInt();
             int touchedSite = in.nextInt(); // -1 if none
 
-            GameBoardUtil.updateSitesFromTurnInput(in, numSites, sitesById);
+            SitesUtils.updateSitesFromTurnInput(in, numSites, sitesById);
+            Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
 
             int numUnits = in.nextInt();
-            Map<UnitType, List<Unit>> unitsByType = GameBoardUtil.getUnitsByType(in, numUnits);
-            Unit myQueen = GameBoardUtil.getMyQueen(unitsByType);
+            Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByType(in, numUnits);
+            Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
             Coordinates myQueenCordinates = myQueen.getCoordinates();
-
-            // Write an action using System.out.println()
-            // To debug: System.err.println("Debug messages...");
 
             // First line: A valid queen action
             // Second line: A set of training instructions
             //System.out.println("WAIT");
             Site nearestSiteToMoveOn;
-            if (GameBoardUtil.isAtLeastOneSiteOwned(sitesById)) {
-            	nearestSiteToMoveOn = GameBoardUtil.getNearestSiteNotOwned(sitesById, myQueenCordinates);
+            if (SitesUtils.isAtLeastOneSiteOwned(sites)) {
+            	nearestSiteToMoveOn = SitesUtils.getNearestSiteNotOwned(sites, myQueenCordinates);
             } else {
-            	nearestSiteToMoveOn = GameBoardUtil.getNearestSite(sitesById, myQueenCordinates);            	
+            	nearestSiteToMoveOn = SitesUtils.getNearestSite(sites, myQueenCordinates);            	
             }
             int nearestSiteId = nearestSiteToMoveOn.getId();
             Coordinates nearestSiteCoordinates = nearestSiteToMoveOn.getCoordinates();
@@ -52,19 +48,19 @@ class Player {
             int yTarget = nearestSiteCoordinates.getY();
             
             if (touchedSite == nearestSiteId) {
-            	if (!GameBoardUtil.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
+            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
             		System.out.println("BUILD " + nearestSiteId + " BARRACKS-KNIGHT");
             	} else {
             		System.out.println("BUILD " + nearestSiteId + " TOWER");
             	}
-            } else if (GameBoardUtil.getNumberOfTowerOwnedByMe(sitesById) == 6) {
-            	Site knightBarrack = GameBoardUtil.getAKnightBarrackOwnedByMe(sitesById);
+            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sitesById) == 6) {
+            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sitesById);
                 System.out.println("MOVE " + knightBarrack.getCoordinates().getX() + " " + knightBarrack.getCoordinates().getY());
             } else {	
                 System.out.println("MOVE " + xTarget + " " + yTarget);
             }
 
-            Site siteToTrain = GameBoardUtil.getASiteToTrain(sitesById);
+            Site siteToTrain = SitesUtils.getASiteToTrain(sites);
             if (siteToTrain != null) {
                 System.out.println("TRAIN " + siteToTrain.getId());
             } else {

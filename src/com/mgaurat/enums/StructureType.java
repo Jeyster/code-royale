@@ -5,14 +5,14 @@ public enum StructureType {
 	TOWER(1),
 	BARRACK(2);
 	
-	private int structureType;
+	private int structureTypeId;
 
-	private StructureType(int structureType) {
-		this.structureType = structureType;
+	private StructureType(int structureTypeId) {
+		this.structureTypeId = structureTypeId;
 	}
 
 	public int getStructureType() {
-		return structureType;
+		return structureTypeId;
 	}
 
 }

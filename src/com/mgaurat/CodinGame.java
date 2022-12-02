@@ -1,17 +1,9 @@
-import java.util.*;
-
-import com.mgaurat.enums.Owner;
-import com.mgaurat.enums.StructureType;
-import com.mgaurat.enums.UnitType;
-import com.mgaurat.model.Coordinates;
-import com.mgaurat.model.Site;
-import com.mgaurat.model.Structure;
-import com.mgaurat.model.Unit;
-import com.mgaurat.utils.GameBoardUtil;
-import com.mgaurat.utils.MathUtils;
-
-import java.io.*;
-import java.math.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Auto-generated code below aims at helping you parse
@@ -23,18 +15,19 @@ class Player {
         Scanner in = new Scanner(System.in);
         int numSites = in.nextInt();
 
-        Map<Integer, Site> sitesById = GameBoardUtil.getSitesFromInitialInput(in, numSites);
+        Map<Integer, Site> sitesById = SitesUtils.getSitesFromInitialInput(in, numSites);
 
         // game loop
         while (true) {
             int gold = in.nextInt();
             int touchedSite = in.nextInt(); // -1 if none
 
-            GameBoardUtil.updateSitesFromTurnInput(in, numSites, sitesById);
+            SitesUtils.updateSitesFromTurnInput(in, numSites, sitesById);
+            Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
 
             int numUnits = in.nextInt();
-            Map<UnitType, List<Unit>> unitsByType = GameBoardUtil.getUnitsByType(in, numUnits);
-            Unit myQueen = GameBoardUtil.getMyQueen(unitsByType);
+            Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByType(in, numUnits);
+            Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
             Coordinates myQueenCordinates = myQueen.getCoordinates();
 
             // Write an action using System.out.println()
@@ -44,10 +37,10 @@ class Player {
             // Second line: A set of training instructions
             //System.out.println("WAIT");
             Site nearestSiteToMoveOn;
-            if (GameBoardUtil.isAtLeastOneSiteOwned(sitesById)) {
-            	nearestSiteToMoveOn = GameBoardUtil.getNearestSiteNotOwned(sitesById, myQueenCordinates);
+            if (SitesUtils.isAtLeastOneSiteOwned(sites)) {
+            	nearestSiteToMoveOn = SitesUtils.getNearestSiteNotOwned(sites, myQueenCordinates);
             } else {
-            	nearestSiteToMoveOn = GameBoardUtil.getNearestSite(sitesById, myQueenCordinates);            	
+            	nearestSiteToMoveOn = SitesUtils.getNearestSite(sites, myQueenCordinates);            	
             }
             int nearestSiteId = nearestSiteToMoveOn.getId();
             Coordinates nearestSiteCoordinates = nearestSiteToMoveOn.getCoordinates();
@@ -55,19 +48,19 @@ class Player {
             int yTarget = nearestSiteCoordinates.getY();
             
             if (touchedSite == nearestSiteId) {
-            	if (!GameBoardUtil.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
+            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
             		System.out.println("BUILD " + nearestSiteId + " BARRACKS-KNIGHT");
             	} else {
             		System.out.println("BUILD " + nearestSiteId + " TOWER");
             	}
-            } else if (GameBoardUtil.getNumberOfTowerOwnedByMe(sitesById) == 4) {
-            	Site knightBarrack = GameBoardUtil.getAKnightBarrackOwnedByMe(sitesById);
+            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sitesById) == 6) {
+            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sitesById);
                 System.out.println("MOVE " + knightBarrack.getCoordinates().getX() + " " + knightBarrack.getCoordinates().getY());
             } else {	
                 System.out.println("MOVE " + xTarget + " " + yTarget);
             }
 
-            Site siteToTrain = GameBoardUtil.getASiteToTrain(sitesById);
+            Site siteToTrain = SitesUtils.getASiteToTrain(sites);
             if (siteToTrain != null) {
                 System.out.println("TRAIN " + siteToTrain.getId());
             } else {
@@ -261,23 +254,6 @@ enum UnitType {
 
 }
 
-enum StructureType {
-	
-	TOWER(1),
-	BARRACK(2);
-	
-	private int structureType;
-
-	private StructureType(int structureType) {
-		this.structureType = structureType;
-	}
-
-	public int getStructureType() {
-		return structureType;
-	}
-
-}
-
 enum Owner {
 	
 	ALLY(0),
@@ -291,6 +267,23 @@ enum Owner {
 
 	public int getOwnerId() {
 		return ownerId;
+	}
+
+}
+
+enum StructureType {
+	
+	TOWER(1),
+	BARRACK(2);
+	
+	private int structureType;
+
+	private StructureType(int structureType) {
+		this.structureType = structureType;
+	}
+
+	public int getStructureType() {
+		return structureType;
 	}
 
 }
@@ -311,9 +304,9 @@ final class MathUtils {
 
 }
 
-final class GameBoardUtil {
+final class SitesUtils {
 	
-	private GameBoardUtil() {
+	private SitesUtils() {
 	}
 	
 	public static Map<Integer, Site> getSitesFromInitialInput(Scanner in, int numSites) {
@@ -350,6 +343,119 @@ final class GameBoardUtil {
             site = sitesById.get(siteId);
             site.setStructure(structure);
         }
+	}
+	
+	public static Collection<Site> getSitesCollection(Map<Integer, Site> sitesById) {
+		return sitesById.values();
+	}
+	
+    public static Site getNearestSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
+        Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {
+            siteCoordinates = site.getCoordinates();
+            distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+            if (distanceToSite < distanceToNearestSite) {
+                distanceToNearestSite = distanceToSite;
+                nearestSite = site;
+            }
+        }
+        return nearestSite;
+    }
+    
+    public static Site getNearestSiteNotOwned(Collection<Site> sites, Coordinates myQueenCoordinates) {
+        Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {            
+            if (site.getStructure().getOwner() != Owner.ALLY.getOwnerId()) {
+            	siteCoordinates = site.getCoordinates();
+            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+            	if (distanceToSite < distanceToNearestSite) {
+            		distanceToNearestSite = distanceToSite;
+            		nearestSite = site;
+            	}            	
+            }
+        }
+        return nearestSite;
+    }
+    
+    public static boolean isAtLeastOneSiteOwned(Collection<Site> sites) {
+        for (Site site : sites) {            
+        	if (site.getStructure().isOwnedByMe()) {
+        		return true;
+        	}
+        }
+        return false;
+
+    }
+    
+    public static Site getASiteToTrain(Collection<Site> sites) {
+        for (Site site : sites) {            
+        	if (site.getStructure().isOwnedByMe() 
+        			&& site.getStructure().getParam1() == 0 
+        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()) {
+        		return site;
+        	}
+        }
+        return null;
+    }
+
+}
+
+final class StructuresUtils {
+	
+	private StructuresUtils() {
+	}
+	
+    public static boolean isAtLeastOneKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
+    	Site site;
+        for (int i = 0; i < sites.size(); i++) {
+        	site = sites.get(i);
+        	if (site.getStructure().isOwnedByMe() 
+        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()
+        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+        		return true;
+        	}
+        }
+        return false;
+    }
+    
+    public static Site getAKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
+    	Site site;
+        for (int i = 0; i < sites.size(); i++) {
+        	site = sites.get(i);
+        	if (site.getStructure().isOwnedByMe() 
+        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()
+        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+        		return site;
+        	}
+        }
+        return null;
+    }
+    
+    public static int getNumberOfTowerOwnedByMe(Map<Integer, Site> sites) {
+    	int towerNumber = 0;
+    	Site site;
+        for (int i = 0; i < sites.size(); i++) {
+        	site = sites.get(i);
+        	if (site.getStructure().isOwnedByMe() 
+        			&& site.getStructure().getStructureType() == StructureType.TOWER.getStructureType()) {
+        		towerNumber++;
+        	}
+        }
+        
+        return towerNumber;
+    }
+
+}
+
+final class UnitsUtils {
+	
+	private UnitsUtils() {
 	}
 	
 	public static Map<UnitType, List<Unit>> getUnitsByType(Scanner in, int numUnits) {
@@ -410,110 +516,7 @@ final class GameBoardUtil {
 		
 		return null;
 	}
-	
-    public static Site getNearestSite(Map<Integer, Site> sites, Coordinates myQueenCoordinates) {
-        Site nearestSite = null;
-        double distanceToSite;
-        double distanceToNearestSite = Double.MAX_VALUE;
-        Site site;
-        Coordinates siteCoordinates;
-        for (int i = 0; i < sites.size(); i++) {
-            site = sites.get(i);
-            siteCoordinates = site.getCoordinates();
-            distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
-            if (distanceToSite < distanceToNearestSite) {
-                distanceToNearestSite = distanceToSite;
-                nearestSite = site;
-            }
-        }
-        return nearestSite;
-    }
-    
-    public static Site getNearestSiteNotOwned(Map<Integer, Site> sites, Coordinates myQueenCoordinates) {
-        Site nearestSite = null;
-        double distanceToSite;
-        double distanceToNearestSite = Double.MAX_VALUE;
-        Site site;
-        Coordinates siteCoordinates;
-        for (int i = 0; i < sites.size(); i++) {
-            site = sites.get(i);
-            
-            if (site.getStructure().getOwner() != Owner.ALLY.getOwnerId()) {
-            	siteCoordinates = site.getCoordinates();
-            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
-            	if (distanceToSite < distanceToNearestSite) {
-            		distanceToNearestSite = distanceToSite;
-            		nearestSite = site;
-            	}            	
-            }
-        }
-        return nearestSite;
-    }
-    
-    public static boolean isAtLeastOneSiteOwned(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe()) {
-        		return true;
-        	}
-        }
-        return false;
-
-    }
-    
-    public static Site getASiteToTrain(Map<Integer, Site> sites) {
-    	Site site = null;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getParam1() == 0 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()) {
-        		return site;
-        	}
-        }
-        return site;
-    }
-    
-    public static boolean isAtLeastOneKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()
-        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
-        		return true;
-        	}
-        }
-        return false;
-    }
-    
-    public static Site getAKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACK.getStructureType()
-        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
-        		return site;
-        	}
-        }
-        return null;
-    }
-    
-    public static int getNumberOfTowerOwnedByMe(Map<Integer, Site> sites) {
-    	int towerNumber = 0;
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.TOWER.getStructureType()) {
-        		towerNumber++;
-        	}
-        }
-        
-        return towerNumber;
-    }
 
 }
+
 
