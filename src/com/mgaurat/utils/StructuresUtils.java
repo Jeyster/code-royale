@@ -1,54 +1,74 @@
 package com.mgaurat.utils;
 
-import java.util.Map;
+import java.util.Collection;
 
 import com.mgaurat.enums.StructureType;
 import com.mgaurat.enums.UnitType;
 import com.mgaurat.model.Site;
+import com.mgaurat.model.Structure;
 
 public final class StructuresUtils {
 	
 	private StructuresUtils() {
 	}
 	
-    public static boolean isAtLeastOneKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()
-        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+    public static boolean isAtLeastOneKnightBarrackOwnedByMe(Collection<Site> sites) {
+    	Structure structure;
+        for (Site site : sites) {
+        	structure = site.getStructure();
+        	if (structure.isOwnedByMe() 
+        			&& structure.getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()
+        			&& structure.getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
         		return true;
         	}
         }
         return false;
     }
     
-    public static Site getAKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()
-        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+    public static Site getAKnightBarrackOwnedByMe(Collection<Site> sites) {
+    	Structure structure;
+        for (Site site : sites) {
+        	structure = site.getStructure();
+        	if (structure.isOwnedByMe() 
+        			&& structure.getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()
+        			&& structure.getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
         		return site;
         	}
         }
         return null;
     }
     
-    public static int getNumberOfTowerOwnedByMe(Map<Integer, Site> sites) {
+    public static int getNumberOfTowerOwnedByMe(Collection<Site> sites) {
     	int towerNumber = 0;
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.TOWER.getStructureType()) {
+    	Structure structure;
+        for (Site site : sites) {
+        	structure = site.getStructure();
+        	if (structure.isOwnedByMe() 
+        			&& structure.getStructureTypeId() == StructureType.TOWER.getStructureTypeId()) {
         		towerNumber++;
         	}
         }
         
         return towerNumber;
+    }
+    
+    public static int getCurrentGoldProduction(Collection<Site> sites) {
+    	int currentGoldProduction = 0;
+    	Structure structure;
+    	for (Site site : sites) {
+        	structure = site.getStructure();
+    		if (structure.isOwnedByMe()
+    			&& structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()) {
+    			currentGoldProduction += structure.getParam1();
+    		}
+    	}
+    	
+    	return currentGoldProduction;
+    }
+    
+    public static boolean isMineOwnedByMeNotInFullProduction(Structure structure) {
+    	return structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()
+    			&& structure.getParam1() < structure.getMaxMineProduction();
     }
 
 }

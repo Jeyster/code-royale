@@ -12,7 +12,7 @@ public enum StructureType {
 		this.structureTypeId = structureTypeId;
 	}
 
-	public int getStructureType() {
+	public int getStructureTypeId() {
 		return structureTypeId;
 	}
 

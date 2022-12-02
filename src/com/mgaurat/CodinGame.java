@@ -1,3 +1,4 @@
+package com.mgaurat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,34 +38,33 @@ class Player {
             int numUnits = in.nextInt();
             Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByType(in, numUnits);
             Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
-            Coordinates myQueenCordinates = myQueen.getCoordinates();
+            Coordinates myQueenCoordinates = myQueen.getCoordinates();
 
             // Choose a target Site :
-            //	- if no Site owned by me, choose the nearest
-            //	- else choose the nearest not owned by me
-            Site targetedSite;
-            if (SitesUtils.isAtLeastOneSiteOwnedByMe(sites)) {
-            	targetedSite = SitesUtils.getNearestSiteNotOwnedByMe(sites, myQueenCordinates);
-            } else {
-            	targetedSite = SitesUtils.getNearestSite(sites, myQueenCordinates);            	
-            }
+            final int MAX_GOLD_PRODUCTION = 10;
+            Site targetedSite = SitesUtils.getSiteToTarget(sitesById, myQueenCoordinates, touchedSite, MAX_GOLD_PRODUCTION);
             int targetedSiteId = targetedSite.getId();
             
             // 1) First turn action is to BUILD if possible. Else is MOVE.
             //		a) BUILD when touching the targeted Site :
-            //			- if I don't owned a Knight Barrack, build it
-            //			- else build a Tower
+            //			- if I don't owned a KNIGHT BARRACKS, build it
+            //			- if my gold production is not sufficient (< MAX_GOLD_PRODUCTION), build a MINE or improve it
+            //			- else build a TOWER
             //		b) else MOVE :
-            //			- if already build a sufficient number of Structures, move back to the Knight Barrack
+            //			- if already build a sufficient number of TOWER (MAX_TOWER_NUMBER), move back to the KNIGHT BARRACKS
             //			- else move to the targeted site
+            
+            final int MAX_TOWER_NUMBER = 6;
             if (touchedSite == targetedSiteId) {
-            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
+            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.BARRACKS, UnitType.KNIGHT);
+            	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
+            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.MINE, null);
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
             	}
-            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sitesById) == 6) {
-            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sitesById);
+            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) == MAX_TOWER_NUMBER) {
+            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sites);
             	SystemOutUtils.printMoveAction(knightBarrack.getCoordinates());
             } else {	
             	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
@@ -104,7 +104,6 @@ class Coordinates {
     
 }
 
-
 class Site {
 	
 	private int id;
@@ -142,51 +141,55 @@ class Site {
 
 class Structure {
 	
-    // Not used yet
-    private int ignore1;
-    private int ignore2;
+    // Gold left in a MINE (-1 if unknown or N/A)
+    private int mineGold;
+    
+    // Maximum MINE gold production (-1 if unknown or N/A)
+    private int maxMineProduction;
     
     // -1 : nothing is built
-    // 1 : Tower 
-    // 2 : Barrack
-    int structureType;
+    // 0 : MINE
+    // 1 : TOWER 
+    // 2 : BARRACKS
+    int structureTypeId;
     
     // -1 : nothing is built
-    // 0 : ally structure
-    // 1 : enemy structure
+    // 0 : ALLY structure
+    // 1 : ENEMY structure
     int owner;
     
     // if nothing is built = -1
-    // if Tower = life points
-    // if Barrack = turns left before TRAIN ending (0 if ready to TRAIN)
+    // if MINE = current gold production (-1 if ENEMY MINE)
+    // if TOWER = life points
+    // if BARRACKS = turns left before TRAIN ending (0 if ready to TRAIN)
     int param1;
     
-    // if nothing is built = -1
-    // if Tower = range radius
-    // if Barrack = 0 if it produces KNIGHT
+    // if nothing or a MINE is built = -1
+    // if TOWER = range radius
+    // if BARRACKS = 0 if it produces KNIGHT
     //            = 1 if it produces ARCHER
     //            = 2 if it produces GIANT
     int param2;
 
-	public Structure(int ignore1, int ignore2, int structureType, int owner, int param1, int param2) {
-		this.ignore1 = ignore1;
-		this.ignore2 = ignore2;
-		this.structureType = structureType;
+	public Structure(int mineGold, int maxMineProduction, int structureType, int owner, int param1, int param2) {
+		this.mineGold = mineGold;
+		this.maxMineProduction = maxMineProduction;
+		this.structureTypeId = structureType;
 		this.owner = owner;
 		this.param1 = param1;
 		this.param2 = param2;
 	}
 
-	public int getIgnore1() {
-		return ignore1;
+	public int getMineGold() {
+		return mineGold;
 	}
 
-	public int getIgnore2() {
-		return ignore2;
+	public int getMaxMineProduction() {
+		return maxMineProduction;
 	}
 
-	public int getStructureType() {
-		return structureType;
+	public int getStructureTypeId() {
+		return structureTypeId;
 	}
 
 	public int getOwner() {
@@ -247,6 +250,60 @@ class Unit {
 		return health;
 	}
  
+}
+
+enum Owner {
+	
+	ALLY(0),
+	ENEMY(1);
+	
+	private int ownerId;
+
+	private Owner(int ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public int getOwnerId() {
+		return ownerId;
+	}
+
+}
+
+enum StructureType {
+	
+	MINE(0),
+	TOWER(1),
+	BARRACKS(2);
+	
+	private int structureTypeId;
+
+	private StructureType(int structureTypeId) {
+		this.structureTypeId = structureTypeId;
+	}
+
+	public int getStructureTypeId() {
+		return structureTypeId;
+	}
+
+}
+
+enum UnitType {
+	
+	QUEEN(-1),
+	KNIGHT(0),
+	ARCHER(1),
+	GIANT(2);
+	
+	private int unitTypeId;
+
+	private UnitType(int unitTypeId) {
+		this.unitTypeId = unitTypeId;
+	}
+
+	public int getUnitTypeId() {
+		return unitTypeId;
+	}
+
 }
 
 final class MathUtils {
@@ -310,6 +367,35 @@ final class SitesUtils {
 		return sitesById.values();
 	}
 	
+	/**
+	 * Choose a Site to target :
+	 * 	- if at least one Site owned by me :
+	 * 		- if my QUEEN touched a MINE of mine that is not in full production and my total gold production is not reached, choose it
+	 *  	- else choose the nearest not owned by me
+	 *  - else choose the nearest
+	 *  
+	 * @param sites
+	 * @param myQueenCoordinates
+	 * @return
+	 */
+	public static Site getSiteToTarget(Map<Integer, Site> sitesById, Coordinates myQueenCoordinates, int touchedSite, int maxGoldProduction) {
+		Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
+		Site targetedSite;
+        if (SitesUtils.isAtLeastOneSiteOwnedByMe(sites)) {
+        	if (touchedSite != -1 
+        			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())
+        			&& StructuresUtils.getCurrentGoldProduction(sites) < maxGoldProduction) {
+        		targetedSite = sitesById.get(touchedSite);
+        	} else {
+        		targetedSite = SitesUtils.getNearestSiteNotOwnedByMe(sites, myQueenCoordinates);        		
+        	}
+        } else {
+        	targetedSite = SitesUtils.getNearestSite(sites, myQueenCoordinates);            	
+        }
+        
+        return targetedSite;
+	}
+	
     public static Site getNearestSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
@@ -358,7 +444,7 @@ final class SitesUtils {
         for (Site site : sites) {            
         	if (site.getStructure().isOwnedByMe() 
         			&& site.getStructure().getParam1() == 0 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()) {
+        			&& site.getStructure().getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()) {
         		return site;
         	}
         }
@@ -372,44 +458,63 @@ final class StructuresUtils {
 	private StructuresUtils() {
 	}
 	
-    public static boolean isAtLeastOneKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()
-        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+    public static boolean isAtLeastOneKnightBarrackOwnedByMe(Collection<Site> sites) {
+    	Structure structure;
+        for (Site site : sites) {
+        	structure = site.getStructure();
+        	if (structure.isOwnedByMe() 
+        			&& structure.getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()
+        			&& structure.getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
         		return true;
         	}
         }
         return false;
     }
     
-    public static Site getAKnightBarrackOwnedByMe(Map<Integer, Site> sites) {
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()
-        			&& site.getStructure().getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
+    public static Site getAKnightBarrackOwnedByMe(Collection<Site> sites) {
+    	Structure structure;
+        for (Site site : sites) {
+        	structure = site.getStructure();
+        	if (structure.isOwnedByMe() 
+        			&& structure.getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()
+        			&& structure.getParam2() == UnitType.KNIGHT.getUnitTypeId()) {
         		return site;
         	}
         }
         return null;
     }
     
-    public static int getNumberOfTowerOwnedByMe(Map<Integer, Site> sites) {
+    public static int getNumberOfTowerOwnedByMe(Collection<Site> sites) {
     	int towerNumber = 0;
-    	Site site;
-        for (int i = 0; i < sites.size(); i++) {
-        	site = sites.get(i);
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getStructureType() == StructureType.TOWER.getStructureType()) {
+    	Structure structure;
+        for (Site site : sites) {
+        	structure = site.getStructure();
+        	if (structure.isOwnedByMe() 
+        			&& structure.getStructureTypeId() == StructureType.TOWER.getStructureTypeId()) {
         		towerNumber++;
         	}
         }
         
         return towerNumber;
+    }
+    
+    public static int getCurrentGoldProduction(Collection<Site> sites) {
+    	int currentGoldProduction = 0;
+    	Structure structure;
+    	for (Site site : sites) {
+        	structure = site.getStructure();
+    		if (structure.isOwnedByMe()
+    			&& structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()) {
+    			currentGoldProduction += structure.getParam1();
+    		}
+    	}
+    	
+    	return currentGoldProduction;
+    }
+    
+    public static boolean isMineOwnedByMeNotInFullProduction(Structure structure) {
+    	return structure.getStructureTypeId() == StructureType.MINE.getStructureTypeId()
+    			&& structure.getParam1() < structure.getMaxMineProduction();
     }
 
 }
@@ -522,57 +627,3 @@ final class SystemOutUtils {
 	}
 
 }
-
-enum Owner {
-	
-	ALLY(0),
-	ENEMY(1);
-	
-	private int ownerId;
-
-	private Owner(int ownerId) {
-		this.ownerId = ownerId;
-	}
-
-	public int getOwnerId() {
-		return ownerId;
-	}
-
-}
-
-enum StructureType {
-	
-	TOWER(1),
-	BARRACKS(2);
-	
-	private int structureTypeId;
-
-	private StructureType(int structureTypeId) {
-		this.structureTypeId = structureTypeId;
-	}
-
-	public int getStructureType() {
-		return structureTypeId;
-	}
-
-}
-
-enum UnitType {
-	
-	QUEEN(-1),
-	KNIGHT(0),
-	ARCHER(1),
-	GIANT(2);
-	
-	private int unitTypeId;
-
-	private UnitType(int unitTypeId) {
-		this.unitTypeId = unitTypeId;
-	}
-
-	public int getUnitTypeId() {
-		return unitTypeId;
-	}
-
-}
-

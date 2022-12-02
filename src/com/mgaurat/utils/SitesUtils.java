@@ -56,6 +56,35 @@ public final class SitesUtils {
 		return sitesById.values();
 	}
 	
+	/**
+	 * Choose a Site to target :
+	 * 	- if at least one Site owned by me :
+	 * 		- if my QUEEN touched a MINE of mine that is not in full production and my total gold production is not reached, choose it
+	 *  	- else choose the nearest not owned by me
+	 *  - else choose the nearest
+	 *  
+	 * @param sites
+	 * @param myQueenCoordinates
+	 * @return
+	 */
+	public static Site getSiteToTarget(Map<Integer, Site> sitesById, Coordinates myQueenCoordinates, int touchedSite, int maxGoldProduction) {
+		Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
+		Site targetedSite;
+        if (SitesUtils.isAtLeastOneSiteOwnedByMe(sites)) {
+        	if (touchedSite != -1 
+        			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())
+        			&& StructuresUtils.getCurrentGoldProduction(sites) < maxGoldProduction) {
+        		targetedSite = sitesById.get(touchedSite);
+        	} else {
+        		targetedSite = SitesUtils.getNearestSiteNotOwnedByMe(sites, myQueenCoordinates);        		
+        	}
+        } else {
+        	targetedSite = SitesUtils.getNearestSite(sites, myQueenCoordinates);            	
+        }
+        
+        return targetedSite;
+	}
+	
     public static Site getNearestSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
@@ -104,7 +133,7 @@ public final class SitesUtils {
         for (Site site : sites) {            
         	if (site.getStructure().isOwnedByMe() 
         			&& site.getStructure().getParam1() == 0 
-        			&& site.getStructure().getStructureType() == StructureType.BARRACKS.getStructureType()) {
+        			&& site.getStructure().getStructureTypeId() == StructureType.BARRACKS.getStructureTypeId()) {
         		return site;
         	}
         }

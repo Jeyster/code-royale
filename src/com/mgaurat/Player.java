@@ -33,34 +33,33 @@ class Player {
             int numUnits = in.nextInt();
             Map<UnitType, List<Unit>> unitsByType = UnitsUtils.getUnitsByType(in, numUnits);
             Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
-            Coordinates myQueenCordinates = myQueen.getCoordinates();
+            Coordinates myQueenCoordinates = myQueen.getCoordinates();
 
             // Choose a target Site :
-            //	- if no Site owned by me, choose the nearest
-            //	- else choose the nearest not owned by me
-            Site targetedSite;
-            if (SitesUtils.isAtLeastOneSiteOwnedByMe(sites)) {
-            	targetedSite = SitesUtils.getNearestSiteNotOwnedByMe(sites, myQueenCordinates);
-            } else {
-            	targetedSite = SitesUtils.getNearestSite(sites, myQueenCordinates);            	
-            }
+            final int MAX_GOLD_PRODUCTION = 8;
+            Site targetedSite = SitesUtils.getSiteToTarget(sitesById, myQueenCoordinates, touchedSite, MAX_GOLD_PRODUCTION);
             int targetedSiteId = targetedSite.getId();
             
             // 1) First turn action is to BUILD if possible. Else is MOVE.
             //		a) BUILD when touching the targeted Site :
-            //			- if I don't owned a Knight Barrack, build it
-            //			- else build a Tower
+            //			- if I don't owned a KNIGHT BARRACKS, build it
+            //			- if my gold production is not sufficient (< MAX_GOLD_PRODUCTION), build a MINE or improve it
+            //			- else build a TOWER
             //		b) else MOVE :
-            //			- if already build a sufficient number of Structures, move back to the Knight Barrack
+            //			- if already build a sufficient number of TOWER (MAX_TOWER_NUMBER), move back to the KNIGHT BARRACKS
             //			- else move to the targeted site
+            
+            final int MAX_TOWER_NUMBER = 4;
             if (touchedSite == targetedSiteId) {
-            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sitesById)) {
+            	if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.BARRACKS, UnitType.KNIGHT);
+            	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
+            		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.MINE, null);
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureType.TOWER, null);
             	}
-            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sitesById) == 6) {
-            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sitesById);
+            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) == MAX_TOWER_NUMBER) {
+            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sites);
             	SystemOutUtils.printMoveAction(knightBarrack.getCoordinates());
             } else {	
             	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
@@ -71,7 +70,7 @@ class Player {
             //		- else train nothing
             Site siteToTrain = SitesUtils.getASiteToTrain(sites);
             if (siteToTrain != null) {
-                SystemOutUtils.printTrainAction(targetedSiteId);
+                SystemOutUtils.printTrainAction(siteToTrain.getId());
             } else {
                 SystemOutUtils.printTrainAction(0);
             }

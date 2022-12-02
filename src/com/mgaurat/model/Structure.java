@@ -20,7 +20,7 @@ public class Structure {
     // 0 : MINE
     // 1 : TOWER 
     // 2 : BARRACKS
-    int structureType;
+    int structureTypeId;
     
     // -1 : nothing is built
     // 0 : ALLY structure
@@ -43,7 +43,7 @@ public class Structure {
 	public Structure(int mineGold, int maxMineProduction, int structureType, int owner, int param1, int param2) {
 		this.mineGold = mineGold;
 		this.maxMineProduction = maxMineProduction;
-		this.structureType = structureType;
+		this.structureTypeId = structureType;
 		this.owner = owner;
 		this.param1 = param1;
 		this.param2 = param2;
@@ -57,8 +57,8 @@ public class Structure {
 		return maxMineProduction;
 	}
 
-	public int getStructureType() {
-		return structureType;
+	public int getStructureTypeId() {
+		return structureTypeId;
 	}
 
 	public int getOwner() {
