@@ -28,8 +28,21 @@ class Player {
             int gold = in.nextInt();
             int touchedSite = in.nextInt(); // -1 if none
 
-            SitesUtils.updateSitesFromTurnInput(in, numSites, sitesById);
-            Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
+            Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> sitesByIdAndStructureAndOwner = SitesUtils.updateSitesFromTurnInput(in, sitesById);
+            Map<Integer, Site> emptySitesById = sitesByIdAndStructureAndOwner.get(OwnerEnum.NOBODY).get(StructureEnum.NOTHING);
+            Collection<Site> emptySites = SitesUtils.getSitesCollection(emptySitesById);
+            
+            Map<StructureEnum, Map<Integer, Site>> allySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ALLY);
+    		Map<Integer, Site> allyMineSitesById = allySitesByIdAndStructure.get(StructureEnum.MINE);
+            Collection<Site> allyMineSites = SitesUtils.getSitesCollection(allyMineSitesById);
+    		Map<Integer, Site> allyTowerSitesById = allySitesByIdAndStructure.get(StructureEnum.TOWER);
+    		Map<Integer, Site> allyBarracksSitesById = allySitesByIdAndStructure.get(StructureEnum.BARRACKS);
+            Collection<Site> allyBarracksSites = SitesUtils.getSitesCollection(allyBarracksSitesById);
+
+    		Map<StructureEnum, Map<Integer, Site>> enemySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ENEMY);
+    		Map<Integer, Site> enemyMineSitesById = enemySitesByIdAndStructure.get(StructureEnum.MINE);
+    		Map<Integer, Site> enemyTowerSitesById = enemySitesByIdAndStructure.get(StructureEnum.TOWER);
+    		Map<Integer, Site> enemyBarracksSitesById = enemySitesByIdAndStructure.get(StructureEnum.BARRACKS);
 
             int numUnits = in.nextInt();
             Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = UnitsUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
@@ -42,13 +55,13 @@ class Player {
             *		a) If i have no KNIGHT BARRACKS :
             *			- get the nearest free site and MOVE to it
             *			- if touching this free site, build a KNIGHT BARRACKS
-            *		b) else if my gold production is less than MIN_GOLD_PRODUCTION :
+            *		b) else if my gold production is less than MIN_GOLD_PRODUCTION and it is safe to build a MINE :
             *			- if I touch a MINE of mine that is not in full production, increase the production
             *			- else get the nearest site where a MINE can be built (gold not depleted) and MOVE on it or BUILD a MINE
             *		c) else if my TOWER number is less than MIN_TOWER_NUMBER :
             *			- if I touch a TOWER of mine that is not full life, increase its life
             *			- else get the nearest free site and MOVE on it or BUILD a TOWER
-            *		d) else if my gold production is less than MAX_GOLD_PRODUCTION :
+            *		d) else if my gold production is less than MAX_GOLD_PRODUCTION and it is safe to build a MINE :
             *			- if I touch a MINE of mine that is not in full production, increase the production
             *			- else get the nearest site where a MINE can be built (gold not depleted) and MOVE on it or BUILD a MINE
             *		e) else if my TOWER number is less than MAX_TOWER_NUMBER :
@@ -61,21 +74,21 @@ class Player {
             final int MAX_TOWER_NUMBER = 6;
             Site targetedSite;
             int targetedSiteId;
-            if (!StructuresUtils.isAtLeastOneKnightBarrackOwnedByMe(sites)) {
-            	targetedSite = SitesUtils.getNearestFreeSite(sites, myQueenCoordinates);
+            if (allyBarracksSites.isEmpty()) {
+            	targetedSite = SitesUtils.getNearestSite(emptySites, myQueenCoordinates);
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
                 	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MIN_GOLD_PRODUCTION
+        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MIN_GOLD_PRODUCTION
         			&& UnitsUtils.isItSafeToBuildAMine(myQueenCoordinates, enemyUnitsByType)) {
-        		if (touchedSite != -1 
-        			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())) {
+        		if (!allyMineSitesById.isEmpty() && allyMineSitesById.get(touchedSite) != null
+        			&& StructuresUtils.isMineNotInFullProduction(allyMineSitesById.get(touchedSite).getStructure())) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         		} else {
-        			targetedSite = SitesUtils.getNearestSiteNotOwnedToBuildAMine(sites, myQueenCoordinates);
+        			targetedSite = SitesUtils.getNearestSiteToBuildAMine(emptySites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
@@ -83,12 +96,12 @@ class Player {
         				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         			}        			
         		}
-            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) < MIN_TOWER_NUMBER) {
-        		if (touchedSite != -1 
-            			&& StructuresUtils.isTowerOwnedByMeNotFullLife(sitesById.get(touchedSite).getStructure())) {
+            } else if (allyTowerSitesById.size() < MIN_TOWER_NUMBER) {
+        		if (!allyTowerSitesById.isEmpty() && allyTowerSitesById.get(touchedSite) != null
+            			&& StructuresUtils.isTowerNotFullLife(allyTowerSitesById.get(touchedSite).getStructure())) {
                 		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
         		} else {
-        			targetedSite = SitesUtils.getNearestFreeSite(sites, myQueenCoordinates);
+        			targetedSite = SitesUtils.getNearestSite(emptySites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
@@ -96,13 +109,13 @@ class Player {
         				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         			}        			
         		}
-        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION
+        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_GOLD_PRODUCTION
         			&& UnitsUtils.isItSafeToBuildAMine(myQueenCoordinates, enemyUnitsByType)) {
-        		if (touchedSite != -1 
-        			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())) {
+        		if (!allyMineSitesById.isEmpty() && allyMineSitesById.get(touchedSite) != null
+        			&& StructuresUtils.isMineNotInFullProduction(allyMineSitesById.get(touchedSite).getStructure())) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         		} else {
-        			targetedSite = SitesUtils.getNearestSiteNotOwnedToBuildAMine(sites, myQueenCoordinates);
+        			targetedSite = SitesUtils.getNearestSiteToBuildAMine(emptySites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
@@ -110,12 +123,12 @@ class Player {
         				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         			}        			
         		}
-            } else if (StructuresUtils.getNumberOfTowerOwnedByMe(sites) < MAX_TOWER_NUMBER) {
-        		if (touchedSite != -1 
-            			&& StructuresUtils.isTowerOwnedByMeNotFullLife(sitesById.get(touchedSite).getStructure())) {
+            } else if (allyTowerSitesById.size() < MAX_TOWER_NUMBER) {
+        		if (!allyTowerSitesById.isEmpty() && allyTowerSitesById.get(touchedSite) != null
+            			&& StructuresUtils.isTowerNotFullLife(allyTowerSitesById.get(touchedSite).getStructure())) {
                 		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
         		} else {
-        			targetedSite = SitesUtils.getNearestFreeSite(sites, myQueenCoordinates);
+        			targetedSite = SitesUtils.getNearestSite(emptySites, myQueenCoordinates);
         			targetedSiteId = targetedSite.getId();
         			if (touchedSite != targetedSiteId) {
         				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
@@ -124,7 +137,7 @@ class Player {
         			}        			
         		}
         	} else {
-            	Site knightBarrack = StructuresUtils.getAKnightBarrackOwnedByMe(sites);
+            	Site knightBarrack = allyBarracksSitesById.values().iterator().next();
             	SystemOutUtils.printMoveAction(knightBarrack.getCoordinates());
         	}
 
@@ -132,7 +145,7 @@ class Player {
             *		- if there is a site available for training, do it
             *		- else train nothing
             */
-            Site siteToTrain = SitesUtils.getASiteToTrain(sites);
+            Site siteToTrain = SitesUtils.getSiteToTrain(allyBarracksSites, gold);
             if (siteToTrain != null) {
                 SystemOutUtils.printTrainAction(siteToTrain.getId());
             } else {

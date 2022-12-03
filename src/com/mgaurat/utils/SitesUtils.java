@@ -16,7 +16,7 @@ public final class SitesUtils {
 	private SitesUtils() {
 	}
 	
-	public static Map<Integer, Site> getSitesFromInitialInput(Scanner in, int numSites) {
+	public static Map<Integer, Site> getSitesFromInitialInput(Scanner in, int numSites) {		
 		Map<Integer, Site> sitesById = new HashMap<>();
         Coordinates coordinates;
         Site site;
@@ -34,10 +34,35 @@ public final class SitesUtils {
         return sitesById;
 	}
 	
-	public static void updateSitesFromTurnInput(Scanner in, int numSites, Map<Integer, Site> sitesById) {
+	public static Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> updateSitesFromTurnInput(Scanner in, Map<Integer, Site> sitesById) {
+		Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> sitesByIdAndStructureAndOwner = new HashMap<>();
+		
+		Map<StructureEnum, Map<Integer, Site>> emptySitesByIdAndStructure = new HashMap<>();
+		Map<Integer, Site> emptySitesById = new HashMap<>();
+		emptySitesByIdAndStructure.put(StructureEnum.NOTHING, emptySitesById);
+		sitesByIdAndStructureAndOwner.put(OwnerEnum.NOBODY, emptySitesByIdAndStructure);
+		
+		Map<StructureEnum, Map<Integer, Site>> allySitesByIdAndStructure = new HashMap<>();
+		Map<Integer, Site> allyMineSitesById = new HashMap<>();
+		Map<Integer, Site> allyTowerSitesById = new HashMap<>();
+		Map<Integer, Site> allyBarracksSitesById = new HashMap<>();
+		allySitesByIdAndStructure.put(StructureEnum.MINE, allyMineSitesById);
+		allySitesByIdAndStructure.put(StructureEnum.TOWER, allyTowerSitesById);
+		allySitesByIdAndStructure.put(StructureEnum.BARRACKS, allyBarracksSitesById);
+		sitesByIdAndStructureAndOwner.put(OwnerEnum.ALLY, allySitesByIdAndStructure);
+		
+		Map<StructureEnum, Map<Integer, Site>> enemySitesByIdAndStructure = new HashMap<>();
+		Map<Integer, Site> enemyMineSitesById = new HashMap<>();
+		Map<Integer, Site> enemyTowerSitesById = new HashMap<>();
+		Map<Integer, Site> enemyBarracksSitesById = new HashMap<>();
+		enemySitesByIdAndStructure.put(StructureEnum.MINE, enemyMineSitesById);
+		enemySitesByIdAndStructure.put(StructureEnum.TOWER, enemyTowerSitesById);
+		enemySitesByIdAndStructure.put(StructureEnum.BARRACKS, enemyBarracksSitesById);
+		sitesByIdAndStructureAndOwner.put(OwnerEnum.ENEMY, enemySitesByIdAndStructure);
+		
 		Structure structure;
 		Site site;
-		for (int i = 0; i < numSites; i++) {
+		for (int i = 0; i < sitesById.size(); i++) {
             int siteId = in.nextInt();
             int ignore1 = in.nextInt();
             int ignore2 = in.nextInt();
@@ -49,7 +74,29 @@ public final class SitesUtils {
             structure = new Structure(ignore1, ignore2, structureType, owner, param1, param2);
             site = sitesById.get(siteId);
             site.setStructure(structure);
+            
+            if (structure.getOwner() == OwnerEnum.NOBODY.getId()) {
+            	emptySitesById.put(siteId, site);
+            } else if (structure.getOwner() == OwnerEnum.ALLY.getId()) {
+            	if (structure.getStructureTypeId() == StructureEnum.MINE.getId()) {
+            		allyMineSitesById.put(siteId, site);
+            	} else if (structure.getStructureTypeId() == StructureEnum.TOWER.getId()) {
+            		allyTowerSitesById.put(siteId, site);
+            	} else if (structure.getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
+            		allyBarracksSitesById.put(siteId, site);
+            	}
+            } else if (structure.getOwner() == OwnerEnum.ENEMY.getId()) {
+            	if (structure.getStructureTypeId() == StructureEnum.MINE.getId()) {
+            		enemyMineSitesById.put(siteId, site);
+            	} else if (structure.getStructureTypeId() == StructureEnum.TOWER.getId()) {
+            		enemyTowerSitesById.put(siteId, site);
+            	} else if (structure.getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
+            		enemyBarracksSitesById.put(siteId, site);
+            	}
+            }
         }
+		
+		return sitesByIdAndStructureAndOwner;
 	}
 	
 	public static Collection<Site> getSitesCollection(Map<Integer, Site> sitesById) {
@@ -72,13 +119,13 @@ public final class SitesUtils {
         return nearestSite;
     }
     
-    public static Site getNearestFreeSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
+    public static Site getNearestSiteToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;
         double distanceToNearestSite = Double.MAX_VALUE;
         Coordinates siteCoordinates;
         for (Site site : sites) {            
-            if (site.getStructure().getOwner() == OwnerEnum.NOBODY.getId()) {
+            if (site.getStructure().getMineGold() != 0) {
             	siteCoordinates = site.getCoordinates();
             	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
             	if (distanceToSite < distanceToNearestSite) {
@@ -90,55 +137,8 @@ public final class SitesUtils {
         return nearestSite;
     }
     
-    public static Site getNearestSiteNotOwnedToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates) {
-        Site nearestSite = null;
-        double distanceToSite;
-        double distanceToNearestSite = Double.MAX_VALUE;
-        Coordinates siteCoordinates;
-        for (Site site : sites) {            
-            if (site.getStructure().getOwner() == OwnerEnum.NOBODY.getId()
-            		&& site.getStructure().getMineGold() != 0) {
-            	siteCoordinates = site.getCoordinates();
-            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
-            	if (distanceToSite < distanceToNearestSite) {
-            		distanceToNearestSite = distanceToSite;
-            		nearestSite = site;
-            	}            	
-            }
-        }
-        return nearestSite;
-    }
-    
-    public static Site getNearestSiteNotOwnedByMe(Collection<Site> sites, Coordinates myQueenCoordinates) {
-        Site nearestSite = null;
-        double distanceToSite;
-        double distanceToNearestSite = Double.MAX_VALUE;
-        Coordinates siteCoordinates;
-        for (Site site : sites) {            
-            if (site.getStructure().getOwner() != OwnerEnum.ALLY.getId()) {
-            	siteCoordinates = site.getCoordinates();
-            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
-            	if (distanceToSite < distanceToNearestSite) {
-            		distanceToNearestSite = distanceToSite;
-            		nearestSite = site;
-            	}            	
-            }
-        }
-        return nearestSite;
-    }
-    
-    public static boolean isAtLeastOneSiteOwnedByMe(Collection<Site> sites) {
-        for (Site site : sites) {            
-        	if (site.getStructure().isOwnedByMe()) {
-        		return true;
-        	}
-        }
-        return false;
-
-    }
-    
-    public static Site getASiteToTrain(Collection<Site> sites) {
-        for (Site site : sites) {            
+    public static Site getSiteToTrain(Collection<Site> sites, int gold) {
+        for (Site site : sites) {     
         	if (site.getStructure().isOwnedByMe() 
         			&& site.getStructure().getParam1() == 0 
         			&& site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
