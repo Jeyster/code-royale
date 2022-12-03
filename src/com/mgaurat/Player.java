@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.mgaurat.enums.OwnerEnum;
 import com.mgaurat.enums.StructureEnum;
 import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
@@ -31,8 +32,10 @@ class Player {
             Collection<Site> sites = SitesUtils.getSitesCollection(sitesById);
 
             int numUnits = in.nextInt();
-            Map<UnitEnum, List<Unit>> unitsByType = UnitsUtils.getUnitsByTypeFromTurnInput(in, numUnits);
-            Unit myQueen = UnitsUtils.getMyQueen(unitsByType);
+            Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = UnitsUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
+            Map<UnitEnum, List<Unit>> allyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ALLY);
+            Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
+            Unit myQueen = UnitsUtils.getMyQueen(allyUnitsByType);
             Coordinates myQueenCoordinates = myQueen.getCoordinates();
             
             /* 1) First turn action is to MOVE or BUILD.
@@ -66,7 +69,8 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MIN_GOLD_PRODUCTION) {
+        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MIN_GOLD_PRODUCTION
+        			&& UnitsUtils.isItSafeToBuildAMine(myQueenCoordinates, enemyUnitsByType)) {
         		if (touchedSite != -1 
         			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
@@ -92,7 +96,8 @@ class Player {
         				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         			}        			
         		}
-        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION) {
+        	} else if (StructuresUtils.getCurrentGoldProduction(sites) < MAX_GOLD_PRODUCTION
+        			&& UnitsUtils.isItSafeToBuildAMine(myQueenCoordinates, enemyUnitsByType)) {
         		if (touchedSite != -1 
         			&& StructuresUtils.isMineOwnedByMeNotInFullProduction(sitesById.get(touchedSite).getStructure())) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
