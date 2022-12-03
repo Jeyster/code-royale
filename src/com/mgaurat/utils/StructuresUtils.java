@@ -3,6 +3,7 @@ package com.mgaurat.utils;
 import java.util.Collection;
 
 import com.mgaurat.enums.StructureEnum;
+import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
 
@@ -35,6 +36,26 @@ public final class StructuresUtils {
     	
     	final int MAX_TOWER_LIFE = 750;
     	return structure.getParam1() < MAX_TOWER_LIFE;
+    }
+    
+    public static boolean isAtLeastOneAllyKnightBarracks(Collection<Site> allyBarracksSites) {
+    	for (Site site : allyBarracksSites) {
+    		if (site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()) {
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
+    
+    public static boolean isAtLeastOneAllyGiantBarracks(Collection<Site> allyBarracksSites) {
+    	for (Site site : allyBarracksSites) {
+    		if (site.getStructure().getParam2() == UnitEnum.GIANT.getId()) {
+    			return true;
+    		}
+    	}
+    	
+    	return false;
     }
 
 }

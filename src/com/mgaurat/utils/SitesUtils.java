@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import com.mgaurat.enums.OwnerEnum;
 import com.mgaurat.enums.StructureEnum;
+import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
@@ -137,15 +138,37 @@ public final class SitesUtils {
         return nearestSite;
     }
     
-    public static Site getSiteToTrain(Collection<Site> sites, int gold) {
+    public static Site getAKnightSite(Collection<Site> sites) {
         for (Site site : sites) {     
-        	if (site.getStructure().isOwnedByMe() 
-        			&& site.getStructure().getParam1() == 0 
-        			&& site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
+        	if (site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()) {
         		return site;
         	}
         }
         return null;
+    }
+    
+    public static Site getKnightSiteToTrain(Collection<Site> sites) {
+        for (Site site : sites) {     
+        	if (site.getStructure().getParam1() == 0
+        			&& site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()) {
+        		return site;
+        	}
+        }
+        return null;
+    }
+    
+    public static Site getGiantSiteToTrain(Collection<Site> sites) {
+        for (Site site : sites) {     
+        	if (site.getStructure().getParam1() == 0
+        			&& site.getStructure().getParam2() == UnitEnum.GIANT.getId()) {
+        		return site;
+        	}
+        }
+        return null;
+    }
+    
+    public static boolean isSiteInTheMap(int siteId, Map<Integer, Site> sitesById) {
+    	return !sitesById.isEmpty() && sitesById.get(siteId) != null;
     }
 
 }

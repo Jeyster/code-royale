@@ -40,7 +40,7 @@ public final class SystemOutUtils {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TRAIN");
 		
-		if (siteId > 0) {
+		if (siteId > -1) {
 			sb.append(" ");
 			sb.append(siteId);			
 		}
