@@ -80,12 +80,24 @@ class Player {
             	}
             }
             
-            final int MIN_ALLY_GOLD_PRODUCTION = 4;
+            int minAllyGoldProduction;
+            if (myQueen.getHealth() < 50) {
+            	minAllyGoldProduction = 3;
+            } else {
+            	minAllyGoldProduction = 4;            	
+            }
             final int MAX_ALLY_GOLD_PRODUCTION = 8;
-            final int MIN_ALLY_TOWER_NUMBER = 3;
-            final int MAX_ALLY_TOWER_NUMBER = 4;
+            
+            int minAllyTowerNumber;
+            if (myQueen.getHealth() < 50) {
+                minAllyTowerNumber = 1;
+            } else {
+            	minAllyTowerNumber = 2;            	
+            }
+            final int AVERAGE_ALLY_TOWER_NUMBER = 3;
+            final int MAX_ALLY_TOWER_NUMBER = 6;
             final int ENEMY_TOWER_NUMBER_THRESHOLD = 3;
-            final int LOW_LIFE_QUEEN = 20;
+            final int LOW_LIFE_QUEEN = 25;
             Site targetedSite;
             int targetedSiteId;
             Site targetedSiteToBuildAMine = SitesUtils.getNearestSiteToBuildAMine(emptySites, myQueenCoordinates);
@@ -129,6 +141,22 @@ class Player {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         	} else if (isTouchingATowerToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
+        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < minAllyGoldProduction
+        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
+        		targetedSiteId = targetedSiteToBuildAMine.getId();
+        		if (touchedSite != targetedSiteId) {
+        			SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
+        		} else {
+        			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
+        		}        			
+        	} else if (allyTowerSitesById.size() < minAllyTowerNumber) {
+        		targetedSite = nearestEmptySite;
+        		targetedSiteId = targetedSite.getId();
+        		if (touchedSite != targetedSiteId) {
+        			SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+        		} else {
+        			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
+        		}        			
             } else if (allyBarracksSites.isEmpty()) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
@@ -137,22 +165,14 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MIN_ALLY_GOLD_PRODUCTION
-        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
-    			targetedSiteId = targetedSiteToBuildAMine.getId();
-    			if (touchedSite != targetedSiteId) {
-    				SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
-    			} else {
-    				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
-    			}        			
-            } else if (allyTowerSitesById.size() < MIN_ALLY_TOWER_NUMBER) {
-    			targetedSite = nearestEmptySite;
-    			targetedSiteId = targetedSite.getId();
-    			if (touchedSite != targetedSiteId) {
-    				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
-    			} else {
-    				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
-    			}        			
+        	} else if (allyTowerSitesById.size() < AVERAGE_ALLY_TOWER_NUMBER) {
+        		targetedSite = nearestEmptySite;
+        		targetedSiteId = targetedSite.getId();
+        		if (touchedSite != targetedSiteId) {
+        			SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+        		} else {
+        			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
+        		}   
             } else if ((myQueen.getHealth() > LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
             		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites))
             		|| (myQueen.getHealth() <= LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD

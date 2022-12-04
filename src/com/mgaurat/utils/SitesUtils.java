@@ -120,11 +120,13 @@ public final class SitesUtils {
         Site nearestSite = null;
         double distanceToSite;
         double distanceToNearestSite = Double.MAX_VALUE;
+        final int GOLD_VISIBILTY_DISTANCE = 300;
         Coordinates siteCoordinates;
         for (Site site : sites) {            
-            if (site.getStructure().getMineGold() != 0) {
-            	siteCoordinates = site.getCoordinates();
-            	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+        	siteCoordinates = site.getCoordinates();
+        	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+            if (site.getStructure().getMineGold() != 0
+            		|| (distanceToSite < GOLD_VISIBILTY_DISTANCE && site.getStructure().getMineGold() > 0)) {
             	if (distanceToSite < distanceToNearestSite) {
             		distanceToNearestSite = distanceToSite;
             		nearestSite = site;
