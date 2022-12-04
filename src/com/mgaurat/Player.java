@@ -153,8 +153,11 @@ class Player {
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
     			}        			
-            } else if (enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
-            		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites)) {
+            } else if ((myQueen.getHealth() > LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
+            		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites))
+            		|| (myQueen.getHealth() <= LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
+            		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites)
+            		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -170,7 +173,9 @@ class Player {
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
     			}        			
-            } else if (allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER) {
+            } else if ((myQueen.getHealth() > LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER)
+            		|| (myQueen.getHealth() <= LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER
+            		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
     			targetedSite = nearestEmptySite;
     			targetedSiteId = targetedSite.getId();
     			if (touchedSite != targetedSiteId) {
