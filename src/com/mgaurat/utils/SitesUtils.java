@@ -100,10 +100,6 @@ public final class SitesUtils {
 		return sitesByIdAndStructureAndOwner;
 	}
 	
-	public static Collection<Site> getSitesCollection(Map<Integer, Site> sitesById) {
-		return sitesById.values();
-	}
-	
     public static Site getNearestSite(Collection<Site> sites, Coordinates myQueenCoordinates) {
         Site nearestSite = null;
         double distanceToSite;

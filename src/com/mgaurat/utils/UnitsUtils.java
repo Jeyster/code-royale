@@ -108,11 +108,6 @@ public final class UnitsUtils {
 		
 		return null;
 	}
-
-	public static boolean isItSafeToBuildAMine(Coordinates myQueenCoordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType) {
-		final double SAFE_DISTANCE = 500;
-		return getNearestEnemyKnightDistance(myQueenCoordinates, enemyUnitsByType) > SAFE_DISTANCE;
-	}
 	
 	public static double getNearestEnemyKnightDistance(Coordinates myQueenCoordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType) {
         double distanceToKnight;
