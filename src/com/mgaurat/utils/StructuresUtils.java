@@ -1,7 +1,6 @@
 package com.mgaurat.utils;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -82,25 +81,21 @@ public final class StructuresUtils {
 		return true;
 	}
 	
-	public static Site getTheSafestTower(Collection<Site> allyTowerSites, Site myKnightBarracksSite) {
-		boolean isLeftSide = GameBoardUtils.isLeftSide(myKnightBarracksSite.getCoordinates());
-		
-		Iterator<Site> it = allyTowerSites.iterator();
-		Site safestTower = it.next();
-		int safestTowerXCoordinate= safestTower.getCoordinates().getX();
-		Site tower;
-		int towerXCoodinate;
-		while (it.hasNext()) {
-			tower = it.next();
-			towerXCoodinate = tower.getCoordinates().getX();
-			if ((isLeftSide && towerXCoodinate < safestTowerXCoordinate)
-					|| (!isLeftSide && towerXCoodinate > safestTowerXCoordinate)) {
-				safestTowerXCoordinate = towerXCoodinate;
-				safestTower = tower;
-			}
+	public static Coordinates getAverageSiteCoordinates(Collection<Site> sites) {
+		if (sites.isEmpty()) {
+			return null;
 		}
-		
-		return safestTower;
+
+		int xCoordinateSum = 0;
+		int yCoordinateSum = 0;
+		Coordinates siteCoordinates;
+		for (Site site : sites) {
+			siteCoordinates = site.getCoordinates();
+			xCoordinateSum += siteCoordinates.getX();
+			yCoordinateSum += siteCoordinates.getY();
+		}
+
+		return new Coordinates(xCoordinateSum/sites.size(), yCoordinateSum/sites.size());
 	}
 	
 }

@@ -32,7 +32,7 @@ public class GameBoardUtils {
 	}
 	
 	public static Coordinates getASafeCoordinatesFromMyBarracksAndTowerSites(Site myKnightBarracksSite, Collection<Site> allyTowerSites) {
-		int yCoordinate = StructuresUtils.getTheSafestTower(allyTowerSites, myKnightBarracksSite).getCoordinates().getY();
+		int yCoordinate = StructuresUtils.getAverageSiteCoordinates(allyTowerSites).getY();
 		if (isLeftSide(myKnightBarracksSite.getCoordinates())) {
 			return new Coordinates(0, yCoordinate);
 		} else {

@@ -64,6 +64,7 @@ class Player {
             Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = UnitsUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
             Map<UnitEnum, List<Unit>> allyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ALLY);
             Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
+            Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
             Unit myQueen = UnitsUtils.getMyQueen(allyUnitsByType);
             Coordinates myQueenCoordinates = myQueen.getCoordinates();
             
@@ -98,6 +99,7 @@ class Player {
             final int MAX_ALLY_TOWER_NUMBER = 6;
             final int ENEMY_TOWER_NUMBER_THRESHOLD = 3;
             final int LOW_LIFE_QUEEN = 25;
+            final int ENEMY_KNIGHTS_THRESHOLD = 10;
             Site targetedSite;
             int targetedSiteId;
             Site targetedSiteToBuildAMine = SitesUtils.getNearestSiteToBuildAMine(emptySites, myQueenCoordinates);
@@ -133,7 +135,8 @@ class Player {
             */
             if ((myQueen.getHealth() < LOW_LIFE_QUEEN 
             		&& !StructuresUtils.isItSafeAtCoordinates(myQueenCoordinates, enemyUnitsByType, enemyTowerSites))
-            		|| emptySites.size() == 0) {
+            		|| emptySites.size() == 0
+            		|| enemyKnights.size() > ENEMY_KNIGHTS_THRESHOLD) {
             	Site myKnightBarracks = SitesUtils.getAKnightSite(allyBarracksSites);
             	Coordinates safestCoordinates = GameBoardUtils.getASafeCoordinates(myKnightBarracks, allyTowerSites, allySites);
             	SystemOutUtils.printMoveAction(safestCoordinates);
