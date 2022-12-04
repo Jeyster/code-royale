@@ -127,7 +127,7 @@ class Player {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
         	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MIN_ALLY_GOLD_PRODUCTION
-        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(myQueenCoordinates, enemyUnitsByType)) {
+        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
     			targetedSiteId = targetedSiteToBuildAMine.getId();
     			if (touchedSite != targetedSiteId) {
     				SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
@@ -152,7 +152,7 @@ class Player {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.GIANT);
             	}
         	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION
-        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(myQueenCoordinates, enemyUnitsByType)) {
+        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
     			targetedSiteId = targetedSiteToBuildAMine.getId();
     			if (touchedSite != targetedSiteId) {
     				SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
