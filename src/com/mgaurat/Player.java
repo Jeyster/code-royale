@@ -144,7 +144,7 @@ class Player {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         	} else if (isTouchingATowerToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
-        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < minAllyGoldProduction
+        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < minAllyGoldProduction && targetedSiteToBuildAMine != null
         			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
         		targetedSiteId = targetedSiteToBuildAMine.getId();
         		if (touchedSite != targetedSiteId) {
@@ -185,7 +185,7 @@ class Player {
             } else if ((myQueen.getHealth() > LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
             		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites))
             		|| (myQueen.getHealth() <= LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
-            		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites)
+            		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites) && nearestEmptySite != null
             		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
@@ -194,7 +194,7 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.GIANT);
             	}
-        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION
+        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION && targetedSiteToBuildAMine != null
         			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
     			targetedSiteId = targetedSiteToBuildAMine.getId();
     			if (touchedSite != targetedSiteId) {
@@ -204,7 +204,7 @@ class Player {
     			}        			
             } else if ((myQueen.getHealth() > LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER)
             		|| (myQueen.getHealth() <= LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER
-            		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+            		&& nearestEmptySite != null && StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
     			targetedSite = nearestEmptySite;
     			targetedSiteId = targetedSite.getId();
     			if (touchedSite != targetedSiteId) {
@@ -212,14 +212,14 @@ class Player {
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
     			}        			
-        	} else if (StructuresUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites)) {
+        	} else if (targetedSiteToBuildAMine != null && StructuresUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites)) {
     			targetedSiteId = targetedSiteToBuildAMine.getId();
     			if (touchedSite != targetedSiteId) {
     				SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
     			}  
-            } else if (StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites)) {
+            } else if (nearestEmptySite != null && StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites)) {
     			targetedSite = nearestEmptySite;
     			targetedSiteId = targetedSite.getId();
     			if (touchedSite != targetedSiteId) {
