@@ -88,8 +88,8 @@ public final class StructuresUtils {
 		return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() == 0;
 	}
 	
-	public static boolean isCoordinatesInRangeOfThreeTowers(Coordinates coordinates, Collection<Site> towerSites) {
-		return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= 3;
+	public static boolean isCoordinatesInRangeOfTwoTowers(Coordinates coordinates, Collection<Site> towerSites) {
+		return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= 2;
 	}
 	
 	public static Coordinates getAverageSiteCoordinates(Collection<Site> sites) {

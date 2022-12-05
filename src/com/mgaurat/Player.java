@@ -145,9 +145,11 @@ class Player {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         	} else if (isTouchingATowerToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
-        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < minAllyGoldProduction && targetedSiteToBuildAMine != null
+        	} else if (targetedSiteToBuildAMine != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && StructuresUtils.getCurrentGoldProduction(allyMineSites) < minAllyGoldProduction 
         			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)
-        			&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites)) {
+        			&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites))
+        			|| (myQueen.getHealth() < LOW_LIFE_QUEEN && StructuresUtils.getCurrentGoldProduction(allyMineSites) < minAllyGoldProduction 
+                			&& StructuresUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
         		targetedSiteId = targetedSiteToBuildAMine.getId();
         		if (touchedSite != targetedSiteId) {
         			SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
@@ -155,7 +157,7 @@ class Player {
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         		}        			
         	} else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyTowerSitesById.size() < minAllyTowerNumber
-        			&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
+        			&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
         			|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyTowerSitesById.size() < minAllyTowerNumber)
         			&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites)) {
         		targetedSite = nearestEmptySite;
@@ -166,7 +168,7 @@ class Player {
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         		}        			
             } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyBarracksSites.isEmpty()
-            		&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
+            		&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
             		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyBarracksSites.isEmpty()
             		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
             	targetedSite = nearestEmptySite;
@@ -177,7 +179,7 @@ class Player {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
             } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyTowerSitesById.size() < AVERAGE_ALLY_TOWER_NUMBER
-            		&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
+            		&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
             		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyTowerSitesById.size() < AVERAGE_ALLY_TOWER_NUMBER
             		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
         		targetedSite = nearestEmptySite;
@@ -189,7 +191,7 @@ class Player {
         		}   
             } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
             		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites)
-            		&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
+            		&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
             		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
             		&& !StructuresUtils.isAtLeastOneAllyGiantBarracks(allyBarracksSites)
             		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
@@ -200,9 +202,12 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.GIANT);
             	}
-        	} else if (StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION && targetedSiteToBuildAMine != null
-        			&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites)
-        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)) {
+        	} else if (targetedSiteToBuildAMine != null 
+        			&& (myQueen.getHealth() >= LOW_LIFE_QUEEN && StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION 
+        			&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites)
+        			&& StructuresUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType))
+        			|| (myQueen.getHealth() < LOW_LIFE_QUEEN && StructuresUtils.getCurrentGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION 
+        					&& StructuresUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
     			targetedSiteId = targetedSiteToBuildAMine.getId();
     			if (touchedSite != targetedSiteId) {
     				SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
@@ -210,7 +215,7 @@ class Player {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
     			}        			
             } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER
-            		&& !StructuresUtils.isCoordinatesInRangeOfThreeTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
+            		&& !StructuresUtils.isCoordinatesInRangeOfTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
             		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER
             		&& StructuresUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
     			targetedSite = nearestEmptySite;
