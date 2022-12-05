@@ -1,5 +1,6 @@
 package com.mgaurat.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ public final class StructuresUtils {
     
     public static boolean isItSafeAtCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites) {
     	return isItSafeAtCoordinatesRegardingEnemyKnights(coordinates, enemyUnitsByType)
-    			&& isItSafeAtCoordinatesRegardingEnemyTowers(coordinates, enemyTowerSites);
+    			&& isCoordinatesInRangeOfAnyTower(coordinates, enemyTowerSites);
     }
     
 	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType) {
@@ -72,13 +73,23 @@ public final class StructuresUtils {
 		return UnitsUtils.getNearestEnemyKnightDistance(coordinates, enemyUnitsByType) > SAFE_DISTANCE;
 	}
 	
-	public static boolean isItSafeAtCoordinatesRegardingEnemyTowers(Coordinates coordinates, Collection<Site> enemyTowerSites) {
-		for (Site site : enemyTowerSites) {
-			if (MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()) < site.getStructure().getParam2()) {
-				return false;
+	public static Collection<Site> getTowerSitesInRangeOfCoordinates(Collection<Site> towerSites, Coordinates coordinates) {
+		Collection<Site> towerSitesInRange = new ArrayList<>();
+		for (Site towerSite : towerSites) {
+			if (MathUtils.getDistanceBetweenTwoCoordinates(coordinates, towerSite.getCoordinates()) < towerSite.getStructure().getParam2()) {
+				towerSitesInRange.add(towerSite);
 			}
 		}
-		return true;
+		
+		return towerSitesInRange;
+	}
+
+	public static boolean isCoordinatesInRangeOfAnyTower(Coordinates coordinates, Collection<Site> towerSites) {
+		return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() == 0;
+	}
+	
+	public static boolean isCoordinatesInRangeOfThreeTowers(Coordinates coordinates, Collection<Site> towerSites) {
+		return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= 3;
 	}
 	
 	public static Coordinates getAverageSiteCoordinates(Collection<Site> sites) {
