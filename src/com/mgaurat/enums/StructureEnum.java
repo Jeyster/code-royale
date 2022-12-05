@@ -1,5 +1,11 @@
 package com.mgaurat.enums;
 
+/**
+ * Enumeration for the Structure type.
+ * 
+ * @author mgaurat
+ *
+ */
 public enum StructureEnum {
 	
 	NOTHING(-1),

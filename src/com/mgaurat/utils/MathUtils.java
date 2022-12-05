@@ -2,10 +2,15 @@ package com.mgaurat.utils;
 
 import com.mgaurat.model.Coordinates;
 
+/**
+ * Final class for mathematical methods.
+ * 
+ * @author mgaurat
+ *
+ */
 public final class MathUtils {
 	
-	private MathUtils() {
-	}
+	private MathUtils() {}
 	
 	public static double getDistanceBetweenTwoCoordinates(Coordinates a, Coordinates b) {
 		int xa = a.getX();

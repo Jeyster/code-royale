@@ -4,6 +4,7 @@ import com.mgaurat.enums.OwnerEnum;
 
 /**
  * Structure that is built on a Site.
+ * It is a bean that is instanciated from the game turn input.
  * 
  * @author mgaurat
  *

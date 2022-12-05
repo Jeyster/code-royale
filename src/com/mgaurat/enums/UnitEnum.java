@@ -1,5 +1,11 @@
 package com.mgaurat.enums;
 
+/**
+ * Enumeration for the Unit type.
+ * 
+ * @author mgaurat
+ *
+ */
 public enum UnitEnum {
 	
 	QUEEN(-1),

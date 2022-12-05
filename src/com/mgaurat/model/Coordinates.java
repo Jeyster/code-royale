@@ -2,7 +2,7 @@ package com.mgaurat.model;
 
 /**
  * Coordinates of a point of the game board.
- * The game board is a 1900 x 1000 length rectangle.
+ * The game board is a 1920 x 1000 length rectangle.
  * The game board origin defined by coordinates (0, 0) is the top left corner.
  * 
  * @author mgaurat

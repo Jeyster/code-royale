@@ -1,5 +1,11 @@
 package com.mgaurat.enums;
 
+/**
+ * Enumeration for the Owner type.
+ * 
+ * @author mgaurat
+ *
+ */
 public enum OwnerEnum {
 	
 	NOBODY(-1),

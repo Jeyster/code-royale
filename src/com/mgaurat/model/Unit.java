@@ -1,5 +1,12 @@
 package com.mgaurat.model;
 
+/**
+ * Class for a game Unit.
+ * It is a bean that is instanciated from the game turn input.
+ * 
+ * @author mgaurat
+ *
+ */
 public class Unit {
 	
 	private Coordinates coordinates;
