@@ -16,30 +16,42 @@ import com.mgaurat.utils.InputUtils;
 import com.mgaurat.utils.SitesUtils;
 import com.mgaurat.utils.StructuresUtils;
 import com.mgaurat.utils.SystemOutUtils;
+import com.mgaurat.utils.TurnStrategyUtils;
 import com.mgaurat.utils.UnitsUtils;
 
+/**
+ * Main class
+ * 
+ * @author mgaurat
+ *
+ */
 class Player {
 
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
         int numSites = in.nextInt();
 
+        // Initialize Sites with start of game input
         Map<Integer, Site> sitesById = InputUtils.getSitesFromInitialInput(in, numSites);
 
-        // game loop
+        // Game loop
         while (true) {
             int gold = in.nextInt();
             int touchedSite = in.nextInt(); // -1 if none
 
+            // Update Sites by creating Structure thanks to the the turn input
             Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> sitesByIdAndStructureAndOwner = InputUtils.updateSitesFromTurnInput(in, sitesById);
+            
             Map<Integer, Site> emptySitesById = sitesByIdAndStructureAndOwner.get(OwnerEnum.NOBODY).get(StructureEnum.NOTHING);
             Collection<Site> emptySites = emptySitesById.values();
+            int emptySitesNumber = emptySites.size();
             
             Map<StructureEnum, Map<Integer, Site>> allySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ALLY);
     		Map<Integer, Site> allyMineSitesById = allySitesByIdAndStructure.get(StructureEnum.MINE);
             Collection<Site> allyMineSites = allyMineSitesById.values();
     		Map<Integer, Site> allyTowerSitesById = allySitesByIdAndStructure.get(StructureEnum.TOWER);
     		Collection<Site> allyTowerSites = allyTowerSitesById.values();
+    		int allyTowersNumber = allyTowerSites.size();
     		Map<Integer, Site> allyBarracksSitesById = allySitesByIdAndStructure.get(StructureEnum.BARRACKS);
             Collection<Site> allyBarracksSites = allyBarracksSitesById.values();
             Collection<Site> allySites = new ArrayList<>();
@@ -48,48 +60,38 @@ class Player {
             allySites.addAll(allyBarracksSites);
 
     		Map<StructureEnum, Map<Integer, Site>> enemySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ENEMY);
-    		Map<Integer, Site> enemyMineSitesById = enemySitesByIdAndStructure.get(StructureEnum.MINE);
-    		Collection<Site> enemyMineSites = enemyMineSitesById.values();
     		Map<Integer, Site> enemyTowerSitesById = enemySitesByIdAndStructure.get(StructureEnum.TOWER);
     		Collection<Site> enemyTowerSites = enemyTowerSitesById.values();
-    		Map<Integer, Site> enemyBarracksSitesById = enemySitesByIdAndStructure.get(StructureEnum.BARRACKS);
-    		Collection<Site> enemyBarracksSites = enemyBarracksSitesById.values();
-    		
-    		Collection<Site> ownedSites = new ArrayList<>();
-    		ownedSites.addAll(allySites);
-    		ownedSites.addAll(enemyMineSites);
-    		ownedSites.addAll(enemyTowerSites);
-    		ownedSites.addAll(enemyBarracksSites);
+    		int enemyTowersNumber = enemyTowerSites.size();
 
+    		// Get the Units thanks to the turn input
             int numUnits = in.nextInt();
             Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = InputUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
+            
             Map<UnitEnum, List<Unit>> allyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ALLY);
             Collection<Unit> allyGiants = allyUnitsByType.get(UnitEnum.GIANT);
-            Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
-            Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
             Unit myQueen = UnitsUtils.getQueen(allyUnitsByType);
             Coordinates myQueenCoordinates = myQueen.getCoordinates();
+            int queenHealth = myQueen.getHealth();
             
-            boolean isTouchingAMineToImprove = false;
-            boolean isTouchingATowerToImprove = false;
-            if (touchedSite != -1) {
-            	if (SitesUtils.isSiteInTheMap(touchedSite, allyMineSitesById)
-            			&& UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(myQueenCoordinates, enemyUnitsByType)
-            			&& StructuresUtils.isMineNotInFullProduction(allyMineSitesById.get(touchedSite).getStructure())) {
-            		isTouchingAMineToImprove = true;
-            	} else if (SitesUtils.isSiteInTheMap(touchedSite, allyTowerSitesById)
-            			&& StructuresUtils.isTowerLifeSufficient(allyTowerSitesById.get(touchedSite).getStructure())) {
-            		isTouchingATowerToImprove = true;
-            	}
-            }
+            Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
+            Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
+            int enemyKnightsNumber = enemyKnights.size();
             
+            
+            // Constants
+            final int AVERAGE_ALLY_TOWERS_NUMBER = 3;
+            final int MAX_ALLY_TOWERS_NUMBER = 6;
+            final int MAX_ALLY_GOLD_PRODUCTION = 8;
+            final int ENEMY_TOWERS_NUMBER_THRESHOLD = 3;
+            
+            // Depending on ally QUEEN health, choose the best values
             int minAllyGoldProduction;
             if (myQueen.getHealth() < 50) {
             	minAllyGoldProduction = 3;
             } else {
             	minAllyGoldProduction = 4;            	
             }
-            final int MAX_ALLY_GOLD_PRODUCTION = 8;
             
             int minAllyTowerNumber;
             if (myQueen.getHealth() < 50) {
@@ -97,70 +99,60 @@ class Player {
             } else {
             	minAllyTowerNumber = 2;            	
             }
-            final int AVERAGE_ALLY_TOWER_NUMBER = 3;
-            final int MAX_ALLY_TOWER_NUMBER = 6;
-            final int ENEMY_TOWER_NUMBER_THRESHOLD = 3;
-            final int LOW_LIFE_QUEEN = 20;
-            final int ENEMY_KNIGHTS_THRESHOLD = 8;
+            
+            // Possible Site to MOVE or to BUILD
             Site targetedSite;
             int targetedSiteId;
+            Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, myQueenCoordinates);
             Site targetedSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, myQueenCoordinates);
-        	Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, myQueenCoordinates);
-
+        	Site myKnightBarracksSite = StructuresUtils.getAKnightSite(allyBarracksSites);
             
-            /* 1) First turn action is to MOVE or BUILD.
-            *		a) If my QUEEN is low life and threatened or if there is no free site left, MOVE to a safe place
+            // Booleans that could be use to choose what to do during this turn
+            boolean isTouchingAMineToImprove = false;
+            boolean isTouchingATowerToImprove = false;
+            if (touchedSite != -1) {
+            	if (allyMineSitesById.get(touchedSite) != null
+            			&& UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(myQueenCoordinates, enemyUnitsByType)
+            			&& StructuresUtils.isMineNotInFullProduction(allyMineSitesById.get(touchedSite).getStructure())) {
+            		isTouchingAMineToImprove = true;
+            	}
+        		if (allyTowerSitesById.get(touchedSite) != null
+            			&& StructuresUtils.isTowerLifeNotSufficient(allyTowerSitesById.get(touchedSite).getStructure())) {
+            		isTouchingATowerToImprove = true;
+            	}
+            }
+            
+            
+            /* 1) First turn action is to MOVE or BUILD. Generally, if ally QUEEN is low life, adopt a safest strategy.
+            *		a) MOVE to a safe place when the ally QUEEN is in danger
             *		b) else if touching a MINE I owned not in full production, improve it
             *		c) else if touching a TOWER I owned not with full range, improve it
-            *		d) else if i have no KNIGHT BARRACKS :
-            *			- get the nearest free site and MOVE to it
-            *			- or if touching this free site, build a KNIGHT BARRACKS
-            *		e) else if my gold production is less than MIN_GOLD_PRODUCTION and it is safe to build a MINE :
-            *			- get the nearest free site where a MINE can be built (gold not depleted) MOVE on it 
-            *			- or if touching this free site, BUILD a MINE
-            *		f) else if my TOWER number is less than MIN_TOWER_NUMBER :
-            *			- get the nearest free site and MOVE on it 
-            *			- or if touching this free site, BUILD a TOWER
-            *		g) else if enemy TOWER number is more than ENEMY_TOWER_NUMBER_THRESHOLD and I do not already owned a GIANT BARRACKS
-            *			- get the nearest free site and MOVE on it 
-            *			- or if touching this free site, BUILD a GIANT BARRACKS
-            *		h) else if my gold production is less than MAX_GOLD_PRODUCTION and it is safe to build a MINE :
-            *			- get the nearest free site where a MINE can be built (gold not depleted) MOVE on it 
-            *			- or if touching this free site, BUILD a MINE
-            *		i) else if my TOWER number is less than MAX_TOWER_NUMBER :
-            *			- get the nearest free site and MOVE on it 
-            *			- or if touching this free site, BUILD a TOWER
-            *		j) else if the nearest free site where a MINE can be built (gold not depleted) is totally safe :
-            *			- MOVE on it 
-            *			- or if touching this free site, BUILD a MINE
-            *		k) else MOVE to a safe coordinates
+            *		d) else if MOVE to a free Site and BUILD a MINE until minAllyGoldProduction is reached
+            *		e) else if MOVE to a free Site and BUILD a TOWER until minAllyTowerNumber is reached
+            *		f) else if MOVE to a free Site and BUILD an only one KNIGHT BARRACKS
+            *		g) else if MOVE to a free Site and BUILD a TOWER until AVERAGE_ALLY_TOWERS_NUMBER is reached
+            *		h) else if MOVE to a free Site and BUILD an only one GIANT BARRACKS
+            *		i) else if MOVE to a free Site and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
+            *		j) else if MOVE to a free Site and BUILD a TOWER until MAX_ALLY_TOWERS_NUMBER is reached
+            *		k) else if MOVE to a free Site and BUILD a MINE
+            *		l) else if MOVE to a free Site and BUILD a TOWER
+            *		m) else MOVE to a safe place
             */
-            if ((myQueen.getHealth() < LOW_LIFE_QUEEN 
-            		&& !GameBoardUtils.isItSafeAtCoordinates(myQueenCoordinates, enemyUnitsByType, enemyTowerSites))
-            		|| emptySites.size() == 0
-            		|| enemyKnights.size() > ENEMY_KNIGHTS_THRESHOLD) {
-            	Site myKnightBarracks = StructuresUtils.getAKnightSite(allyBarracksSites);
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracks, allyTowerSites, allySites);
+            if (TurnStrategyUtils.isSafeMoveStrategyOk(queenHealth, myQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracksSite, allyTowerSites, allySites);
             	SystemOutUtils.printMoveAction(safestCoordinates);
             } else if (isTouchingAMineToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         	} else if (isTouchingATowerToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
-        	} else if (targetedSiteToBuildAMine != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && StructuresUtils.getGoldProduction(allyMineSites) < minAllyGoldProduction 
-        			&& UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)
-        			&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites))
-        			|| (myQueen.getHealth() < LOW_LIFE_QUEEN && StructuresUtils.getGoldProduction(allyMineSites) < minAllyGoldProduction 
-                			&& GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(queenHealth, targetedSiteToBuildAMine, allyMineSites, minAllyGoldProduction, enemyUnitsByType, enemyTowerSites)) {
         		targetedSiteId = targetedSiteToBuildAMine.getId();
         		if (touchedSite != targetedSiteId) {
         			SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
         		} else {
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         		}        			
-        	} else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyTowerSitesById.size() < minAllyTowerNumber
-        			&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
-        			|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyTowerSitesById.size() < minAllyTowerNumber)
-        			&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites)) {
+        	} else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(queenHealth, nearestEmptySite, allyTowersNumber, minAllyTowerNumber, enemyUnitsByType, enemyTowerSites)) {
         		targetedSite = nearestEmptySite;
         		targetedSiteId = targetedSite.getId();
         		if (touchedSite != targetedSiteId) {
@@ -168,10 +160,7 @@ class Player {
         		} else {
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         		}        			
-            } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyBarracksSites.isEmpty()
-            		&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
-            		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyBarracksSites.isEmpty()
-            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(queenHealth, nearestEmptySite, allyBarracksSites, enemyUnitsByType, enemyTowerSites)) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -179,10 +168,7 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-            } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyTowerSitesById.size() < AVERAGE_ALLY_TOWER_NUMBER
-            		&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
-            		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyTowerSitesById.size() < AVERAGE_ALLY_TOWER_NUMBER
-            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(queenHealth, nearestEmptySite, allyTowersNumber, AVERAGE_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites)) {
         		targetedSite = nearestEmptySite;
         		targetedSiteId = targetedSite.getId();
         		if (touchedSite != targetedSiteId) {
@@ -190,12 +176,7 @@ class Player {
         		} else {
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         		}   
-            } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
-            		&& !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
-            		&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
-            		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
-            		&& !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
-            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(queenHealth, nearestEmptySite, enemyTowersNumber, allyBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD)) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -203,22 +184,14 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.GIANT);
             	}
-        	} else if (targetedSiteToBuildAMine != null 
-        			&& (myQueen.getHealth() >= LOW_LIFE_QUEEN && StructuresUtils.getGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION 
-        			&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites)
-        			&& UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType))
-        			|| (myQueen.getHealth() < LOW_LIFE_QUEEN && StructuresUtils.getGoldProduction(allyMineSites) < MAX_ALLY_GOLD_PRODUCTION 
-        					&& GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(queenHealth, targetedSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites)) {
     			targetedSiteId = targetedSiteToBuildAMine.getId();
     			if (touchedSite != targetedSiteId) {
     				SystemOutUtils.printMoveAction(targetedSiteToBuildAMine.getCoordinates());
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
     			}        			
-            } else if (nearestEmptySite != null && (myQueen.getHealth() >= LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER
-            		&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites))
-            		|| (myQueen.getHealth() < LOW_LIFE_QUEEN && allyTowerSitesById.size() < MAX_ALLY_TOWER_NUMBER
-            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites))) {
+            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(queenHealth, nearestEmptySite, allyTowersNumber, MAX_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites)) {
     			targetedSite = nearestEmptySite;
     			targetedSiteId = targetedSite.getId();
     			if (touchedSite != targetedSiteId) {
@@ -242,8 +215,7 @@ class Player {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
     			} 
             } else {
-            	Site myKnightBarracks = StructuresUtils.getAKnightSite(allyBarracksSites);
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracks, allyTowerSites, allySites);
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracksSite, allyTowerSites, allySites);
             	SystemOutUtils.printMoveAction(safestCoordinates);
         	}
 
@@ -252,7 +224,7 @@ class Player {
             *		b) else TRAIN a KNIGHT
             */
             Site siteToTrain = null;
-            if (enemyTowerSitesById.size() > ENEMY_TOWER_NUMBER_THRESHOLD
+            if (enemyTowerSitesById.size() > ENEMY_TOWERS_NUMBER_THRESHOLD
             		&& allyGiants.size() < 2
             		&& StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)) {
             	siteToTrain = StructuresUtils.getGiantSiteToTrain(allyBarracksSites);

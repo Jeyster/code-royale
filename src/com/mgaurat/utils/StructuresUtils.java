@@ -51,7 +51,7 @@ public final class StructuresUtils {
      * @param structure
      * @return boolean
      */
-    public static boolean isTowerLifeSufficient(Structure structure) {
+    public static boolean isTowerLifeNotSufficient(Structure structure) {
     	if (structure.getStructureTypeId() != StructureEnum.TOWER.getId()) {
     		return false;
     	}

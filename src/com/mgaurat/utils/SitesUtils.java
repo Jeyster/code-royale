@@ -2,7 +2,6 @@ package com.mgaurat.utils;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
@@ -69,10 +68,6 @@ public final class SitesUtils {
     	return site.getCoordinates();
     }
 
-    public static boolean isSiteInTheMap(int siteId, Map<Integer, Site> sitesById) {
-    	return !sitesById.isEmpty() && sitesById.get(siteId) != null;
-    }
-    
 	/**
 	 * Get from the input Sites collection the average Coordinates.
 	 * 
