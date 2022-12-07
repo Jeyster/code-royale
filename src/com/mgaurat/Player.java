@@ -58,13 +58,26 @@ class Player {
             allySites.addAll(allyMineSites);
             allySites.addAll(allyTowerSites);
             allySites.addAll(allyBarracksSites);
-
+            
     		Map<StructureEnum, Map<Integer, Site>> enemySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ENEMY);
+    		Map<Integer, Site> enemyMineSitesById = enemySitesByIdAndStructure.get(StructureEnum.MINE);
+            Collection<Site> enemyMineSites = enemyMineSitesById.values();
     		Map<Integer, Site> enemyTowerSitesById = enemySitesByIdAndStructure.get(StructureEnum.TOWER);
     		Collection<Site> enemyTowerSites = enemyTowerSitesById.values();
     		int enemyTowersNumber = enemyTowerSites.size();
+    		Map<Integer, Site> enemyBarracksSitesById = enemySitesByIdAndStructure.get(StructureEnum.BARRACKS);
+            Collection<Site> enemyBarracksSites = enemyBarracksSitesById.values();
+            Collection<Site> enemySites = new ArrayList<>();
+            allySites.addAll(enemyMineSites);
+            allySites.addAll(enemyTowerSites);
+            allySites.addAll(enemyBarracksSites);
+            
+            Collection<Site> allSites = new ArrayList<>();
+            allSites.addAll(emptySites);
+            allSites.addAll(allySites);
+            allSites.addAll(enemySites);
 
-    		// Get the Units thanks to the turn input
+            // Get the Units thanks to the turn input
             int numUnits = in.nextInt();
             Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = InputUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
             
@@ -104,6 +117,7 @@ class Player {
             Site targetedSite;
             int targetedSiteId;
             Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, myQueenCoordinates);
+            Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), myQueenCoordinates);
             Site targetedSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, myQueenCoordinates);
         	Site myKnightBarracksSite = StructuresUtils.getAKnightSite(allyBarracksSites);
             
@@ -136,7 +150,8 @@ class Player {
             *		j) else if MOVE to a free Site and BUILD a TOWER until MAX_ALLY_TOWERS_NUMBER is reached
             *		k) else if MOVE to a free Site and BUILD a MINE
             *		l) else if MOVE to a free Site and BUILD a TOWER
-            *		m) else MOVE to a safe place
+            *		m) else if MOVE to the nearest ally TOWER with not enough life points
+            *		n) else MOVE to a safe place
             */
             if (TurnStrategyUtils.isSafeMoveStrategyOk(queenHealth, myQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
             	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracksSite, allyTowerSites, allySites);
@@ -214,6 +229,8 @@ class Player {
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
     			} 
+            } else if (nearestAllyTowerSiteWithNotSufficientLife != null) {
+            	SystemOutUtils.printMoveAction(nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()); 
             } else {
             	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracksSite, allyTowerSites, allySites);
             	SystemOutUtils.printMoveAction(safestCoordinates);

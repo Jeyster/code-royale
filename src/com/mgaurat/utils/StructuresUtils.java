@@ -61,6 +61,23 @@ public final class StructuresUtils {
     }
     
     /**
+     * Get the ally TOWER Sites that do not have enough life points.
+     * 
+     * @param allyTowerSites
+     * @return
+     */
+    public static Collection<Site> getAllyTowerSitesWithNotSufficientLife(Collection<Site> allyTowerSites) {
+    	Collection<Site> allyTowerSitesWithNotSufficientLife = new ArrayList<>();
+    	for (Site allyTowerSite : allyTowerSites) {
+    		if (isTowerLifeNotSufficient(allyTowerSite.getStructure())) {
+    			allyTowerSitesWithNotSufficientLife.add(allyTowerSite);
+    		}
+    	}
+    	
+    	return allyTowerSitesWithNotSufficientLife;
+    }
+    
+    /**
      * Check if the input Sites collection holds a KNIGHT BARRACKS.
      * 
      * @param sites
