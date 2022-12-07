@@ -26,6 +26,9 @@ import com.mgaurat.utils.UnitsUtils;
  *
  */
 class Player {
+	
+	private static Integer startingQueenHealth = null;
+	private static Coordinates startingAllyQueenCoordinates = null;
 
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
@@ -86,11 +89,18 @@ class Player {
             Unit myQueen = UnitsUtils.getQueen(allyUnitsByType);
             Coordinates myQueenCoordinates = myQueen.getCoordinates();
             int queenHealth = myQueen.getHealth();
-            
+                        
             Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
             Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
             int enemyKnightsNumber = enemyKnights.size();
             
+            // Initialize start of game parameters
+            if (startingQueenHealth == null) {
+            	startingQueenHealth = queenHealth;
+            }
+            if (startingAllyQueenCoordinates == null) {
+            	startingAllyQueenCoordinates = myQueenCoordinates;
+            }
             
             // Constants
             final int AVERAGE_ALLY_TOWERS_NUMBER = 3;
@@ -119,7 +129,6 @@ class Player {
             Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, myQueenCoordinates);
             Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), myQueenCoordinates);
             Site targetedSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, myQueenCoordinates);
-        	Site myKnightBarracksSite = StructuresUtils.getAKnightSite(allyBarracksSites);
             
             // Booleans that could be use to choose what to do during this turn
             boolean isTouchingAMineToImprove = false;
@@ -154,7 +163,7 @@ class Player {
             *		n) else MOVE to a safe place
             */
             if (TurnStrategyUtils.isSafeMoveStrategyOk(queenHealth, myQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracksSite, allyTowerSites, allySites);
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, allySites);
             	SystemOutUtils.printMoveAction(safestCoordinates);
             } else if (isTouchingAMineToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
@@ -232,7 +241,7 @@ class Player {
             } else if (nearestAllyTowerSiteWithNotSufficientLife != null) {
             	SystemOutUtils.printMoveAction(nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()); 
             } else {
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(myKnightBarracksSite, allyTowerSites, allySites);
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, allySites);
             	SystemOutUtils.printMoveAction(safestCoordinates);
         	}
 

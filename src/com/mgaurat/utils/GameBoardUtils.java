@@ -31,46 +31,42 @@ public class GameBoardUtils {
 	}
 	
 	/**
-	 * Get the Coordinates evaluated to be the safest regarding my BARRACKS and TOWER.
+	 * Get the Coordinates evaluated to be the safest regarding my starting ally QUEEN Coordinates and TOWER.
 	 * 
-	 * @param myKnightBarracks
+	 * @param startingAllyQueenCoordinates
 	 * @param allyTowerSites
 	 * @param allySites
 	 * @return Coordinates
 	 */
-	public static Coordinates getSafestCoordinates(Site myKnightBarracks, Collection<Site> allyTowerSites, Collection<Site> allySites) {
+	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Site> allySites) {
 		Coordinates safestCoordinates;
-    	if (allyTowerSites.size() >= 1 && myKnightBarracks != null) {
-    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromMyBarracksAndTowerSites(myKnightBarracks, allyTowerSites);
-    	} else if (myKnightBarracks != null) {
-    		safestCoordinates = myKnightBarracks.getCoordinates();
-    	} else if (allyTowerSites.size() >= 2) {
-    		safestCoordinates = SitesUtils.getCoordinatesBetweenTwoRandomSites(allyTowerSites);
-    	} else if (allyTowerSites.size() >= 1) {
-    		safestCoordinates = SitesUtils.getRandomSiteCoordinates(allyTowerSites);
+    	if (allyTowerSites.size() >= 1) {
+    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromAllyQueenAndTowerSites(startingAllyQueenCoordinates, allyTowerSites);
     	} else {
-    		safestCoordinates = SitesUtils.getRandomSiteCoordinates(allySites);
+    		safestCoordinates = startingAllyQueenCoordinates;
+//    	} else if (allyTowerSites.size() >= 2) {
+//    		safestCoordinates = SitesUtils.getCoordinatesBetweenTwoRandomSites(allyTowerSites);
+//    	} else if (allyTowerSites.size() >= 1) {
+//    		safestCoordinates = SitesUtils.getRandomSiteCoordinates(allyTowerSites);
+//    	} else {
+//    		safestCoordinates = SitesUtils.getRandomSiteCoordinates(allySites);
     	}
     	
     	return safestCoordinates;
 	}
 	
 	/**
-	 * Get the Coordinates evaluated to be the safest regarding an ally KNIGHT BARRACKS and the ally TOWER.
+	 * Get the Coordinates evaluated to be the safest regarding the starting ally QUEEN Coordinates and the ally TOWER.
 	 * Y coordinate is the average y coordinate from the the ally TOWER.
-	 * X coordinate is the extreme left or ride side of the game board are depending on the side a the KNIGHT BARRACKS.
+	 * X coordinate is the extreme left or ride side of the game board are depending on the starting ally QUEEN Coordinates.
 	 * 
-	 * @param myKnightBarracksSite
+	 * @param startingAllyQueenCoordinates
 	 * @param allyTowerSites
 	 * @return Coordinates
 	 */
-	public static Coordinates getSafestCoordinatesFromMyBarracksAndTowerSites(Site myKnightBarracksSite, Collection<Site> allyTowerSites) {
-		if (myKnightBarracksSite == null) {
-			return null;
-		}
-		
+	public static Coordinates getSafestCoordinatesFromAllyQueenAndTowerSites(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites) {
 		int yCoordinate = SitesUtils.getAverageSiteCoordinates(allyTowerSites).getY();
-		if (isLeftSide(myKnightBarracksSite.getCoordinates())) {
+		if (isLeftSide(startingAllyQueenCoordinates)) {
 			return new Coordinates(0, yCoordinate);
 		} else {
 			return new Coordinates(X_LENGTH, yCoordinate);

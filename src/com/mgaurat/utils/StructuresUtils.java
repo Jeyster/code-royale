@@ -169,22 +169,6 @@ public final class StructuresUtils {
     }
     
     /**
-     * Get the first KNIGHT BARRACKS Site of the input Sites collection.
-     * 
-     * @param sites
-     * @return Site
-     */
-    public static Site getAKnightSite(Collection<Site> sites) {
-        for (Site site : sites) {     
-        	if (site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()
-        			&& site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()) {
-        		return site;
-        	}
-        }
-        return null;
-    }
-    
-    /**
      * Get the first KNIGHT BARRACKS Site of the input Sites collection that can be TRAIN.
      * 
      * @param sites
