@@ -138,6 +138,19 @@ public final class StructuresUtils {
 		return towerSitesInRange;
 	}
 	
+	public static Collection<Site> getSitesExceptKnightBarracksAndTower(Collection<Site> sites) {
+		Collection<Site> sitesExceptKnightBarracksAndTower = new ArrayList<>();
+		for (Site site : sites) {
+			if (site.getStructure().getStructureTypeId() != StructureEnum.TOWER.getId()
+					&& site.getStructure().getStructureTypeId() != StructureEnum.BARRACKS.getId()
+					&& site.getStructure().getParam2() != UnitEnum.KNIGHT.getId()) {
+				sitesExceptKnightBarracksAndTower.add(site);
+			}
+		}
+		
+		return sitesExceptKnightBarracksAndTower;
+	}
+	
 	/**
 	 * Get the nearest Site from the input Coordinates of the ally QUEEN in which a MINE can be built.
 	 * If there is no gold left in the Site, a MINE cannot be built.

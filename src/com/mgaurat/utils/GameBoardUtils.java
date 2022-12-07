@@ -19,6 +19,7 @@ import com.mgaurat.model.Unit;
 public class GameBoardUtils {
 	
 	private final static int X_LENGTH = 1920;
+	private final static int Y_LENGTH = 1000;
 	
 	/**
 	 * Is the input Coodinates in the left half side of the game board area.
@@ -41,7 +42,8 @@ public class GameBoardUtils {
 	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Site> allySites) {
 		Coordinates safestCoordinates;
     	if (allyTowerSites.size() >= 1) {
-    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromAllyQueenAndTowerSites(startingAllyQueenCoordinates, allyTowerSites);
+//    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromStartingAllyQueenAndTowerSites(startingAllyQueenCoordinates, allyTowerSites);
+    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
     	} else {
     		safestCoordinates = startingAllyQueenCoordinates;
 //    	} else if (allyTowerSites.size() >= 2) {
@@ -64,12 +66,20 @@ public class GameBoardUtils {
 	 * @param allyTowerSites
 	 * @return Coordinates
 	 */
-	public static Coordinates getSafestCoordinatesFromAllyQueenAndTowerSites(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites) {
+	public static Coordinates getSafestCoordinatesFromStartingAllyQueenAndTowerSites(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites) {
 		int yCoordinate = SitesUtils.getAverageSiteCoordinates(allyTowerSites).getY();
 		if (isLeftSide(startingAllyQueenCoordinates)) {
 			return new Coordinates(0, yCoordinate);
 		} else {
 			return new Coordinates(X_LENGTH, yCoordinate);
+		}
+	}
+	
+	public static Coordinates getSafestCoordinatesFromStartingAllyQueen(Coordinates startingAllyQueenCoordinates) {
+		if (isLeftSide(startingAllyQueenCoordinates)) {
+			return new Coordinates(0, Y_LENGTH);
+		} else {
+			return new Coordinates(X_LENGTH, 0);
 		}
 	}
 	

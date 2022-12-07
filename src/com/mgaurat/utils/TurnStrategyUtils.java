@@ -30,20 +30,41 @@ public final class TurnStrategyUtils {
      *	- number of enemy KNIGHT
      *
 	 * @param queenHealth
-	 * @param myQueenCoordinates
+	 * @param allyQueenCoordinates
 	 * @param enemyUnitsByType
 	 * @param enemyTowerSites
 	 * @param emptySitesNumber
 	 * @param enemyKnightsNumber
 	 * @return
 	 */
-	public static boolean isSafeMoveStrategyOk(int queenHealth, Coordinates myQueenCoordinates,
+	public static boolean isRunAwayStrategyOk(int queenHealth, Coordinates allyQueenCoordinates,
 			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites,
 			int emptySitesNumber, int enemyKnightsNumber) {
 		return (queenHealth < LOW_HEALTH_QUEEN 
-        		&& !GameBoardUtils.isItSafeAtCoordinates(myQueenCoordinates, enemyUnitsByType, enemyTowerSites))
+        		&& !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites))
         		|| emptySitesNumber == 0
         		|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
+	}
+	
+	public static boolean isBuildTowerWhenRunningAwayStrategyOk(Coordinates allyQueenCoordinates, Site nearestSiteToBuildATower) {
+		if (nearestSiteToBuildATower == null) {
+			return false;
+		}
+		
+		final int X_RANGE = 200;
+		final int Y_RANGE = 200;
+		
+		Coordinates nearestSiteToBuildATowerCoordinates = nearestSiteToBuildATower.getCoordinates();
+		int xNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getX();
+		int yNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getY();
+		int xAllyQueenCoordinates = allyQueenCoordinates.getX();
+		int yAllyQueenCoordinates = allyQueenCoordinates.getY();
+		if (Math.abs(xNearestSiteToBuildATowerCoordinates - xAllyQueenCoordinates) <= X_RANGE
+				&& Math.abs(yNearestSiteToBuildATowerCoordinates - yAllyQueenCoordinates) <= Y_RANGE) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
