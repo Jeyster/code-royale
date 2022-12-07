@@ -1,5 +1,6 @@
 package com.mgaurat.utils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,16 @@ public final class UnitsUtils {
 		}
 		
 		return distanceToNearestKnight;
+	}
+	
+	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
+		final int GIANT_SAFE_ZONE = 200;
+		for (Unit giant : giants) {
+			if (MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

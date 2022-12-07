@@ -98,6 +98,7 @@ class Player {
             Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
             Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
             int enemyKnightsNumber = enemyKnights.size();
+            Collection<Unit> enemyGiants = enemyUnitsByType.get(UnitEnum.GIANT);
             
             // Initialize start of game parameters
             if (startingQueenHealth == null) {
@@ -170,7 +171,7 @@ class Player {
             */
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
             	Coordinates safestCoordinates;
-            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATower)) {
+            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATower, enemyGiants)) {
             		if (touchedSite == nearestSiteToBuildATower.getId()) {
                 		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
             		} else {

@@ -46,8 +46,9 @@ public final class TurnStrategyUtils {
         		|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 	}
 	
-	public static boolean isBuildTowerWhenRunningAwayStrategyOk(Coordinates allyQueenCoordinates, Site nearestSiteToBuildATower) {
-		if (nearestSiteToBuildATower == null) {
+	public static boolean isBuildTowerWhenRunningAwayStrategyOk(Coordinates allyQueenCoordinates, Site nearestSiteToBuildATower, Collection<Unit> enemyGiants) {
+		if (nearestSiteToBuildATower == null
+				|| UnitsUtils.isGiantCloseToCoordinates(enemyGiants, allyQueenCoordinates)) {
 			return false;
 		}
 		
