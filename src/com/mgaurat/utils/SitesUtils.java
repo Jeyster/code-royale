@@ -7,7 +7,7 @@ import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 
 /**
- * Final class for utilitaries methods that manipulates Site.
+ * Final class for static methods that manipulates Site.
  * It does not refer to any particular Structure type.
  * 
  * @author mgaurat

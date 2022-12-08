@@ -80,7 +80,11 @@ class Player {
             Collection<Site> allyAndEmptySites = new ArrayList<>();
             allyAndEmptySites.addAll(emptySites);
             allyAndEmptySites.addAll(allySites);
-            Collection<Site> allyAndEmptySitesExceptKnightBarracksAndTower = StructuresUtils.getSitesExceptKnightBarracksAndTower(allyAndEmptySites);
+            
+            Collection<Site> emptyAndAllyBarracksAndMineSites = new ArrayList<>();
+            emptyAndAllyBarracksAndMineSites.addAll(emptySites);
+            emptyAndAllyBarracksAndMineSites.addAll(allyBarracksSites);
+            emptyAndAllyBarracksAndMineSites.addAll(allyMineSites);
             
             Collection<Site> allSites = new ArrayList<>();
             allSites.addAll(emptySites);
@@ -132,7 +136,7 @@ class Player {
             Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
             Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
             Site nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, allyQueenCoordinates, remainingGoldBySiteId);
-            Site nearestSiteToBuildATower = SitesUtils.getNearestSiteFromCoordinates(allyAndEmptySitesExceptKnightBarracksAndTower, allyQueenCoordinates);
+            Site nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptyAndAllyBarracksAndMineSites, allyQueenCoordinates);
             
             // Booleans that could be use to choose what to do during this turn
             boolean isTouchingAMineToImprove = false;
@@ -151,29 +155,29 @@ class Player {
             
             
             /* 1) First turn action is to MOVE or BUILD. Generally, if ally QUEEN is low life, adopt a safest strategy.
-            *		a) MOVE to a safe place when the ally QUEEN is in danger
+            *		a) MOVE to a safe place when the ally QUEEN is in danger.
+            *		   Can BUILD TOWER on the way to go.
             *		b) else if touching a MINE I owned not in full production, improve it
             *		c) else if touching a TOWER I owned not with full range, improve it
             *		d) else if MOVE to a free Site and BUILD a MINE until minAllyGoldProduction is reached
             *		e) else if MOVE to a free Site and BUILD a TOWER until minAllyTowerNumber is reached
             *		f) else if MOVE to a free Site and BUILD an only one KNIGHT BARRACKS
-            *		g) else if MOVE to a free Site and BUILD a TOWER until AVERAGE_ALLY_TOWERS_NUMBER is reached
-            *		h) else if MOVE to a free Site and BUILD an only one GIANT BARRACKS
-            *		i) else if MOVE to a free Site and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
-            *		j) else if MOVE to a free Site and BUILD a TOWER until MAX_ALLY_TOWERS_NUMBER is reached
-            *		k) else if MOVE to a free Site and BUILD a MINE
-            *		l) else if MOVE to a free Site and BUILD a TOWER
-            *		m) else if MOVE to the nearest ally TOWER with not enough life points
-            *		n) else MOVE to a safe place
+            *		g) else if MOVE to a free Site and BUILD an only one GIANT BARRACKS
+            *		h) else if MOVE to a free Site and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
+            *		i) else if MOVE to a free Site and BUILD a TOWER until MAX_ALLY_TOWERS_NUMBER is reached
+            *		j) else if MOVE to a free Site and BUILD a MINE
+            *		k) else if MOVE to a free Site and BUILD a TOWER
+            *		l) else if MOVE to the nearest ally TOWER with not enough life points
+            *		m) else MOVE to a safe place
             */
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
             	Coordinates safestCoordinates;
-            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATower, enemyGiants)
+            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)
             			&& allyQueenHealth > 8) {
-            		if (touchedSite == nearestSiteToBuildATower.getId()) {
+            		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
                 		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
             		} else {
-            			safestCoordinates = nearestSiteToBuildATower.getCoordinates();
+            			safestCoordinates = nearestSiteToBuildATowerWhenRunningAway.getCoordinates();
             			SystemOutUtils.printMoveAction(safestCoordinates);            			
             		}
             	} else {

@@ -15,12 +15,12 @@ import com.mgaurat.model.Structure;
 import com.mgaurat.model.Unit;
 
 /**
- * Final class for utilitaries methods that initialize the game and each turn from input.
+ * Final class for static methods that initialize the game and each turn from input.
  * 
  * @author mgaurat
  *
  */
-public class InputUtils {
+public final class InputUtils {
 	
 	private InputUtils() {}
 	

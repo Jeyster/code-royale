@@ -3,7 +3,7 @@ package com.mgaurat.utils;
 import com.mgaurat.model.Coordinates;
 
 /**
- * Final class for mathematical methods.
+ * Final class for static mathematical methods.
  * 
  * @author mgaurat
  *

@@ -9,7 +9,7 @@ import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Unit;
 
 /**
- * Final class for utilitaries methods that manipulates Unit.
+ * Final class for static methods that manipulates Unit.
  * 
  * @author mgaurat
  *
@@ -70,6 +70,13 @@ public final class UnitsUtils {
 		return distanceToNearestKnight;
 	}
 	
+	/**
+	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
+	 * 
+	 * @param giants
+	 * @param coordinates
+	 * @return boolean
+	 */
 	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
 		final int GIANT_SAFE_ZONE = 200;
 		for (Unit giant : giants) {

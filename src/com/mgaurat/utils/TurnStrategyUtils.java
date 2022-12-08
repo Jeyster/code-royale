@@ -10,7 +10,7 @@ import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
 
 /**
- * Final class for utilitaries methods that help to choose a turn strategy.
+ * Final class for static methods that help to choose a turn strategy.
  * 
  * @author mgaurat
  *
@@ -46,6 +46,17 @@ public final class TurnStrategyUtils {
         		|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 	}
 	
+	/**
+	 * Check if it is possible to BUILD a TOWER when running away.
+	 * If an enemy GIANT is too close, do not BUILD a TOWER.
+	 * If nearestSiteToBuildATower is not so far, do it.
+	 * The distance "not so far" is defined by constants.
+	 * 
+	 * @param allyQueenCoordinates
+	 * @param nearestSiteToBuildATower
+	 * @param enemyGiants
+	 * @return boolean
+	 */
 	public static boolean isBuildTowerWhenRunningAwayStrategyOk(Coordinates allyQueenCoordinates, Site nearestSiteToBuildATower, Collection<Unit> enemyGiants) {
 		if (nearestSiteToBuildATower == null
 				|| UnitsUtils.isGiantCloseToCoordinates(enemyGiants, allyQueenCoordinates)) {

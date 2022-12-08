@@ -11,7 +11,7 @@ import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
 
 /**
- * Final class for utilitaries methods that manipulates Site with Structure informations.
+ * Final class for static methods that manipulates Site with Structure informations.
  * 
  * @author mgaurat
  *
@@ -139,19 +139,6 @@ public final class StructuresUtils {
 		return towerSitesInRange;
 	}
 	
-	public static Collection<Site> getSitesExceptKnightBarracksAndTower(Collection<Site> sites) {
-		Collection<Site> sitesExceptKnightBarracksAndTower = new ArrayList<>();
-		for (Site site : sites) {
-			if (site.getStructure().getStructureTypeId() != StructureEnum.TOWER.getId()
-					&& site.getStructure().getStructureTypeId() != StructureEnum.BARRACKS.getId()
-					&& site.getStructure().getParam2() != UnitEnum.KNIGHT.getId()) {
-				sitesExceptKnightBarracksAndTower.add(site);
-			}
-		}
-		
-		return sitesExceptKnightBarracksAndTower;
-	}
-	
 	/**
 	 * Get the nearest Site from the input Coordinates of the ally QUEEN in which a MINE can be built.
 	 * If there is no gold left in the Site, a MINE cannot be built.
@@ -221,6 +208,14 @@ public final class StructuresUtils {
         return null;
     }
     
+    /**
+     * Update a map that lists siteId by remaining gold at each turn.
+     * At the first turn of the game, the map is empty.
+     * Each time a Site is sufficiently close to show its gold content, the Site is added or updated.
+     * 
+     * @param remainingGoldBySiteId
+     * @param sites
+     */
     public static void updateRemaingGoldBySiteId(Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> sites) {
     	int siteId;
     	int remainingGold;

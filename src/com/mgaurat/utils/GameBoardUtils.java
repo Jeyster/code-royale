@@ -10,19 +10,19 @@ import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
 
 /**
- * Final class for utilitaries methods that gives informations about the game board area.
+ * Final class for static methods that gives informations about the game board area.
  * Basically it provides Coordinates.
  * 
  * @author mgaurat
  *
  */
-public class GameBoardUtils {
+public final class GameBoardUtils {
 	
 	private final static int X_LENGTH = 1920;
 	private final static int Y_LENGTH = 1000;
 	
 	/**
-	 * Is the input Coodinates in the left half side of the game board area.
+	 * Check if the input Coordinates in the left half side of the game board area.
 	 * 
 	 * @param coordinates
 	 * @return boolean
@@ -32,7 +32,7 @@ public class GameBoardUtils {
 	}
 	
 	/**
-	 * Get the Coordinates evaluated to be the safest regarding my starting ally QUEEN Coordinates and TOWER.
+	 * Get the Coordinates evaluated to be the safest regarding my starting ally QUEEN Coordinates and the ally TOWER.
 	 * 
 	 * @param startingAllyQueenCoordinates
 	 * @param allyTowerSites
@@ -42,39 +42,22 @@ public class GameBoardUtils {
 	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Site> allySites) {
 		Coordinates safestCoordinates;
     	if (allyTowerSites.size() >= 1) {
-//    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromStartingAllyQueenAndTowerSites(startingAllyQueenCoordinates, allyTowerSites);
     		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
     	} else {
     		safestCoordinates = startingAllyQueenCoordinates;
-//    	} else if (allyTowerSites.size() >= 2) {
-//    		safestCoordinates = SitesUtils.getCoordinatesBetweenTwoRandomSites(allyTowerSites);
-//    	} else if (allyTowerSites.size() >= 1) {
-//    		safestCoordinates = SitesUtils.getRandomSiteCoordinates(allyTowerSites);
-//    	} else {
-//    		safestCoordinates = SitesUtils.getRandomSiteCoordinates(allySites);
     	}
     	
     	return safestCoordinates;
 	}
 	
 	/**
-	 * Get the Coordinates evaluated to be the safest regarding the starting ally QUEEN Coordinates and the ally TOWER.
-	 * Y coordinate is the average y coordinate from the the ally TOWER.
-	 * X coordinate is the extreme left or ride side of the game board are depending on the starting ally QUEEN Coordinates.
+	 * Get the Coordinates evaluated to be the safest regarding the starting ally QUEEN Coordinates.
+	 * If we start at left side, the safest Coordinates is the bottom left corner.
+	 * If we start at right side, the safest Coordinates is the top right corner.
 	 * 
 	 * @param startingAllyQueenCoordinates
-	 * @param allyTowerSites
 	 * @return Coordinates
 	 */
-	public static Coordinates getSafestCoordinatesFromStartingAllyQueenAndTowerSites(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites) {
-		int yCoordinate = SitesUtils.getAverageSiteCoordinates(allyTowerSites).getY();
-		if (isLeftSide(startingAllyQueenCoordinates)) {
-			return new Coordinates(0, yCoordinate);
-		} else {
-			return new Coordinates(X_LENGTH, yCoordinate);
-		}
-	}
-	
 	public static Coordinates getSafestCoordinatesFromStartingAllyQueen(Coordinates startingAllyQueenCoordinates) {
 		if (isLeftSide(startingAllyQueenCoordinates)) {
 			return new Coordinates(0, Y_LENGTH);

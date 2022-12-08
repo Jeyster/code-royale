@@ -5,7 +5,7 @@ import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 
 /**
- * Final class for utilitaries methods that print outputs.
+ * Final class for static methods that print outputs.
  * 
  * @author mgaurat
  *
