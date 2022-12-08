@@ -2,6 +2,7 @@ package com.mgaurat.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import com.mgaurat.enums.StructureEnum;
 import com.mgaurat.enums.UnitEnum;
@@ -163,15 +164,20 @@ public final class StructuresUtils {
 	 * @param myQueenCoordinates
 	 * @return Site
 	 */
-    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates) {    	
+    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, Map<Integer, Integer> remainingGoldBySiteId) {    	
     	double distanceToNearestSite = Double.MAX_VALUE;
         Site nearestSite = null;
         double distanceToSite;
         Coordinates siteCoordinates;
+        int siteId;
+        Integer remainingGold;
         for (Site site : sites) {
+        	siteId = site.getId();
+        	remainingGold = remainingGoldBySiteId.get(siteId);
         	siteCoordinates = site.getCoordinates();
         	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
-            if (site.getStructure().getMineGold() != 0) {
+            if ((remainingGold == null && site.getStructure().getMineGold() != 0)
+            		|| (remainingGold != null && remainingGold > 0)) {
             	if (distanceToSite < distanceToNearestSite) {
             		distanceToNearestSite = distanceToSite;
             		nearestSite = site;
@@ -213,6 +219,18 @@ public final class StructuresUtils {
         	}
         }
         return null;
+    }
+    
+    public static void updateRemaingGoldBySiteId(Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> sites) {
+    	int siteId;
+    	int remainingGold;
+    	for (Site site : sites) {
+    		siteId = site.getId();
+    		remainingGold = site.getStructure().getMineGold();
+    		if (remainingGold > -1) {
+    			remainingGoldBySiteId.put(siteId, remainingGold);
+    		}
+    	}
     }
 	
 }

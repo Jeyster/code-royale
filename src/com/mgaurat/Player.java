@@ -1,6 +1,7 @@
 package com.mgaurat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -29,6 +30,7 @@ class Player {
 	
 	private static Integer startingQueenHealth = null;
 	private static Coordinates startingAllyQueenCoordinates = null;
+	private static Map<Integer, Integer> remainingGoldBySiteId = new HashMap<>();
 
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
@@ -84,6 +86,8 @@ class Player {
             allSites.addAll(emptySites);
             allSites.addAll(allySites);
             allSites.addAll(enemySites);
+            
+            StructuresUtils.updateRemaingGoldBySiteId(remainingGoldBySiteId, allSites);
 
             // Get the Units thanks to the turn input
             int numUnits = in.nextInt();
@@ -127,7 +131,7 @@ class Player {
             int targetedSiteId;
             Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
             Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
-            Site nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, allyQueenCoordinates);
+            Site nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, allyQueenCoordinates, remainingGoldBySiteId);
             Site nearestSiteToBuildATower = SitesUtils.getNearestSiteFromCoordinates(allyAndEmptySitesExceptKnightBarracksAndTower, allyQueenCoordinates);
             
             // Booleans that could be use to choose what to do during this turn
