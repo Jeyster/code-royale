@@ -119,14 +119,7 @@ class Player {
             if (allyQueen.getHealth() < 50) {
             	minAllyGoldProduction = 4;
             } else {
-            	minAllyGoldProduction = 6;            	
-            }
-            
-            int minAllyTowerNumber;
-            if (allyQueen.getHealth() < 50) {
-                minAllyTowerNumber = 1;
-            } else {
-            	minAllyTowerNumber = 2;            	
+            	minAllyGoldProduction = 5;            	
             }
             
             // Possible Site to MOVE or to BUILD
@@ -171,7 +164,8 @@ class Player {
             */
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
             	Coordinates safestCoordinates;
-            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATower, enemyGiants)) {
+            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATower, enemyGiants)
+            			&& allyQueenHealth > 8) {
             		if (touchedSite == nearestSiteToBuildATower.getId()) {
                 		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
             		} else {
