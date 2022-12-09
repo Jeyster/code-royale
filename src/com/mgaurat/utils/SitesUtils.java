@@ -1,7 +1,6 @@
 package com.mgaurat.utils;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
@@ -38,34 +37,6 @@ public final class SitesUtils {
             }
         }
         return nearestSite;
-    }
-    
-    /**
-     * Get the Coordinates in the middle of the first two Site of the input list.
-     * 
-     * @param sites
-     * @return Coordinates
-     */
-    public static Coordinates getCoordinatesBetweenTwoRandomSites(Collection<Site> sites) {
-    	if (sites.size() < 2) {
-    		return null;
-    	}
-    	
-    	Iterator<Site> it = sites.iterator();
-    	Site site1 = it.next();
-    	Site site2 = it.next();
-    	return MathUtils.getCoordinatesBetweenTwoCoordinates(site1.getCoordinates(), site2.getCoordinates());
-    }
-
-    /**
-     * Get the Coordinates of the first Site of the input list.
-     * 
-     * @param sites
-     * @return Coordinates
-     */
-    public static Coordinates getRandomSiteCoordinates(Collection<Site> sites) {
-    	Site site = sites.iterator().next();
-    	return site.getCoordinates();
     }
 
 	/**

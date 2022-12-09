@@ -267,5 +267,41 @@ public final class StructuresUtils {
     	
     	return mineAndNotTrainingBarracksAndTowerSites;
     }
+    
+    public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates) {
+    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	int safestXCoordinate = isLeftSide ? 1920 : 0;
+    	Site safestTower = null;
+    	for (Site allyTowerSite : allyTowerSites) {
+    		if ((isLeftSide && allyTowerSite.getCoordinates().getX() < safestXCoordinate)
+    				|| (!isLeftSide && allyTowerSite.getCoordinates().getX() > safestXCoordinate)) {
+    			safestXCoordinate = allyTowerSite.getCoordinates().getX();
+    			safestTower = allyTowerSite;
+    		}
+    	}
+
+    	return safestTower;
+    }
+    
+    public static Coordinates getCoordinatesBehindTower(Coordinates startingAllyQueenCoordinates, Site towerSite) {
+    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
+    	int towerRadius = towerSite.getRadius();
+    	int xCoordinate = isLeftSide ? 
+    			towerSiteCoordinates.getX() - towerRadius : towerSiteCoordinates.getX() + towerRadius;
+    	
+    	return new Coordinates(xCoordinate, towerSiteCoordinates.getY());
+    	
+//    	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
+//    	int distanceBetweenQueenAndTower = (int) Math.round(MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, towerSiteCoordinates));
+//    	int towerRadius = towerSite.getRadius();
+//    	int xDifferenceBetweenQueenAndTower = towerSite.getCoordinates().getX() - allyQueenCoordinates.getX();
+//    	int yDifferenceBetweenQueenAndTower = towerSite.getCoordinates().getY() - allyQueenCoordinates.getY();
+//
+//    	int deltaX = towerRadius * xDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
+//    	int deltaY = towerRadius * yDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
+//    	
+//    	return new Coordinates(towerSiteCoordinates.getX() + deltaX, towerSiteCoordinates.getY() + deltaY);
+    }
 	
 }

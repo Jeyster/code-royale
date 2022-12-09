@@ -41,10 +41,11 @@ public final class GameBoardUtils {
 	 */
 	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Site> allySites) {
 		Coordinates safestCoordinates;
-    	if (allyTowerSites.size() >= 1) {
-    		safestCoordinates = GameBoardUtils.getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
+    	if (allyTowerSites.size() >= 3) {
+    		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
+    		safestCoordinates = StructuresUtils.getCoordinatesBehindTower(startingAllyQueenCoordinates, safestAllyTower);
     	} else {
-    		safestCoordinates = startingAllyQueenCoordinates;
+    		safestCoordinates = getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
     	}
     	
     	return safestCoordinates;
@@ -113,5 +114,5 @@ public final class GameBoardUtils {
     		return !isXaLessThanXb && !isYaLessThanYb;
     	}
     }
-	
+    	
 }
