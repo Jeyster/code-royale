@@ -178,8 +178,8 @@ class Player {
             *		n) else MOVE to a safe place
             */
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
-            	Coordinates safestCoordinates;
-            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, allySites); 
+            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)
             			&& allyQueenHealth > 8) {
             		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
                 		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
@@ -188,7 +188,6 @@ class Player {
             			SystemOutUtils.printMoveAction(safestCoordinates);            			
             		}
             	} else {
-            		safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, allySites);            		
             		SystemOutUtils.printMoveAction(safestCoordinates);
             	}
             } else if (isTouchingAMineToImprove) {

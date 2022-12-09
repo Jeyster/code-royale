@@ -79,5 +79,39 @@ public final class GameBoardUtils {
     	return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(coordinates, enemyUnitsByType)
     			&& StructuresUtils.isCoordinatesInRangeOfAnyTower(coordinates, enemyTowerSites);
     }
+    
+    /**
+     * a is the Coordinates to evaluate.
+     * b is the Coordinates to go.
+     * c is the QUEEN Coordinates.
+     * 
+     * @param a
+     * @param b
+     * @param c
+     * @return boolean
+     */
+    public static boolean isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(Coordinates a, Coordinates b, Coordinates c) {
+    	int xa = a.getX();
+    	int ya = a.getY();
+    	int xb = b.getX();
+    	int yb = b.getY();
+    	int xc = c.getX();
+    	int yc = c.getY();
+    	
+    	boolean isXcLessThanXb = xc < xb;
+    	boolean isYcLessThanYb = yc < yb;
+    	boolean isXaLessThanXb = xa < xb;
+    	boolean isYaLessThanYb = ya < yb;
+    	
+    	if (isXcLessThanXb && isYcLessThanYb) {
+    		return isXaLessThanXb && isYaLessThanYb;
+    	} else if (isXcLessThanXb && !isYcLessThanYb) {
+    		return isXaLessThanXb && !isYaLessThanYb;
+    	} else if (!isXcLessThanXb && isYcLessThanYb) {
+    		return !isXaLessThanXb && isYaLessThanYb;
+    	} else {
+    		return !isXaLessThanXb && !isYaLessThanYb;
+    	}
+    }
 	
 }
