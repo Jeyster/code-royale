@@ -145,29 +145,29 @@ public final class TurnStrategyUtils {
 	/**
 	 * Check if we choose to BUILD a KNIGHT BARRACKS. Depends on :
 	 *	- ally QUEEN health
-     *	- nearest empty Site
+     *	- nearest Site
      *	- ally KNIGHT BARRACKS Sites
      *	- enemy UNIT location
      *	- enemy TOWER location
      *
 	 * @param queenHealth
-	 * @param nearestEmptySite
+	 * @param nearestSite
 	 * @param allyBarracksSites
 	 * @param enemyUnitsByType
 	 * @param enemyTowerSites
 	 * @return boolean
 	 */
-	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, 
+	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, 
 			Collection<Site> allyBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites) {
 		
-		if (nearestEmptySite == null || !allyBarracksSites.isEmpty()) {
+		if (nearestSite == null || !allyBarracksSites.isEmpty()) {
 			return false;
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
-			return !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites);			
+			return !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestSite.getCoordinates(), enemyTowerSites);			
 		} else {
-			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
+			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
 		}
 	}
 	

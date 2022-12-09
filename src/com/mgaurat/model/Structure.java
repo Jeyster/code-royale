@@ -1,6 +1,8 @@
 package com.mgaurat.model;
 
 import com.mgaurat.enums.OwnerEnum;
+import com.mgaurat.enums.StructureEnum;
+import com.mgaurat.enums.UnitEnum;
 
 /**
  * Structure that is built on a Site.
@@ -77,5 +79,35 @@ public class Structure {
 	public boolean isOwnedByMe() {
 		return getOwner() == OwnerEnum.ALLY.getId();
 	}
-
+	
+	public boolean isMine() {
+		return this.getStructureTypeId() == StructureEnum.MINE.getId();
+	}
+	
+	public boolean isBarrack() {
+		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId();
+	}
+	
+	public boolean isKnightBarracks() {
+		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+				&& this.getParam2() == UnitEnum.KNIGHT.getId();
+	}
+	
+	public boolean isArcherBarracks() {
+		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+				&& this.getParam2() == UnitEnum.ARCHER.getId();
+	}
+	
+	public boolean isGiantBarracks() {
+		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+				&& this.getParam2() == UnitEnum.GIANT.getId();
+	}
+	
+	public boolean isTower() {
+		return this.getStructureTypeId() == StructureEnum.TOWER.getId();
+	}
+	
+	public boolean isBarracksInTraining() {
+		return this.isBarrack() && this.getParam1() > 0;
+	}
 }

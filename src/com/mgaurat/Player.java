@@ -64,6 +64,14 @@ class Player {
             allySites.addAll(allyTowerSites);
             allySites.addAll(allyBarracksSites);
             
+            Collection<Site> allyMineAndNotTrainingBarracksAndTowerSites = StructuresUtils.getMineAndNotTrainingBarracksAndTowerSites(allySites);
+            
+            Collection<Site> allyAndEmptySites = new ArrayList<>();
+            allyAndEmptySites.addAll(emptySites);
+            allyAndEmptySites.addAll(allySites);
+            
+            Collection<Site> emptyAndAllyMineAndNotInTraingBarracksSites = StructuresUtils.getEmptyAndMineAndNotTrainingBarracks(allyAndEmptySites);
+            
     		Map<StructureEnum, Map<Integer, Site>> enemySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ENEMY);
     		Map<Integer, Site> enemyMineSitesById = enemySitesByIdAndStructure.get(StructureEnum.MINE);
             Collection<Site> enemyMineSites = enemyMineSitesById.values();
@@ -77,14 +85,6 @@ class Player {
             enemySites.addAll(enemyTowerSites);
             enemySites.addAll(enemyBarracksSites);
             
-            Collection<Site> allyAndEmptySites = new ArrayList<>();
-            allyAndEmptySites.addAll(emptySites);
-            allyAndEmptySites.addAll(allySites);
-            
-            Collection<Site> emptyAndAllyBarracksAndMineSites = new ArrayList<>();
-            emptyAndAllyBarracksAndMineSites.addAll(emptySites);
-            emptyAndAllyBarracksAndMineSites.addAll(allyBarracksSites);
-            emptyAndAllyBarracksAndMineSites.addAll(allyMineSites);
             
             Collection<Site> allSites = new ArrayList<>();
             allSites.addAll(emptySites);
@@ -136,7 +136,8 @@ class Player {
             Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
             Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
             Site nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, allyQueenCoordinates, remainingGoldBySiteId);
-            Site nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptyAndAllyBarracksAndMineSites, allyQueenCoordinates);
+            Site nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptyAndAllyMineAndNotInTraingBarracksSites, allyQueenCoordinates);
+            Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteFromCoordinates(allyMineAndNotTrainingBarracksAndTowerSites, allyQueenCoordinates);
             
             // Booleans that could be use to choose what to do during this turn
             boolean isTouchingAMineToImprove = false;
@@ -162,13 +163,14 @@ class Player {
             *		d) else if MOVE to a free Site and BUILD a MINE until minAllyGoldProduction is reached
             *		e) else if MOVE to a free Site and BUILD a TOWER until minAllyTowerNumber is reached
             *		f) else if MOVE to a free Site and BUILD an only one KNIGHT BARRACKS
-            *		g) else if MOVE to a free Site and BUILD an only one GIANT BARRACKS
-            *		h) else if MOVE to a free Site and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
-            *		i) else if MOVE to a free Site and BUILD a TOWER until MAX_ALLY_TOWERS_NUMBER is reached
-            *		j) else if MOVE to a free Site and BUILD a MINE
-            *		k) else if MOVE to a free Site and BUILD a TOWER
-            *		l) else if MOVE to the nearest ally TOWER with not enough life points
-            *		m) else MOVE to a safe place
+            *		g) else if MOVE to a Site not in training and BUILD an only one KNIGHT BARRACKS
+            *		h) else if MOVE to a free Site and BUILD an only one GIANT BARRACKS
+            *		i) else if MOVE to a free Site and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
+            *		j) else if MOVE to a free Site and BUILD a TOWER until MAX_ALLY_TOWERS_NUMBER is reached
+            *		k) else if MOVE to a free Site and BUILD a MINE
+            *		l) else if MOVE to a free Site and BUILD a TOWER
+            *		m) else if MOVE to the nearest ally TOWER with not enough life points
+            *		n) else MOVE to a safe place
             */
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber)) {
             	Coordinates safestCoordinates;
@@ -197,6 +199,14 @@ class Player {
         		}        			      			
             } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyBarracksSites, enemyUnitsByType, enemyTowerSites)) {
             	targetedSite = nearestEmptySite;
+            	targetedSiteId = targetedSite.getId();
+            	if (touchedSite != targetedSiteId) {
+                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+            	} else {
+            		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
+            	}
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyBarracksSites, enemyUnitsByType, enemyTowerSites)) {
+            	targetedSite = nearestAllySiteNotInTraining;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
                 	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());

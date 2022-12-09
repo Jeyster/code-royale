@@ -40,5 +40,9 @@ public class Site {
 	public void setStructure(Structure structure) {
 		this.structure = structure;
 	}
+	
+	public boolean isEmpty() {
+		return this.structure.getParam1() == -1;
+	}
 
 }

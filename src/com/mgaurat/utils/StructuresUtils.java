@@ -227,5 +227,45 @@ public final class StructuresUtils {
     		}
     	}
     }
+    
+    /**
+     * Get Sites that are empty, or a MINE or a not training BARRACKS.
+     * 
+     * @param sites
+     * @return Collection<Site>
+     */
+    public static Collection<Site> getEmptyAndMineAndNotTrainingBarracks(Collection<Site> sites) {
+    	Collection<Site> emptyAndMineAndNotTrainingBarracks = new ArrayList<>();
+    	Structure structure;
+    	for (Site site : sites) {
+    		structure = site.getStructure();
+    		if (site.isEmpty() || structure.isMine() || 
+    				(structure.isBarrack() && !structure.isBarracksInTraining())) {
+    			emptyAndMineAndNotTrainingBarracks.add(site);
+    		}
+    	}
+    	
+    	return emptyAndMineAndNotTrainingBarracks;
+    }
+    
+    /**
+     * Get Sites that are a MINE or a TOWER or a not training BARRACKS.
+     * 
+     * @param sites
+     * @return Collection<Site>
+     */
+    public static Collection<Site> getMineAndNotTrainingBarracksAndTowerSites(Collection<Site> sites) {
+    	Collection<Site> mineAndNotTrainingBarracksAndTowerSites = new ArrayList<>();
+    	Structure structure;
+    	for (Site site : sites) {
+    		structure = site.getStructure();
+    		if (structure.isMine() || structure.isTower() || 
+    				(structure.isBarrack() && !structure.isBarracksInTraining())) {
+    			mineAndNotTrainingBarracksAndTowerSites.add(site);
+    		}
+    	}
+    	
+    	return mineAndNotTrainingBarracksAndTowerSites;
+    }
 	
 }
