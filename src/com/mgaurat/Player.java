@@ -85,6 +85,11 @@ class Player {
             enemySites.addAll(enemyTowerSites);
             enemySites.addAll(enemyBarracksSites);
             
+            Collection<Site> enemyAndEmptySites = new ArrayList<>();
+            enemyAndEmptySites.addAll(emptySites);
+            enemyAndEmptySites.addAll(enemySites);
+            
+            Collection<Site> emptyAndEnemyMineAndNotInTraingBarracksSites = StructuresUtils.getEmptyAndMineAndNotTrainingBarracks(enemyAndEmptySites);
             
             Collection<Site> allSites = new ArrayList<>();
             allSites.addAll(emptySites);
@@ -133,9 +138,9 @@ class Player {
             // Possible Site to MOVE or to BUILD
             Site targetedSite;
             int targetedSiteId;
-            Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+            Site nearestEmptySite = SitesUtils.getNearestSiteFromCoordinates(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates);
             Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
-            Site nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptySites, allyQueenCoordinates, remainingGoldBySiteId);
+            Site nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId);
             Site nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptyAndAllyMineAndNotInTraingBarracksSites, allyQueenCoordinates);
             Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteFromCoordinates(allyMineAndNotTrainingBarracksAndTowerSites, allyQueenCoordinates);
             
