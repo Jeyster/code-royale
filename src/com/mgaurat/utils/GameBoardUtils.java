@@ -69,7 +69,7 @@ public final class GameBoardUtils {
 	
 	/**
 	 * Check if the input Coordinates is considered as safe.
-	 * It depends on enemy KNIGHT and TOWER.
+	 * It depends on enemy KNIGHT, enemy TOWER and KNIGHT BARRACKS.
 	 * 
 	 * @param coordinates
 	 * @param enemyUnitsByType
@@ -80,7 +80,7 @@ public final class GameBoardUtils {
     		Collection<Site> enemyTowerSites, int safeDistance, Collection<Site> enemyKnightBarracksSites) {
     	return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(coordinates, enemyUnitsByType, safeDistance)
     			&& !StructuresUtils.isCoordinatesInRangeOfTowers(coordinates, enemyTowerSites, 1)
-    			&& !StructuresUtils.isEnemyKnightBarracksDangereous(coordinates, enemyKnightBarracksSites);
+    			&& !StructuresUtils.isEnemyKnightBarracksDangerous(coordinates, enemyKnightBarracksSites);
     }
     
     /**

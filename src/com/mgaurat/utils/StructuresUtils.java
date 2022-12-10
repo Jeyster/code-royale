@@ -113,6 +113,14 @@ public final class StructuresUtils {
     	return false;
     }
     
+    /**
+     * Check if Coordinates can be reached by a certain number of towers.
+     * 
+     * @param coordinates
+     * @param towerSites
+     * @param towerNumberInRangeMax
+     * @return boolean
+     */
     public static boolean isCoordinatesInRangeOfTowers(Coordinates coordinates, Collection<Site> towerSites, int towerNumberInRangeMax) {
     	return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= towerNumberInRangeMax;
     }
@@ -170,6 +178,29 @@ public final class StructuresUtils {
         return nearestSite;
     }
     
+    /**
+     * Check if site is close (distance <= SAFE_DISTANCE) to the nearest enemy KNIGHT BARRACKS.
+     * 
+     * @param site
+     * @param enemyKnightBarracksSites
+     * @return boolean
+     */
+    public static boolean isSiteCloseToNearestEnemyKnightBarracksSite(Site site, Collection<Site> enemyKnightBarracksSites) {
+    	if (site == null || enemyKnightBarracksSites.isEmpty()) {
+    		return false;
+    	}
+    	
+    	Site nearestEnemyKnightBarrackSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, site.getCoordinates());
+    	return isSiteCloseToAnotherSite(site, nearestEnemyKnightBarrackSite);
+    }
+
+    /**
+     * Check if the distance between 2 Sites is less or equal to constant SAFE_DISTANCE.
+     * 
+     * @param site1
+     * @param site2
+     * @return boolean
+     */
     public static boolean isSiteCloseToAnotherSite(Site site1, Site site2) {
     	if (site1 == null || site2 == null) {
     		return false;
@@ -179,15 +210,12 @@ public final class StructuresUtils {
     	return MathUtils.getDistanceBetweenTwoCoordinates(site1.getCoordinates(), site2.getCoordinates()) <= SAFE_DISTANCE;
     }
     
-    public static boolean isSiteCloseToNearestEnemyKnightBarracksSite(Site site, Collection<Site> enemyKnightBarracksSites) {
-    	if (site == null || enemyKnightBarracksSites.isEmpty()) {
-    		return false;
-    	}
-    	
-    	Site nearestEnemyKnightBarrackSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, site.getCoordinates());
-    	return isSiteCloseToAnotherSite(site, nearestEnemyKnightBarrackSite);
-    }
-    
+    /**
+     * Get the Sites from the input BARRACKS Sites that are KNIGHT BARRACKS.
+     * 
+     * @param barracksSites
+     * @return Collection<Site>
+     */
     public static Collection<Site> getKnightBarracksSites(Collection<Site> barracksSites) {
     	Collection<Site> knightBarracksSites = new ArrayList<>();
     	for (Site barracksSite : barracksSites) {
@@ -198,7 +226,15 @@ public final class StructuresUtils {
     	return knightBarracksSites;
     }
     
-    public static boolean isEnemyKnightBarracksDangereous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites) {
+    /**
+     * Check if there is a enemy KNIGHT BARRACKS that is dangerous for my QUEEN.
+     * It means that my QUEEN should not be close (< SAFE_DISTANCE) to a training enemy KNIGHT BARRACKS.
+     * 
+     * @param allyQueenCoordinates
+     * @param enemyKnightBarracksSites
+     * @return boolean
+     */
+    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites) {
     	final double SAFE_DISTANCE = 500;
     	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
     	if (nearestEnemyKnightBarracksSite == null) {
@@ -305,6 +341,16 @@ public final class StructuresUtils {
     	return mineAndNotTrainingBarracksAndTowerSites;
     }
     
+    /**
+     * Find a safe TOWER Site. The algorithm is defined as followed :
+     * 	- for each ally TOWER Site, evaluate the number of ally TOWER (including itself) that cover this Site
+     * 	- put in a map the left most (or right most depending on startingAllyQueenCoordinates) for each number of covering ally TOWER
+     * 	- return the Site from the map that is the most covered
+     * 
+     * @param allyTowerSites
+     * @param startingAllyQueenCoordinates
+     * @return Site
+     */
     public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates) {
     	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
     	Map<Integer, Site> safestTowersProtectedByTowers = new HashMap<>();
@@ -331,6 +377,13 @@ public final class StructuresUtils {
     	return safestTower;
     }
     
+    /**
+     * Get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
+     * 
+     * @param startingAllyQueenCoordinates
+     * @param towerSite
+     * @return Coordinates
+     */
     public static Coordinates getCoordinatesBehindTower(Coordinates startingAllyQueenCoordinates, Site towerSite) {
     	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
     	Coordinates towerSiteCoordinates = towerSite.getCoordinates();

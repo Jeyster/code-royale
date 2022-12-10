@@ -26,7 +26,6 @@ public final class TurnStrategyUtils {
      * Check if we have to MOVE to a safe place. Depends on :
      *	- ally QUEEN health 
      *	- ally QUEEN coordinates
-     *	- free sites that left
      *	- number of enemy KNIGHT
      *
 	 * @param queenHealth
