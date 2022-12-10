@@ -39,11 +39,12 @@ public final class TurnStrategyUtils {
 	 */
 	public static boolean isRunAwayStrategyOk(int queenHealth, Coordinates allyQueenCoordinates,
 			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites,
-			int emptySitesNumber, int enemyKnightsNumber) {
+			int emptySitesNumber, int enemyKnightsNumber, int safeDistance) {
 		return (queenHealth < LOW_HEALTH_QUEEN 
-        		&& !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites))
-        		|| emptySitesNumber == 0
-        		|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
+        		&& !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance))
+				|| (queenHealth >= 40 && !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 10))
+				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN && !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
+				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 	}
 	
 	/**
@@ -99,17 +100,17 @@ public final class TurnStrategyUtils {
 	 * @return boolean
 	 */
 	public static boolean isMineMoveOrBuildStrategyOk(int queenHealth, Site targetedSiteToBuildAMine, Collection<Site> allyMineSites, 
-			int goldProductionIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites) {
+			int goldProductionIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance) {
 		
 		if (targetedSiteToBuildAMine == null || StructuresUtils.getGoldProduction(allyMineSites) >= goldProductionIWant ) {
 			return false;
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
-			return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)
+			return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, safeDistance)
 					&& !StructuresUtils.isCoordinatesInRangeOfTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites, 2);			
 		} else {
-			return GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites);
+			return GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance);
 		}
 	}
 
@@ -131,7 +132,7 @@ public final class TurnStrategyUtils {
 	 * @return boolean
 	 */
 	public static boolean isTowerMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int allyTowersNumber,
-			int allyTowersNumberIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites) {
+			int allyTowersNumberIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance) {
 		
 		if (nearestEmptySite == null || allyTowersNumber >= allyTowersNumberIWant) {
 			return false;
@@ -140,7 +141,7 @@ public final class TurnStrategyUtils {
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
-			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
+			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance);
 		}
 	}
 	
@@ -159,8 +160,8 @@ public final class TurnStrategyUtils {
 	 * @param enemyTowerSites
 	 * @return boolean
 	 */
-	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, 
-			Collection<Site> allyBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites) {
+	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, Collection<Site> allyBarracksSites, 
+			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance) {
 		
 		if (nearestSite == null || !allyBarracksSites.isEmpty()) {
 			return false;
@@ -169,7 +170,7 @@ public final class TurnStrategyUtils {
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
-			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
+			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance);
 		}
 	}
 	
@@ -193,7 +194,7 @@ public final class TurnStrategyUtils {
 	 */
 	public static boolean isGiantBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int enemyTowersNumber,
 			Collection<Site> allyBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
-			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold) {
+			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold, int safeDistance) {
 		
 		if (nearestEmptySite == null || enemyTowersNumber <= enemyTowersNumberThreshold) {
 			return false;
@@ -204,7 +205,7 @@ public final class TurnStrategyUtils {
             		&& !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
 			return !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
-            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
+            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance);
 		}
 	}
 

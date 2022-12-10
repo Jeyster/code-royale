@@ -42,9 +42,8 @@ public final class UnitsUtils {
 	 * @param enemyUnitsByType
 	 * @return boolean
 	 */
-	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType) {
-		final double SAFE_DISTANCE = 500;
-		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > SAFE_DISTANCE;
+	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, int safeDistance) {
+		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > safeDistance;
 	}
 	
 	/**
