@@ -180,7 +180,7 @@ class Player {
             *		n) else MOVE to a safe place
             */
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites)) {
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, allySites); 
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights); 
             	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)
             			&& allyQueenHealth > 8) {
             		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
@@ -268,7 +268,7 @@ class Player {
             } else if (nearestAllyTowerSiteWithNotSufficientLife != null) {
             	SystemOutUtils.printMoveAction(nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()); 
             } else {
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, allySites);
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights);
             	SystemOutUtils.printMoveAction(safestCoordinates);
         	}
 

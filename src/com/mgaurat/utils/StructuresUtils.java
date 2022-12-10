@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mgaurat.enums.GameBoardQuarterEnum;
 import com.mgaurat.enums.StructureEnum;
 import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
+import com.mgaurat.model.Unit;
 
 /**
  * Final class for static methods that manipulates Site with Structure informations.
@@ -378,20 +380,68 @@ public final class StructuresUtils {
     }
     
     /**
-     * Get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
+     * Get a Coordinates to hide from enemies behind a tower :
+     * 	- first evaluate the nearest enemy position with respect to the towerSite
+     * 	- then adapt the Coordinates close to the towerSite
+     * 
+     * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
      * 
      * @param startingAllyQueenCoordinates
      * @param towerSite
      * @return Coordinates
      */
-    public static Coordinates getCoordinatesBehindTower(Coordinates startingAllyQueenCoordinates, Site towerSite) {
-    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-    	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
-    	int towerRadius = towerSite.getRadius();
-    	int xCoordinate = isLeftSide ? 
-    			towerSiteCoordinates.getX() - towerRadius : towerSiteCoordinates.getX() + towerRadius;
+    public static Coordinates getCoordinatesBehindTower(Unit nearestEnemyKnight, Site towerSite, Coordinates startingAllyQueenCoordinates) {	
+    	if (towerSite == null) {
+    		return null;
+    	}
     	
-    	return new Coordinates(xCoordinate, towerSiteCoordinates.getY());
+    	if (nearestEnemyKnight != null) {
+    		int xCoordinate, yCoordinate;
+    		Coordinates towerCoordinates = towerSite.getCoordinates();
+    		Coordinates nearestEnemyKnightCoordinates = nearestEnemyKnight.getCoordinates();
+    		int towerXCoordinate = towerCoordinates.getX();
+    		int towerYCoordinate = towerCoordinates.getY();
+    		int towerRadius = towerSite.getRadius();
+    		GameBoardQuarterEnum boardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(nearestEnemyKnightCoordinates, towerCoordinates);
+    		switch (boardGameQuarter) {
+	    		case TOPLEFT: {
+	    			xCoordinate = towerXCoordinate + towerRadius;
+	    			yCoordinate = towerYCoordinate;
+	    			break;
+	    		}
+	    		case TOPRIGHT: {
+	    			xCoordinate = towerXCoordinate;
+	    			yCoordinate = towerYCoordinate + towerRadius;
+	    			break;
+	    		}
+	    		case BOTTOMRIGHT: {
+	    			xCoordinate = towerXCoordinate - towerRadius;
+	    			yCoordinate = towerYCoordinate;
+	    			break;
+	    		}
+	    		case BOTTOMLEFT: {
+	    			xCoordinate = towerXCoordinate;
+	    			yCoordinate = towerYCoordinate - towerRadius;
+	    			break;
+	    		}
+	    		// Should not happened
+	    		default: {
+	    			xCoordinate = towerXCoordinate;
+	    			yCoordinate = towerYCoordinate;
+	    		}
+    		}
+    		
+    		return new Coordinates(xCoordinate, yCoordinate);    		
+    	} else {
+        	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+        	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
+        	int towerRadius = towerSite.getRadius();
+        	int xCoordinate = isLeftSide ? 
+        			towerSiteCoordinates.getX() - towerRadius : towerSiteCoordinates.getX() + towerRadius;
+        	
+        	return new Coordinates(xCoordinate, towerSiteCoordinates.getY());
+    	}
+    	
     	
 //    	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
 //    	int distanceBetweenQueenAndTower = (int) Math.round(MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, towerSiteCoordinates));

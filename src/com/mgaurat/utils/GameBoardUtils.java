@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.mgaurat.enums.GameBoardQuarterEnum;
 import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
@@ -32,18 +33,18 @@ public final class GameBoardUtils {
 	}
 	
 	/**
-	 * Get the Coordinates evaluated to be the safest regarding my starting ally QUEEN Coordinates and the ally TOWER.
+	 * Get the Coordinates evaluated to be the safest regarding my starting ally QUEEN Coordinates, the ally TOWER and the enemy KNIGHT.
 	 * 
 	 * @param startingAllyQueenCoordinates
 	 * @param allyTowerSites
 	 * @param allySites
 	 * @return Coordinates
 	 */
-	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Site> allySites) {
+	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights) {
 		Coordinates safestCoordinates;
-    	if (allyTowerSites.size() >= 3) {
+    	if (!allyTowerSites.isEmpty()) {
     		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
-    		safestCoordinates = StructuresUtils.getCoordinatesBehindTower(startingAllyQueenCoordinates, safestAllyTower);
+    		safestCoordinates = StructuresUtils.getCoordinatesBehindTower(UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights), safestAllyTower, startingAllyQueenCoordinates);
     	} else {
     		safestCoordinates = getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
     	}
@@ -114,6 +115,22 @@ public final class GameBoardUtils {
     		return !isXaLessThanXb && isYaLessThanYb;
     	} else {
     		return !isXaLessThanXb && !isYaLessThanYb;
+    	}
+    }
+    
+    public static GameBoardQuarterEnum getQuarterOfCoordinatesWithRespectToAnotherCoordinates(Coordinates coordinates, Coordinates referenceCoordinates) {
+    	int xCoordinate = coordinates.getX();  
+    	int yCoordinate = coordinates.getY();
+    	int xReferenceCoordinate = referenceCoordinates.getX();
+    	int yReferenceCoordinate = referenceCoordinates.getY();
+    	if (xCoordinate < xReferenceCoordinate && yCoordinate < yReferenceCoordinate) {
+    		return GameBoardQuarterEnum.TOPLEFT;
+    	} else if (xCoordinate < xReferenceCoordinate && yCoordinate >= yReferenceCoordinate) {
+    		return GameBoardQuarterEnum.BOTTOMLEFT;
+    	} else if (xCoordinate >= xReferenceCoordinate && yCoordinate < yReferenceCoordinate) {
+    		return GameBoardQuarterEnum.TOPRIGHT;
+    	} else {
+    		return GameBoardQuarterEnum.BOTTOMRIGHT;
     	}
     }
     	

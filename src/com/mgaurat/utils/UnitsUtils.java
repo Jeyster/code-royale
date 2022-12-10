@@ -69,6 +69,23 @@ public final class UnitsUtils {
 		return distanceToNearestKnight;
 	}
 	
+	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {
+        double distanceToUnit;
+        double distanceToNearestUnit = Double.MAX_VALUE;
+		Coordinates unitCoordinates;
+		Unit nearestUnit = null;
+		for (Unit unit : units) {
+			unitCoordinates = unit.getCoordinates();
+			distanceToUnit = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unitCoordinates);
+			if (distanceToUnit < distanceToNearestUnit) {
+				distanceToNearestUnit = distanceToUnit;
+				nearestUnit = unit;
+			}
+		}
+		
+		return nearestUnit;
+	}
+	
 	/**
 	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
 	 * 
