@@ -59,6 +59,7 @@ class Player {
     		int allyTowersNumber = allyTowerSites.size();
     		Map<Integer, Site> allyBarracksSitesById = allySitesByIdAndStructure.get(StructureEnum.BARRACKS);
             Collection<Site> allyBarracksSites = allyBarracksSitesById.values();
+            Collection<Site> allyKnightBarracksSites = StructuresUtils.getKnightBarracksSites(allyBarracksSites);
             Collection<Site> allySites = new ArrayList<>();
             allySites.addAll(allyMineSites);
             allySites.addAll(allyTowerSites);
@@ -104,12 +105,13 @@ class Player {
             Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = InputUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
             
             Map<UnitEnum, List<Unit>> allyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ALLY);
-            Collection<Unit> allyGiants = allyUnitsByType.get(UnitEnum.GIANT);
             Unit allyQueen = UnitsUtils.getQueen(allyUnitsByType);
+            Collection<Unit> allyGiants = allyUnitsByType.get(UnitEnum.GIANT);
             Coordinates allyQueenCoordinates = allyQueen.getCoordinates();
             int allyQueenHealth = allyQueen.getHealth();
                         
             Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
+            Unit enemyQueen = UnitsUtils.getQueen(enemyUnitsByType);
             Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
             int enemyKnightsNumber = enemyKnights.size();
             Collection<Unit> enemyGiants = enemyUnitsByType.get(UnitEnum.GIANT);
@@ -128,6 +130,7 @@ class Player {
             final int MAX_ALLY_GOLD_PRODUCTION = 8;
             final int ENEMY_TOWERS_NUMBER_THRESHOLD = 3;
     		final int SAFE_DISTANCE = 500;
+    		final int GOLD_THRESHOLD_FOR_TWO_KNIGHT_BARRACKS = 160;
             
             // Depending on ally QUEEN health, choose the best values
             int minAllyGoldProduction;
@@ -203,7 +206,7 @@ class Player {
         		} else {
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         		}        			      			
-            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, gold, GOLD_THRESHOLD_FOR_TWO_KNIGHT_BARRACKS)) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -211,7 +214,7 @@ class Player {
             	} else {
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, gold, GOLD_THRESHOLD_FOR_TWO_KNIGHT_BARRACKS)) {
             	targetedSite = nearestAllySiteNotInTraining;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -276,20 +279,17 @@ class Player {
             *		a) if enemy TOWER number is more than ENEMY_TOWER_NUMBER_THRESHOLD and I owned a GIANT BARRACKS, TRAIN a GIANT
             *		b) else TRAIN a KNIGHT
             */
-            Site siteToTrain = null;
+            Collection<Site> sitesToTrain = new ArrayList<>();
+            Site giantSiteToTrain = StructuresUtils.getGiantSiteToTrain(allyBarracksSites);
             if (enemyTowerSitesById.size() > ENEMY_TOWERS_NUMBER_THRESHOLD
             		&& allyGiants.size() < 2
-            		&& StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)) {
-            	siteToTrain = StructuresUtils.getGiantSiteToTrain(allyBarracksSites);
-            } else if (StructuresUtils.isAtLeastOneKnightBarracks(allyBarracksSites)) {
-            	siteToTrain = StructuresUtils.getAKnightSiteToTrain(allyBarracksSites);            	
+            		&& giantSiteToTrain != null) {
+            	sitesToTrain.add(giantSiteToTrain);
+            } else if (!allyKnightBarracksSites.isEmpty()) {
+            	sitesToTrain = StructuresUtils.getKnightSitesToTrain(allyKnightBarracksSites);            	
             }
             
-            if (siteToTrain != null) {
-                SystemOutUtils.printTrainAction(siteToTrain.getId());
-            } else {
-                SystemOutUtils.printTrainAction(-1);
-            }
+            SystemOutUtils.printTrainAction(sitesToTrain, gold, GOLD_THRESHOLD_FOR_TWO_KNIGHT_BARRACKS, enemyQueen);
         }
     }
 

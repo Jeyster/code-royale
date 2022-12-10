@@ -1,8 +1,12 @@
 package com.mgaurat.utils;
 
+import java.util.Collection;
+
 import com.mgaurat.enums.StructureEnum;
 import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
+import com.mgaurat.model.Site;
+import com.mgaurat.model.Unit;
 
 /**
  * Final class for static methods that print outputs.
@@ -60,13 +64,20 @@ public final class SystemOutUtils {
 	 * 
 	 * @param siteId
 	 */
-	public static void printTrainAction(int siteId) {
+	public static void printTrainAction(Collection<Site> sitesToTrain, int gold, int goldThreshold, Unit enemyQueen) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TRAIN");
 		
-		if (siteId > -1) {
-			sb.append(" ");
-			sb.append(siteId);			
+		if (!sitesToTrain.isEmpty()) {
+			if (gold < goldThreshold) {
+				sb.append(" ");
+				sb.append(SitesUtils.getNearestSiteFromCoordinates(sitesToTrain, enemyQueen.getCoordinates()).getId());	
+			} else {
+				for (Site siteToTrain : sitesToTrain) {
+					sb.append(" ");
+					sb.append(siteToTrain.getId());			
+				}			
+			}			
 		}
 		
 		System.out.println(sb.toString());

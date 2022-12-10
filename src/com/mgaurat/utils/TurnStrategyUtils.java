@@ -155,15 +155,18 @@ public final class TurnStrategyUtils {
      *
 	 * @param queenHealth
 	 * @param nearestSite
-	 * @param allyBarracksSites
+	 * @param allyKnightBarracksSites
 	 * @param enemyUnitsByType
 	 * @param enemyTowerSites
 	 * @return boolean
 	 */
-	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, Collection<Site> allyBarracksSites, 
-			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, Collection<Site> enemyKnightBarracksSites) {
+	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, Collection<Site> allyKnightBarracksSites, 
+			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
+			Collection<Site> enemyKnightBarracksSites, int gold, int goldThreshold) {
 		
-		if (nearestSite == null || !allyBarracksSites.isEmpty()) {
+		if (nearestSite == null 
+				|| (gold < goldThreshold && allyKnightBarracksSites.size() >= 1)
+				|| (gold >= goldThreshold && allyKnightBarracksSites.size() >= 2)) {
 			return false;
 		}
 		

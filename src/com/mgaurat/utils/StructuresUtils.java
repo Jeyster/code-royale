@@ -82,23 +82,6 @@ public final class StructuresUtils {
     }
     
     /**
-     * Check if the input Sites collection holds a KNIGHT BARRACKS.
-     * 
-     * @param sites
-     * @return boolean
-     */
-    public static boolean isAtLeastOneKnightBarracks(Collection<Site> sites) {
-    	for (Site site : sites) {
-    		if (site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()
-    				&& site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()) {
-    			return true;
-    		}
-    	}
-    	
-    	return false;
-    }
-    
-    /**
      * Check if the input Sites collection holds a GIANT BARRACKS.
      * 
      * @param sites
@@ -264,6 +247,16 @@ public final class StructuresUtils {
         	}
         }
         return null;
+    }
+    
+    public static Collection<Site> getKnightSitesToTrain(Collection<Site> knightSites) {
+    	Collection<Site> knightSitesToTrain = new ArrayList<>();
+    	for (Site knightSite : knightSites) {     
+        	if (knightSite.getStructure().getParam1() == 0) {
+        		knightSitesToTrain.add(knightSite);
+        	}
+        }
+        return knightSitesToTrain;
     }
     
     /**
