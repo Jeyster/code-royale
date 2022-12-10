@@ -175,8 +175,8 @@ public final class StructuresUtils {
     		return false;
     	}
     	
-    	final double DISTANCE = 300;
-    	return MathUtils.getDistanceBetweenTwoCoordinates(site1.getCoordinates(), site2.getCoordinates()) <= DISTANCE;
+    	final double SAFE_DISTANCE = 300;
+    	return MathUtils.getDistanceBetweenTwoCoordinates(site1.getCoordinates(), site2.getCoordinates()) <= SAFE_DISTANCE;
     }
     
     public static boolean isSiteCloseToNearestEnemyKnightBarracksSite(Site site, Collection<Site> enemyKnightBarracksSites) {
@@ -196,6 +196,19 @@ public final class StructuresUtils {
     		}
     	}
     	return knightBarracksSites;
+    }
+    
+    public static boolean isEnemyKnightBarracksDangereous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites) {
+    	final double SAFE_DISTANCE = 500;
+    	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
+    	if (nearestEnemyKnightBarracksSite == null) {
+    		return false;
+    	}
+    	
+    	boolean isNearestEnemyKnightBarracksSiteInTraining = nearestEnemyKnightBarracksSite.getStructure().isBarracksInTraining();
+    	double distanceFromNearestEnemyKnightBarracksSite = MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestEnemyKnightBarracksSite.getCoordinates());
+    	
+    	return isNearestEnemyKnightBarracksSiteInTraining && distanceFromNearestEnemyKnightBarracksSite < SAFE_DISTANCE;
     }
         
     /**

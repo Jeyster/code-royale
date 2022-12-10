@@ -77,9 +77,10 @@ public final class GameBoardUtils {
 	 * @return boolean
 	 */
     public static boolean isItSafeAtCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
-    		Collection<Site> enemyTowerSites, int safeDistance) {
+    		Collection<Site> enemyTowerSites, int safeDistance, Collection<Site> enemyKnightBarracksSites) {
     	return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(coordinates, enemyUnitsByType, safeDistance)
-    			&& !StructuresUtils.isCoordinatesInRangeOfTowers(coordinates, enemyTowerSites, 1);
+    			&& !StructuresUtils.isCoordinatesInRangeOfTowers(coordinates, enemyTowerSites, 1)
+    			&& !StructuresUtils.isEnemyKnightBarracksDangereous(coordinates, enemyKnightBarracksSites);
     }
     
     /**
