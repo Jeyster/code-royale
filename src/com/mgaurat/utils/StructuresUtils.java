@@ -2,6 +2,7 @@ package com.mgaurat.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.mgaurat.enums.StructureEnum;
@@ -111,13 +112,9 @@ public final class StructuresUtils {
     	
     	return false;
     }
-	
-    public static boolean isCoordinatesInRangeOfAnyTower(Coordinates coordinates, Collection<Site> towerSites) {
-    	return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() == 0;
-    }
     
-    public static boolean isCoordinatesInRangeOfAtLeastTwoTowers(Coordinates coordinates, Collection<Site> towerSites) {
-    	return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= 2;
+    public static boolean isCoordinatesInRangeOfTowers(Coordinates coordinates, Collection<Site> towerSites, int towerNumberInRangeMax) {
+    	return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= towerNumberInRangeMax;
     }
 
     /**
@@ -270,13 +267,24 @@ public final class StructuresUtils {
     
     public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates) {
     	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	Map<Integer, Site> safestTowersProtectedByTowers = new HashMap<>();
     	int safestXCoordinate = isLeftSide ? 1920 : 0;
-    	Site safestTower = null;
+    	int numberOfAllyTowersInRangeOfTower;
     	for (Site allyTowerSite : allyTowerSites) {
-    		if ((isLeftSide && allyTowerSite.getCoordinates().getX() < safestXCoordinate)
-    				|| (!isLeftSide && allyTowerSite.getCoordinates().getX() > safestXCoordinate)) {
-    			safestXCoordinate = allyTowerSite.getCoordinates().getX();
-    			safestTower = allyTowerSite;
+    		numberOfAllyTowersInRangeOfTower = StructuresUtils.getTowerSitesInRangeOfCoordinates(allyTowerSites, allyTowerSite.getCoordinates()).size();
+			if ((isLeftSide && allyTowerSite.getCoordinates().getX() < safestXCoordinate)
+					|| (!isLeftSide && allyTowerSite.getCoordinates().getX() > safestXCoordinate)) {
+				safestXCoordinate = allyTowerSite.getCoordinates().getX();
+    			safestTowersProtectedByTowers.put(numberOfAllyTowersInRangeOfTower, allyTowerSite);
+			}    			
+    	}
+    	
+    	int numberOfProtectedAllyTowerForSafestTower = -1;
+    	Site safestTower = null;
+    	for (Integer numberOfProtectedAllyTower : safestTowersProtectedByTowers.keySet()) {
+    		if (numberOfProtectedAllyTower > numberOfProtectedAllyTowerForSafestTower) {
+    			numberOfProtectedAllyTowerForSafestTower = numberOfProtectedAllyTower;
+    			safestTower = safestTowersProtectedByTowers.get(numberOfProtectedAllyTower);
     		}
     	}
 

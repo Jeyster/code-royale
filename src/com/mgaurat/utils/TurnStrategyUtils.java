@@ -107,7 +107,7 @@ public final class TurnStrategyUtils {
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType)
-					&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites);			
+					&& !StructuresUtils.isCoordinatesInRangeOfTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites, 2);			
 		} else {
 			return GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites);
 		}
@@ -138,7 +138,7 @@ public final class TurnStrategyUtils {
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
-			return !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites);			
+			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
 			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
 		}
@@ -167,7 +167,7 @@ public final class TurnStrategyUtils {
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
-			return !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestSite.getCoordinates(), enemyTowerSites);			
+			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
 			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
 		}
@@ -201,7 +201,7 @@ public final class TurnStrategyUtils {
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
-            		&& !StructuresUtils.isCoordinatesInRangeOfAtLeastTwoTowers(nearestEmptySite.getCoordinates(), enemyTowerSites);			
+            		&& !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
 			return !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
             		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites);
