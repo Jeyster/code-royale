@@ -139,16 +139,14 @@ public final class StructuresUtils {
 	/**
 	 * Get the nearest Site from the input Coordinates of the ally QUEEN in which a MINE can be built.
 	 * If there is no gold left in the Site, a MINE cannot be built.
-	 * But we can only know it it remains gold in a Site if the ally QUEEN is sufficiently close to the Site (distance less than 300).
-	 * 
-	 * Here we consider that if the gold that remains in a Site is unknown (= -1), this Site can be chosen.
-	 * But we cannot be sure of that until the QUEEN is close enough.
+	 * remainingGoldBySiteId tells us if we know the remaining gold in Sites.
 	 * 
 	 * @param sites
 	 * @param myQueenCoordinates
 	 * @return Site
 	 */
-    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, Map<Integer, Integer> remainingGoldBySiteId) {    	
+    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
+    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites) {    	
     	double distanceToNearestSite = Double.MAX_VALUE;
         Site nearestSite = null;
         double distanceToSite;
@@ -160,8 +158,9 @@ public final class StructuresUtils {
         	remainingGold = remainingGoldBySiteId.get(siteId);
         	siteCoordinates = site.getCoordinates();
         	distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
-            if ((remainingGold == null && site.getStructure().getMineGold() != 0)
-            		|| (remainingGold != null && remainingGold > 0)) {
+            if (!isSiteCloseToNearestEnemyKnightBarracksSite(site, enemyKnightBarrackSites) 
+            		&& ((remainingGold == null && site.getStructure().getMineGold() != 0)
+            		|| (remainingGold != null && remainingGold > 0))) {
             	if (distanceToSite < distanceToNearestSite) {
             		distanceToNearestSite = distanceToSite;
             		nearestSite = site;
@@ -171,6 +170,34 @@ public final class StructuresUtils {
         return nearestSite;
     }
     
+    public static boolean isSiteCloseToAnotherSite(Site site1, Site site2) {
+    	if (site1 == null || site2 == null) {
+    		return false;
+    	}
+    	
+    	final double DISTANCE = 300;
+    	return MathUtils.getDistanceBetweenTwoCoordinates(site1.getCoordinates(), site2.getCoordinates()) <= DISTANCE;
+    }
+    
+    public static boolean isSiteCloseToNearestEnemyKnightBarracksSite(Site site, Collection<Site> enemyKnightBarracksSites) {
+    	if (site == null || enemyKnightBarracksSites.isEmpty()) {
+    		return false;
+    	}
+    	
+    	Site nearestEnemyKnightBarrackSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, site.getCoordinates());
+    	return isSiteCloseToAnotherSite(site, nearestEnemyKnightBarrackSite);
+    }
+    
+    public static Collection<Site> getKnightBarracksSites(Collection<Site> barracksSites) {
+    	Collection<Site> knightBarracksSites = new ArrayList<>();
+    	for (Site barracksSite : barracksSites) {
+    		if (barracksSite.getStructure().isKnightBarracks()) {
+    			knightBarracksSites.add(barracksSite);
+    		}
+    	}
+    	return knightBarracksSites;
+    }
+        
     /**
      * Get the first KNIGHT BARRACKS Site of the input Sites collection that can be TRAIN.
      * 
