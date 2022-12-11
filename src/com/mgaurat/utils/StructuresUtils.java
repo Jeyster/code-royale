@@ -183,7 +183,7 @@ public final class StructuresUtils {
     public static Site getNearestSiteFromCoordinatesToBuildAMineInForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
     		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates) { 
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-        final int Y_GAP = 100;
+        final int Y_GAP = 200;
     	double distanceToNearestSite = Double.MAX_VALUE;
         Site nearestSite = null;
         double distanceToSite;
@@ -409,28 +409,38 @@ public final class StructuresUtils {
      */
     public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates) {
     	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-    	Map<Integer, Site> safestTowersProtectedByTowers = new HashMap<>();
+    	Site safestTowerSite = null;
     	int safestXCoordinate = isLeftSide ? 1920 : 0;
-    	int numberOfAllyTowersInRangeOfTower;
     	for (Site allyTowerSite : allyTowerSites) {
-    		numberOfAllyTowersInRangeOfTower = StructuresUtils.getTowerSitesInRangeOfCoordinates(allyTowerSites, allyTowerSite.getCoordinates()).size();
 			if ((isLeftSide && allyTowerSite.getCoordinates().getX() < safestXCoordinate)
 					|| (!isLeftSide && allyTowerSite.getCoordinates().getX() > safestXCoordinate)) {
 				safestXCoordinate = allyTowerSite.getCoordinates().getX();
-    			safestTowersProtectedByTowers.put(numberOfAllyTowersInRangeOfTower, allyTowerSite);
+				safestTowerSite = allyTowerSite;
 			}    			
     	}
     	
-    	int numberOfProtectedAllyTowerForSafestTower = -1;
-    	Site safestTower = null;
-    	for (Integer numberOfProtectedAllyTower : safestTowersProtectedByTowers.keySet()) {
-    		if (numberOfProtectedAllyTower > numberOfProtectedAllyTowerForSafestTower) {
-    			numberOfProtectedAllyTowerForSafestTower = numberOfProtectedAllyTower;
-    			safestTower = safestTowersProtectedByTowers.get(numberOfProtectedAllyTower);
-    		}
-    	}
+//    	Map<Integer, Site> safestTowersProtectedByTowers = new HashMap<>();
+//    	int safestXCoordinate = isLeftSide ? 1920 : 0;
+//    	int numberOfAllyTowersInRangeOfTower;
+//    	for (Site allyTowerSite : allyTowerSites) {
+//    		numberOfAllyTowersInRangeOfTower = StructuresUtils.getTowerSitesInRangeOfCoordinates(allyTowerSites, allyTowerSite.getCoordinates()).size();
+//			if ((isLeftSide && allyTowerSite.getCoordinates().getX() < safestXCoordinate)
+//					|| (!isLeftSide && allyTowerSite.getCoordinates().getX() > safestXCoordinate)) {
+//				safestXCoordinate = allyTowerSite.getCoordinates().getX();
+//    			safestTowersProtectedByTowers.put(numberOfAllyTowersInRangeOfTower, allyTowerSite);
+//			}    			
+//    	}
+//    	
+//    	int numberOfProtectedAllyTowerForSafestTower = -1;
+//    	Site safestTower = null;
+//    	for (Integer numberOfProtectedAllyTower : safestTowersProtectedByTowers.keySet()) {
+//    		if (numberOfProtectedAllyTower > numberOfProtectedAllyTowerForSafestTower) {
+//    			numberOfProtectedAllyTowerForSafestTower = numberOfProtectedAllyTower;
+//    			safestTower = safestTowersProtectedByTowers.get(numberOfProtectedAllyTower);
+//    		}
+//    	}
 
-    	return safestTower;
+    	return safestTowerSite;
     }
     
     /**

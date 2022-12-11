@@ -127,7 +127,7 @@ class Player {
             
             // Constants
             final int MIN_ALLY_TOWERS_NUMBER = 3;
-            final int MAX_ALLY_TOWERS_NUMBER = 6;
+            final int MAX_ALLY_TOWERS_NUMBER = 5;
             final int MAX_ALLY_GOLD_PRODUCTION = 8;
             final int ENEMY_TOWERS_NUMBER_THRESHOLD = 3;
     		final int SAFE_DISTANCE = 500;

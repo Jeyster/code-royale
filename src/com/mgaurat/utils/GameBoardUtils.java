@@ -42,7 +42,7 @@ public final class GameBoardUtils {
 	 */
 	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights) {
 		Coordinates safestCoordinates;
-    	if (allyTowerSites.size() >= 3) {
+    	if (allyTowerSites.size() >= 2) {
     		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
     		safestCoordinates = StructuresUtils.getCoordinatesBehindTower(UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights), safestAllyTower, startingAllyQueenCoordinates);
     	} else {

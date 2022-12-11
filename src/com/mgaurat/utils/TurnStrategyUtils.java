@@ -18,7 +18,7 @@ import com.mgaurat.model.Unit;
 public final class TurnStrategyUtils {
 	
     final static int LOW_HEALTH_QUEEN = 20;
-    final static int ENEMY_KNIGHTS_THRESHOLD = 8;
+    final static int ENEMY_KNIGHTS_THRESHOLD = 7;
 		
 	private TurnStrategyUtils() {}
 	
