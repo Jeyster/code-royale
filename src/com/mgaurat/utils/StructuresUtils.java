@@ -234,6 +234,28 @@ public final class StructuresUtils {
         return nearestSite;
     }
     
+    public static Site getFirstSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+		GameBoardQuarterEnum siteBoardGameQuarter;
+        boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	Site chosenSite = null;
+        double distanceToSite;
+        double distanceToChosenSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {
+        	siteBoardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(site.getCoordinates(), new Coordinates(960, 500));
+        	if ((isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.BOTTOMLEFT))
+        			|| (!isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.TOPRIGHT))) {
+        		siteCoordinates = site.getCoordinates();
+        		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(new Coordinates(960, 500), siteCoordinates);
+        		if (distanceToSite < distanceToChosenSite) {
+        			distanceToChosenSite = distanceToSite;
+        			chosenSite = site;
+        		}        		
+        	}
+        }
+        return chosenSite;
+    }
+    
     /**
      * Check if site is close (distance <= SAFE_DISTANCE) to the nearest enemy KNIGHT BARRACKS.
      * 
