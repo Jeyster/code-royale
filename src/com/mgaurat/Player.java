@@ -64,6 +64,7 @@ class Player {
     		int allyTowersNumber = allyTowerSites.size();
     		Map<Integer, Site> allyBarracksSitesById = allySitesByIdAndStructure.get(StructureEnum.BARRACKS);
             Collection<Site> allyBarracksSites = allyBarracksSitesById.values();
+            Collection<Site> allyKnightBarracksSites = StructuresUtils.getKnightBarracksSites(allyBarracksSites);
             Collection<Site> allySites = new ArrayList<>();
             allySites.addAll(allyMineSites);
             allySites.addAll(allyTowerSites);
@@ -257,7 +258,7 @@ class Player {
         			}
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         		}   
-            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -268,7 +269,7 @@ class Player {
             		}
             		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
             	targetedSite = nearestAllySiteNotInTraining;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {

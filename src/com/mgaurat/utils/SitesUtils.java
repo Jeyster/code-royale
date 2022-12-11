@@ -41,7 +41,7 @@ public final class SitesUtils {
     
     public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-        final int Y_GAP = 200;
+        final int Y_GAP = 150;
     	Site nearestSite = null;
         double distanceToSite;
         double distanceToNearestSite = Double.MAX_VALUE;

@@ -2,7 +2,6 @@ package com.mgaurat.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.mgaurat.enums.GameBoardQuarterEnum;
@@ -183,7 +182,7 @@ public final class StructuresUtils {
     public static Site getNearestSiteFromCoordinatesToBuildAMineInForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
     		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates) { 
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-        final int Y_GAP = 200;
+        final int Y_GAP = 150;
     	double distanceToNearestSite = Double.MAX_VALUE;
         Site nearestSite = null;
         double distanceToSite;
@@ -313,8 +312,8 @@ public final class StructuresUtils {
      * @return boolean
      */
     public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites) {
-    	final double SAFE_DISTANCE = 500;
     	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
+    	final double safeDistance = StructuresUtils.getSafeDistanceWithRespectToKnightBarracks(nearestEnemyKnightBarracksSite);
     	if (nearestEnemyKnightBarracksSite == null) {
     		return false;
     	}
@@ -322,7 +321,7 @@ public final class StructuresUtils {
     	boolean isNearestEnemyKnightBarracksSiteInTraining = nearestEnemyKnightBarracksSite.getStructure().isBarracksInTraining();
     	double distanceFromNearestEnemyKnightBarracksSite = MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestEnemyKnightBarracksSite.getCoordinates());
     	
-    	return isNearestEnemyKnightBarracksSiteInTraining && distanceFromNearestEnemyKnightBarracksSite < SAFE_DISTANCE;
+    	return isNearestEnemyKnightBarracksSiteInTraining && distanceFromNearestEnemyKnightBarracksSite < safeDistance;
     }
         
     /**
@@ -539,6 +538,19 @@ public final class StructuresUtils {
 //    	int deltaY = towerRadius * yDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
 //    	
 //    	return new Coordinates(towerSiteCoordinates.getX() + deltaX, towerSiteCoordinates.getY() + deltaY);
+    }
+    
+    public static int getSafeDistanceWithRespectToKnightBarracks(Site knightBarracksSite) {
+    	if (knightBarracksSite == null) {
+    		return 0;
+    	}
+    	
+    	int trainingTurnsRemaining = knightBarracksSite.getStructure().getParam1();
+    	if (trainingTurnsRemaining == 0) {
+    		return 0;
+    	} else {
+    		return (6 - trainingTurnsRemaining) * 150;
+    	}
     }
 	
 }

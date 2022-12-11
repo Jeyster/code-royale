@@ -42,6 +42,7 @@ public final class TurnStrategyUtils {
 		return (queenHealth < LOW_HEALTH_QUEEN 
         		&& !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites))
 				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN && !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
+    			|| StructuresUtils.isEnemyKnightBarracksDangerous(allyQueenCoordinates, enemyKnightBarracksSites)
 				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 	}
 	
@@ -141,7 +142,9 @@ public final class TurnStrategyUtils {
 			return false;
 		}
 		
-		if (queenHealth >= LOW_HEALTH_QUEEN) {
+		if (allyTowersNumber < 3) {
+			return true;
+		} else if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
 			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites);
