@@ -191,10 +191,10 @@ public final class StructuresUtils {
         int siteId;
         Integer remainingGold;
         for (Site site : sites) {
-        	if ((isStartingLeftSide && (site.getCoordinates().getX() > myQueenCoordinates.getX()) 
-        			&& (site.getCoordinates().getY() < myQueenCoordinates.getY() + Y_GAP))
-        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < myQueenCoordinates.getX()))
-        			&& (site.getCoordinates().getY() > myQueenCoordinates.getY() - Y_GAP)) {
+        	if ((isStartingLeftSide && (site.getCoordinates().getX() > startingAllyQueenCoordinates.getX()) 
+        			&& (site.getCoordinates().getY() < startingAllyQueenCoordinates.getY() + Y_GAP))
+        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < startingAllyQueenCoordinates.getX()))
+        			&& (site.getCoordinates().getY() > startingAllyQueenCoordinates.getY() - Y_GAP)) {
         		siteId = site.getId();
         		remainingGold = remainingGoldBySiteId.get(siteId);
         		siteCoordinates = site.getCoordinates();

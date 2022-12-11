@@ -33,6 +33,7 @@ class Player {
 	private static Map<Integer, Integer> remainingGoldBySiteId = new HashMap<>();
 	private static boolean isFirstBuildDone = false;
 	private static boolean isFirstKnightBarracksBuilt = false;
+	private static boolean isTwoFirstMinesBuild = false;
 	private static int towersBuilt = 0;
 
     public static void main(String args[]) {
@@ -133,11 +134,23 @@ class Player {
     		final int SAFE_DISTANCE = 500;
             
             // Depending on ally QUEEN health, choose the best values
-            int minAllyGoldProduction;
+            int minAllyGoldProduction = 2;
+//            if (allyQueen.getHealth() < 50) {
+//            	minAllyGoldProduction = 3;
+//            } else {
+//            	minAllyGoldProduction = 4;            	
+//            }
+            
+            int minAllyFirstMines;
             if (allyQueen.getHealth() < 50) {
-            	minAllyGoldProduction = 3;
+            	minAllyFirstMines = 1;
             } else {
-            	minAllyGoldProduction = 4;            	
+            	minAllyFirstMines = 2;            	
+            }
+            
+            
+            if (!isTwoFirstMinesBuild) {
+            	isTwoFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;
             }
             
             // Possible Site to MOVE or to BUILD
@@ -217,6 +230,17 @@ class Player {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
         	} else if (isTouchingATowerToImprove) {
             		SystemOutUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
+        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)
+        			&& !isTwoFirstMinesBuild) {
+        		targetedSiteId = nearestSiteToBuildAMine.getId();
+        		if (touchedSite != targetedSiteId) {
+        			SystemOutUtils.printMoveAction(nearestSiteToBuildAMine.getCoordinates());
+        		} else {
+        			if (!isFirstBuildDone) {
+        				isFirstBuildDone = true;
+        			}
+        			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
+        		}   
         	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, minAllyGoldProduction, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
         		targetedSiteId = nearestSiteToBuildAMine.getId();
         		if (touchedSite != targetedSiteId) {
@@ -226,7 +250,7 @@ class Player {
         				isFirstBuildDone = true;
         			}
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
-        		}        			      			
+        		}   
             } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();

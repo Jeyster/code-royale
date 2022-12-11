@@ -47,10 +47,10 @@ public final class SitesUtils {
         double distanceToNearestSite = Double.MAX_VALUE;
         Coordinates siteCoordinates;
         for (Site site : sites) {
-        	if ((isStartingLeftSide && (site.getCoordinates().getX() > coordinates.getX()) 
-        			&& (site.getCoordinates().getY() < coordinates.getY() + Y_GAP))
-        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < coordinates.getX()))
-        			&& (site.getCoordinates().getY() > coordinates.getY() - Y_GAP)) {
+        	if ((isStartingLeftSide && (site.getCoordinates().getX() > startingAllyQueenCoordinates.getX()) 
+        			&& (site.getCoordinates().getY() < startingAllyQueenCoordinates.getY() + Y_GAP))
+        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < startingAllyQueenCoordinates.getX()))
+        			&& (site.getCoordinates().getY() > startingAllyQueenCoordinates.getY() - Y_GAP)) {
         		siteCoordinates = site.getCoordinates();
         		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, siteCoordinates);
         		if (distanceToSite < distanceToNearestSite) {
