@@ -38,6 +38,29 @@ public final class SitesUtils {
         }
         return nearestSite;
     }
+    
+    public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
+        boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+        final int Y_GAP = 100;
+    	Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {
+        	if ((isStartingLeftSide && (site.getCoordinates().getX() > coordinates.getX()) 
+        			&& (site.getCoordinates().getY() < coordinates.getY() + Y_GAP))
+        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < coordinates.getX()))
+        			&& (site.getCoordinates().getY() > coordinates.getY() - Y_GAP)) {
+        		siteCoordinates = site.getCoordinates();
+        		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, siteCoordinates);
+        		if (distanceToSite < distanceToNearestSite) {
+        			distanceToNearestSite = distanceToSite;
+        			nearestSite = site;
+        		}        		
+        	}
+        }
+        return nearestSite;
+    }
 
 	/**
 	 * Get from the input Sites collection the average Coordinates.

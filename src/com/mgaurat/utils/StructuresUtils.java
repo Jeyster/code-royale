@@ -180,6 +180,60 @@ public final class StructuresUtils {
         return nearestSite;
     }
     
+    public static Site getNearestSiteFromCoordinatesToBuildAMineInForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
+    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates) { 
+        boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+        final int Y_GAP = 100;
+    	double distanceToNearestSite = Double.MAX_VALUE;
+        Site nearestSite = null;
+        double distanceToSite;
+        Coordinates siteCoordinates;
+        int siteId;
+        Integer remainingGold;
+        for (Site site : sites) {
+        	if ((isStartingLeftSide && (site.getCoordinates().getX() > myQueenCoordinates.getX()) 
+        			&& (site.getCoordinates().getY() < myQueenCoordinates.getY() + Y_GAP))
+        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < myQueenCoordinates.getX()))
+        			&& (site.getCoordinates().getY() > myQueenCoordinates.getY() - Y_GAP)) {
+        		siteId = site.getId();
+        		remainingGold = remainingGoldBySiteId.get(siteId);
+        		siteCoordinates = site.getCoordinates();
+        		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, siteCoordinates);
+        		if (!isSiteCloseToNearestEnemyKnightBarracksSite(site, enemyKnightBarrackSites) 
+        				&& ((remainingGold == null && site.getStructure().getMineGold() != 0)
+        						|| (remainingGold != null && remainingGold > 0))) {
+        			if (distanceToSite < distanceToNearestSite) {
+        				distanceToNearestSite = distanceToSite;
+        				nearestSite = site;
+        			}            	
+        		}        		
+        	}
+        }
+        return nearestSite;
+    }
+    
+    public static Site getNearestSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+		GameBoardQuarterEnum siteBoardGameQuarter;
+        boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	Site nearestSite = null;
+        double distanceToSite;
+        double distanceToNearestSite = Double.MAX_VALUE;
+        Coordinates siteCoordinates;
+        for (Site site : sites) {
+        	siteBoardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(site.getCoordinates(), new Coordinates(960, 500));
+        	if ((isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.BOTTOMLEFT))
+        			|| (!isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.TOPRIGHT))) {
+        		siteCoordinates = site.getCoordinates();
+        		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, siteCoordinates);
+        		if (distanceToSite < distanceToNearestSite) {
+        			distanceToNearestSite = distanceToSite;
+        			nearestSite = site;
+        		}        		
+        	}
+        }
+        return nearestSite;
+    }
+    
     /**
      * Check if site is close (distance <= SAFE_DISTANCE) to the nearest enemy KNIGHT BARRACKS.
      * 
