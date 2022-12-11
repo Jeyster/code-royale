@@ -41,7 +41,6 @@ public final class TurnStrategyUtils {
 			int emptySitesNumber, int enemyKnightsNumber, int safeDistance, Collection<Site> enemyKnightBarracksSites) {
 		return (queenHealth < LOW_HEALTH_QUEEN 
         		&& !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites))
-				|| (queenHealth >= 40 && !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 10))
 				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN && !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
 				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 	}
@@ -62,6 +61,10 @@ public final class TurnStrategyUtils {
 		if (nearestSiteToBuildATower == null
 				|| UnitsUtils.isGiantCloseToCoordinates(enemyGiants, allyQueenCoordinates)) {
 			return false;
+		}
+		
+		if (SitesUtils.isReallyCloseToCoordinates(allyQueenCoordinates, nearestSiteToBuildATower.getCoordinates())) {
+			return true;
 		}
 		
 		final int X_RANGE = 200;

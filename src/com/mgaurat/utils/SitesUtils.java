@@ -61,5 +61,10 @@ public final class SitesUtils {
 
 		return new Coordinates(xCoordinateSum/sites.size(), yCoordinateSum/sites.size());
 	}
+	
+	public static boolean isReallyCloseToCoordinates(Coordinates allyQueenCoordinates, Coordinates coordinates) {
+		final int REALLY_CLOSE = 150;
+		return MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, coordinates) <= REALLY_CLOSE;
+	}
     
 }
