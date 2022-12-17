@@ -1,5 +1,5 @@
 .classpath
 .project
 .settings
+.metadata
 /bin
-src/com/mgaurat/CodinGame.java

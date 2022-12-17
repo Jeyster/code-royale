@@ -201,11 +201,11 @@ public final class TurnStrategyUtils {
 	public static boolean isGiantBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int enemyTowersNumber,
 			Collection<Site> allyBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
 			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold, int safeDistance, 
-			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMineSites) {
+			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMineSites, Collection<Site> allyMineSites) {
 		
 		if (nearestEmptySite == null 
 				|| enemyTowersNumber < enemyTowersNumberThreshold
-				|| (enemyTowersNumber == enemyTowersNumberThreshold && enemyMineSites.size() > 1)) {
+				|| StructuresUtils.getGoldProduction(allyMineSites) < 10) {
 			return false;
 		}
 		

@@ -130,7 +130,7 @@ class Player {
             
             // Constants
             final int MIN_ALLY_TOWERS_NUMBER = 3;
-            final int MAX_ALLY_TOWERS_NUMBER = 3;
+            final int MAX_ALLY_TOWERS_NUMBER = 4;
             final int MAX_ALLY_GOLD_PRODUCTION = 8;
             final int ENEMY_TOWERS_NUMBER_THRESHOLD = 3;
     		final int SAFE_DISTANCE = 500;
@@ -286,11 +286,7 @@ class Player {
         			towersBuilt++;
         			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         		}   
-            } else if (nearestAllyTowerSiteWithNotSufficientLife != null 
-            		&& (nearestSiteToBuildAMine == null || MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()) < MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates()))
-            		&& (nearestEmptySite == null || MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()) < MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestEmptySite.getCoordinates()))) {
-            	SystemOutUtils.printMoveAction(nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()); 
-            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, enemyTowersNumber, allyBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
+            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, enemyTowersNumber, allyBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, allyMineSites)) {
             	targetedSite = nearestEmptySite;
             	targetedSiteId = targetedSite.getId();
             	if (touchedSite != targetedSiteId) {
@@ -321,7 +317,11 @@ class Player {
     			} else {
     				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
     			}  
-            } else if (nearestEmptySite != null && GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
+        	} else if (nearestAllyTowerSiteWithNotSufficientLife != null 
+        			&& (nearestSiteToBuildAMine == null || MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()) < MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates()))
+        			&& (nearestEmptySite == null || MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()) < MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestEmptySite.getCoordinates()))) {
+        		SystemOutUtils.printMoveAction(nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()); 
+            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyTowersNumber, Integer.MAX_VALUE, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
     			targetedSite = nearestEmptySite;
     			targetedSiteId = targetedSite.getId();
     			if (touchedSite != targetedSiteId) {
@@ -340,8 +340,8 @@ class Player {
             *		b) else TRAIN a KNIGHT
             */
             Site siteToTrain = null;
-            if ((enemyTowerSitesById.size() > ENEMY_TOWERS_NUMBER_THRESHOLD
-            		|| (enemyTowerSitesById.size() == ENEMY_TOWERS_NUMBER_THRESHOLD && enemyMineSites.size() <= 1))
+            if ((enemyTowerSitesById.size() > (ENEMY_TOWERS_NUMBER_THRESHOLD + 2) ||
+            		(enemyTowersNumber > 1 && StructuresUtils.getGoldProduction(allyMineSites) >= 8))
             		&& allyGiants.size() < 2
             		&& StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)) {
             	siteToTrain = StructuresUtils.getGiantSiteToTrain(allyBarracksSites);

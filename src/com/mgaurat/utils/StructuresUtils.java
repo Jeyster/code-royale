@@ -549,7 +549,7 @@ public final class StructuresUtils {
     	if (trainingTurnsRemaining == 0) {
     		return 0;
     	} else {
-    		return (6 - trainingTurnsRemaining) * 150;
+    		return (6 - trainingTurnsRemaining) * 100;
     	}
     }
 	
