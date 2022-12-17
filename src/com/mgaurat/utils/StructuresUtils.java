@@ -179,6 +179,19 @@ public final class StructuresUtils {
         return nearestSite;
     }
     
+    /**
+	 * Get the nearest Site from the input Coordinates of the ally QUEEN in which a MINE can be built.
+	 * Only Sites that are towards the enemy camp are considered.
+	 * If there is no gold left in the Site, a MINE cannot be built.
+	 * remainingGoldBySiteId tells us if we know the remaining gold in Sites.
+	 *
+     * @param sites
+     * @param myQueenCoordinates
+     * @param remainingGoldBySiteId
+     * @param enemyKnightBarrackSites
+     * @param startingAllyQueenCoordinates
+     * @return Site
+     */
     public static Site getNearestSiteFromCoordinatesToBuildAMineInForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
     		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates) { 
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
@@ -211,6 +224,45 @@ public final class StructuresUtils {
         return nearestSite;
     }
     
+    /**
+     * Get the Site to BUILD the first TOWER.
+     * It would be the one that is the closest to the middle and in the "safe" game board corner.
+     * 
+     * @param sites
+     * @param allyQueenCoordinates
+     * @param startingAllyQueenCoordinates
+     * @return Site
+     */
+    public static Site getFirstSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+    	GameBoardQuarterEnum siteBoardGameQuarter;
+    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	Site chosenSite = null;
+    	double distanceToSite;
+    	double distanceToChosenSite = Double.MAX_VALUE;
+    	Coordinates siteCoordinates;
+    	for (Site site : sites) {
+    		siteBoardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(site.getCoordinates(), new Coordinates(960, 500));
+    		if ((isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.BOTTOMLEFT))
+    				|| (!isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.TOPRIGHT))) {
+    			siteCoordinates = site.getCoordinates();
+    			distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(new Coordinates(960, 500), siteCoordinates);
+    			if (distanceToSite < distanceToChosenSite) {
+    				distanceToChosenSite = distanceToSite;
+    				chosenSite = site;
+    			}        		
+    		}
+    	}
+    	return chosenSite;
+    }
+    
+    /**
+     * Get the nearest Site to BUILD a TOWER in the "safe" game board corner.
+     * 
+     * @param sites
+     * @param allyQueenCoordinates
+     * @param startingAllyQueenCoordinates
+     * @return Site
+     */
     public static Site getNearestSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
 		GameBoardQuarterEnum siteBoardGameQuarter;
         boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
@@ -231,28 +283,6 @@ public final class StructuresUtils {
         	}
         }
         return nearestSite;
-    }
-    
-    public static Site getFirstSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
-		GameBoardQuarterEnum siteBoardGameQuarter;
-        boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-    	Site chosenSite = null;
-        double distanceToSite;
-        double distanceToChosenSite = Double.MAX_VALUE;
-        Coordinates siteCoordinates;
-        for (Site site : sites) {
-        	siteBoardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(site.getCoordinates(), new Coordinates(960, 500));
-        	if ((isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.BOTTOMLEFT))
-        			|| (!isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.TOPRIGHT))) {
-        		siteCoordinates = site.getCoordinates();
-        		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(new Coordinates(960, 500), siteCoordinates);
-        		if (distanceToSite < distanceToChosenSite) {
-        			distanceToChosenSite = distanceToSite;
-        			chosenSite = site;
-        		}        		
-        	}
-        }
-        return chosenSite;
     }
     
     /**
@@ -540,7 +570,17 @@ public final class StructuresUtils {
 //    	return new Coordinates(towerSiteCoordinates.getX() + deltaX, towerSiteCoordinates.getY() + deltaY);
     }
     
+    /**
+     * Evaluate a safe distance with a KNIGHT BARRACKS.
+     * It depends on the turns that left to finish a TRAIN and on an arbitrary safe distance.
+     * 
+     * @param knightBarracksSite
+     * @return int
+     */
     public static int getSafeDistanceWithRespectToKnightBarracks(Site knightBarracksSite) {
+    	final int TRAINING_KNIGHT_TURNS_NUMBER = 5;
+    	final int SAFE_DISTANCE_PER_REMAINING_TURN = 100;
+    	
     	if (knightBarracksSite == null) {
     		return 0;
     	}
@@ -549,7 +589,7 @@ public final class StructuresUtils {
     	if (trainingTurnsRemaining == 0) {
     		return 0;
     	} else {
-    		return (6 - trainingTurnsRemaining) * 100;
+    		return (TRAINING_KNIGHT_TURNS_NUMBER + 1 - trainingTurnsRemaining) * SAFE_DISTANCE_PER_REMAINING_TURN;
     	}
     }
 	

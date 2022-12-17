@@ -21,7 +21,7 @@ public final class MathUtils {
 		return Math.sqrt(Math.pow(xa - xb, 2) + Math.pow(ya - yb, 2));
 	}
 
-	public static Coordinates getCoordinatesBetweenTwoCoordinates(Coordinates a, Coordinates b) {
+	public static Coordinates getMiddleCoordinatesOfTwoCoordinates(Coordinates a, Coordinates b) {
 		int xa = a.getX();
 		int ya = a.getY();
 		int xb = b.getX();

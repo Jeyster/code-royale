@@ -217,5 +217,26 @@ public final class TurnStrategyUtils {
             		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites);
 		}
 	}
+	
+	/**
+	 * We have to train a GIANT if :
+	 * 	- there are more enemy TOWER than a given threshold or there is an enemy TOWER and we produce enough gold
+	 * 	- there is less than 2 ally GIANT
+	 * 	- there is at least 1 ally GIANT BARRACKS
+	 * 
+	 * @param enemyTowersNumber
+	 * @param enemyTowersNumberThreshold
+	 * @param allyMineSites
+	 * @param allyGiants
+	 * @param allyBarracksSites
+	 * @return boolean
+	 */
+	public static boolean isGiantTrainStrategyOk(int enemyTowersNumber, int enemyTowersNumberThreshold,
+			Collection<Site> allyMineSites, Collection<Unit> allyGiants, Collection<Site> allyBarracksSites) {
+		return (enemyTowersNumber > enemyTowersNumberThreshold ||
+        		(enemyTowersNumber > 1 && StructuresUtils.getGoldProduction(allyMineSites) >= 8))
+        		&& allyGiants.size() < 2
+        		&& StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites);
+	}
 
 }

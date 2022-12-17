@@ -39,6 +39,14 @@ public final class SitesUtils {
         return nearestSite;
     }
     
+    /**
+     * Get the nearest Site that is towards the enemy camp.
+     * 
+     * @param sites
+     * @param coordinates
+     * @param startingAllyQueenCoordinates
+     * @return
+     */
     public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
         final int Y_GAP = 150;

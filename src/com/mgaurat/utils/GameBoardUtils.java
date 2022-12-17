@@ -118,6 +118,13 @@ public final class GameBoardUtils {
     	}
     }
     
+    /**
+     * Says in which cardinal corner is the coordinates with respect to the referenceCoordinates.
+     * 
+     * @param coordinates
+     * @param referenceCoordinates
+     * @return GameBoardQuarterEnum
+     */
     public static GameBoardQuarterEnum getQuarterOfCoordinatesWithRespectToAnotherCoordinates(Coordinates coordinates, Coordinates referenceCoordinates) {
     	int xCoordinate = coordinates.getX();  
     	int yCoordinate = coordinates.getY();
