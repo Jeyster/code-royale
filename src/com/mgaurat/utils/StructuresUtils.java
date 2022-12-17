@@ -495,9 +495,8 @@ public final class StructuresUtils {
     }
     
     /**
-     * Get a Coordinates to hide from enemies behind a tower :
-     * 	- first evaluate the nearest enemy position with respect to the towerSite
-     * 	- then adapt the Coordinates close to the towerSite
+     * Get a Coordinates to hide from enemies behind a TOWER.
+     * Choose a cardinal point (N, E, S or W) on the input TOWER that is opposite to the nearest enemy KNIGHT.
      * 
      * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
      * 
@@ -568,6 +567,46 @@ public final class StructuresUtils {
 //    	int deltaY = towerRadius * yDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
 //    	
 //    	return new Coordinates(towerSiteCoordinates.getX() + deltaX, towerSiteCoordinates.getY() + deltaY);
+    }
+    
+    /**
+     * Get a Coordinates to hide from enemies behind a TOWER.
+     * Choose the coordinates on the input TOWER Site circle that is opposite to the nearest enemy KNIGHT.
+     * 
+     * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
+     * 
+     * @param nearestEnemyKnight
+     * @param towerSite
+     * @param startingAllyQueenCoordinates
+     * @return Coordinates
+     */
+    public static Coordinates getCoordinatesBehindTowerOppositeToNearestEnemyKnight(Unit nearestEnemyKnight, Site towerSite, Coordinates startingAllyQueenCoordinates) {	
+    	if (towerSite == null) {
+    		return null;
+    	}
+    	
+    	if (nearestEnemyKnight != null) {
+    		Coordinates towerCoordinates = towerSite.getCoordinates();
+    		Coordinates nearestEnemyKnightCoordinates = nearestEnemyKnight.getCoordinates();
+    		int towerRadius = towerSite.getRadius();
+        	int distanceBetweenNearestEnemyKnightAndTower = (int) Math.round(MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnightCoordinates, towerCoordinates));
+        	int xDifferenceBetweenNearestEnemyKnightAndTower = towerSite.getCoordinates().getX() - nearestEnemyKnightCoordinates.getX();
+        	int yDifferenceBetweenNearestEnemyKnightAndTower = towerSite.getCoordinates().getY() - nearestEnemyKnightCoordinates.getY();
+
+        	int deltaX = towerRadius * xDifferenceBetweenNearestEnemyKnightAndTower / distanceBetweenNearestEnemyKnightAndTower;
+        	int deltaY = towerRadius * yDifferenceBetweenNearestEnemyKnightAndTower / distanceBetweenNearestEnemyKnightAndTower;
+        	
+        	return new Coordinates(towerCoordinates.getX() + deltaX, towerCoordinates.getY() + deltaY); 		
+    	} else {
+        	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+        	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
+        	int towerRadius = towerSite.getRadius();
+        	int xCoordinate = isLeftSide ? 
+        			towerSiteCoordinates.getX() - towerRadius : towerSiteCoordinates.getX() + towerRadius;
+        	
+        	return new Coordinates(xCoordinate, towerSiteCoordinates.getY());
+    	}
+    	
     }
     
     /**

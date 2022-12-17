@@ -199,7 +199,7 @@
 //            if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites)
 //            		&& towersBuilt > 0) {
 //            	System.err.println("Strategy a)");
-//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights); 
+//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
 //            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)) {
 //            		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
 //            			towersBuilt++;
@@ -323,7 +323,7 @@
 //    			} 
 //            } else {
 //            	System.err.println("Strategy o)");
-//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights);
+//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates);
 //            	SystemOutUtils.printMoveAction(safestCoordinates);
 //        	}
 //
@@ -367,6 +367,7 @@
 //    }
 //    
 //}
+//
 //
 //class Site {
 //	
@@ -1206,9 +1207,8 @@
 //    }
 //    
 //    /**
-//     * Get a Coordinates to hide from enemies behind a tower :
-//     * 	- first evaluate the nearest enemy position with respect to the towerSite
-//     * 	- then adapt the Coordinates close to the towerSite
+//     * Get a Coordinates to hide from enemies behind a TOWER.
+//     * Choose a cardinal point (N, E, S or W) on the input TOWER that is opposite to the nearest enemy KNIGHT.
 //     * 
 //     * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
 //     * 
@@ -1279,6 +1279,46 @@
 ////    	int deltaY = towerRadius * yDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
 ////    	
 ////    	return new Coordinates(towerSiteCoordinates.getX() + deltaX, towerSiteCoordinates.getY() + deltaY);
+//    }
+//    
+//    /**
+//     * Get a Coordinates to hide from enemies behind a TOWER.
+//     * Choose the coordinates on the input TOWER Site circle that is opposite to the nearest enemy KNIGHT.
+//     * 
+//     * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
+//     * 
+//     * @param nearestEnemyKnight
+//     * @param towerSite
+//     * @param startingAllyQueenCoordinates
+//     * @return Coordinates
+//     */
+//    public static Coordinates getCoordinatesBehindTowerOppositeToNearestEnemyKnight(Unit nearestEnemyKnight, Site towerSite, Coordinates startingAllyQueenCoordinates) {	
+//    	if (towerSite == null) {
+//    		return null;
+//    	}
+//    	
+//    	if (nearestEnemyKnight != null) {
+//    		Coordinates towerCoordinates = towerSite.getCoordinates();
+//    		Coordinates nearestEnemyKnightCoordinates = nearestEnemyKnight.getCoordinates();
+//    		int towerRadius = towerSite.getRadius();
+//        	int distanceBetweenNearestEnemyKnightAndTower = (int) Math.round(MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnightCoordinates, towerCoordinates));
+//        	int xDifferenceBetweenNearestEnemyKnightAndTower = towerSite.getCoordinates().getX() - nearestEnemyKnightCoordinates.getX();
+//        	int yDifferenceBetweenNearestEnemyKnightAndTower = towerSite.getCoordinates().getY() - nearestEnemyKnightCoordinates.getY();
+//
+//        	int deltaX = towerRadius * xDifferenceBetweenNearestEnemyKnightAndTower / distanceBetweenNearestEnemyKnightAndTower;
+//        	int deltaY = towerRadius * yDifferenceBetweenNearestEnemyKnightAndTower / distanceBetweenNearestEnemyKnightAndTower;
+//        	
+//        	return new Coordinates(towerCoordinates.getX() + deltaX, towerCoordinates.getY() + deltaY); 		
+//    	} else {
+//        	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+//        	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
+//        	int towerRadius = towerSite.getRadius();
+//        	int xCoordinate = isLeftSide ? 
+//        			towerSiteCoordinates.getX() - towerRadius : towerSiteCoordinates.getX() + towerRadius;
+//        	
+//        	return new Coordinates(xCoordinate, towerSiteCoordinates.getY());
+//    	}
+//    	
 //    }
 //    
 //    /**
@@ -1555,11 +1595,22 @@
 //	 * @param allySites
 //	 * @return Coordinates
 //	 */
-//	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights) {
+//	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates) {
 //		Coordinates safestCoordinates;
-//    	if (allyTowerSites.size() >= 3) {
+//    	System.err.println("---Get safest coordinates---");
+//		if (allyTowerSites.size() >= 3) {
 //    		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
-//    		safestCoordinates = StructuresUtils.getCoordinatesBehindTower(UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights), safestAllyTower, startingAllyQueenCoordinates);
+//    		System.err.println("Safest TOWER ID : " + safestAllyTower.getId());
+//    		
+//    		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights);
+//    		if (nearestEnemyKnight != null) {
+//    			System.err.println("Nearest enemy knight X : " + nearestEnemyKnight.getCoordinates().getX());    			
+//    			System.err.println("Nearest enemy knight Y : " + nearestEnemyKnight.getCoordinates().getY());    			
+//    		}
+//    		
+//    		safestCoordinates = StructuresUtils.getCoordinatesBehindTowerOppositeToNearestEnemyKnight(nearestEnemyKnight, safestAllyTower, startingAllyQueenCoordinates);
+//    		System.err.println("Safest X : " + safestCoordinates.getX());
+//    		System.err.println("Safest Y : " + safestCoordinates.getY());
 //    	} else {
 //    		safestCoordinates = getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
 //    	}
@@ -1656,6 +1707,29 @@
 //    	}
 //    }
 //    	
+//}
+//
+//final class MathUtils {
+//	
+//	private MathUtils() {}
+//	
+//	public static double getDistanceBetweenTwoCoordinates(Coordinates a, Coordinates b) {
+//		int xa = a.getX();
+//		int ya = a.getY();
+//		int xb = b.getX();
+//		int yb = b.getY();
+//		
+//		return Math.sqrt(Math.pow(xa - xb, 2) + Math.pow(ya - yb, 2));
+//	}
+//
+//	public static Coordinates getMiddleCoordinatesOfTwoCoordinates(Coordinates a, Coordinates b) {
+//		int xa = a.getX();
+//		int ya = a.getY();
+//		int xb = b.getX();
+//		int yb = b.getY();
+//		
+//		return new Coordinates(Math.abs(xb - xa), Math.abs(yb - ya));
+//	}
 //}
 //
 //final class InputUtils {
@@ -1857,29 +1931,6 @@
 //
 //}
 //
-//final class MathUtils {
-//	
-//	private MathUtils() {}
-//	
-//	public static double getDistanceBetweenTwoCoordinates(Coordinates a, Coordinates b) {
-//		int xa = a.getX();
-//		int ya = a.getY();
-//		int xb = b.getX();
-//		int yb = b.getY();
-//		
-//		return Math.sqrt(Math.pow(xa - xb, 2) + Math.pow(ya - yb, 2));
-//	}
-//
-//	public static Coordinates getMiddleCoordinatesOfTwoCoordinates(Coordinates a, Coordinates b) {
-//		int xa = a.getX();
-//		int ya = a.getY();
-//		int xb = b.getX();
-//		int yb = b.getY();
-//		
-//		return new Coordinates(Math.abs(xb - xa), Math.abs(yb - ya));
-//	}
-//}
-//
 //final class SystemOutUtils {
 //	
 //	private SystemOutUtils() {}
@@ -2008,3 +2059,4 @@
 //	}
 //
 //}
+//
