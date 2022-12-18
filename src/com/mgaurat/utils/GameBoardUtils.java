@@ -42,20 +42,21 @@ public final class GameBoardUtils {
 	 */
 	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates) {
 		Coordinates safestCoordinates;
-    	System.err.println("---Get safest coordinates---");
 		if (allyTowerSites.size() >= 3) {
     		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
-    		System.err.println("Safest TOWER ID : " + safestAllyTower.getId());
     		
     		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights);
-    		if (nearestEnemyKnight != null) {
-    			System.err.println("Nearest enemy knight X : " + nearestEnemyKnight.getCoordinates().getX());    			
-    			System.err.println("Nearest enemy knight Y : " + nearestEnemyKnight.getCoordinates().getY());    			
-    		}
     		
     		safestCoordinates = StructuresUtils.getCoordinatesBehindTowerOppositeToNearestEnemyKnight(nearestEnemyKnight, safestAllyTower, startingAllyQueenCoordinates);
-    		System.err.println("Safest X : " + safestCoordinates.getX());
-    		System.err.println("Safest Y : " + safestCoordinates.getY());
+
+//    		System.err.println("---Get safest coordinates---");
+//    		System.err.println("Safest TOWER ID : " + safestAllyTower.getId());
+//    		if (nearestEnemyKnight != null) {
+//    			System.err.println("Nearest enemy knight X : " + nearestEnemyKnight.getCoordinates().getX());    			
+//    			System.err.println("Nearest enemy knight Y : " + nearestEnemyKnight.getCoordinates().getY());    			
+//    		}
+//    		System.err.println("Safest X : " + safestCoordinates.getX());
+//    		System.err.println("Safest Y : " + safestCoordinates.getY());
     	} else {
     		safestCoordinates = getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
     	}
@@ -117,15 +118,17 @@ public final class GameBoardUtils {
     	boolean isYcLessThanYb = yc < yb;
     	boolean isXaLessThanXb = xa < xb;
     	boolean isYaLessThanYb = ya < yb;
+    	boolean isXcLessThanXa = xc < xa;
+    	boolean isYcLessThanYa = yc < ya;
     	
     	if (isXcLessThanXb && isYcLessThanYb) {
-    		return isXaLessThanXb && isYaLessThanYb;
+    		return isXaLessThanXb && isYaLessThanYb && isXcLessThanXa && isYcLessThanYa;
     	} else if (isXcLessThanXb && !isYcLessThanYb) {
-    		return isXaLessThanXb && !isYaLessThanYb;
+    		return isXaLessThanXb && !isYaLessThanYb && isXcLessThanXa && !isYcLessThanYa;
     	} else if (!isXcLessThanXb && isYcLessThanYb) {
-    		return !isXaLessThanXb && isYaLessThanYb;
+    		return !isXaLessThanXb && isYaLessThanYb && !isXcLessThanXa && isYcLessThanYa;
     	} else {
-    		return !isXaLessThanXb && !isYaLessThanYb;
+    		return !isXaLessThanXb && !isYaLessThanYb && !isXcLessThanXa && !isYcLessThanYa;
     	}
     }
     
@@ -150,6 +153,59 @@ public final class GameBoardUtils {
     	} else {
     		return GameBoardQuarterEnum.BOTTOMRIGHT;
     	}
+    }
+    
+    /**
+     * Find the best Coordinates that avoid a direct collision with the input siteToAvoid.
+     * 
+     * @param allyQueenCoordinates
+     * @param targetCoordinates
+     * @param siteToAvoid
+     * @return Coordinates
+     */
+    public static Coordinates getCoordinatesToAvoidCollisionWithSite(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Site siteToAvoid) {
+    	Coordinates coordinates = null;
+    	double intersectionDistance;
+    	double smallestIntersectionDistance = Double.MAX_VALUE;
+    	Coordinates siteCoordinates = siteToAvoid.getCoordinates();
+    	Coordinates closestCoordinatesOfMoveSegmentFromSiteCenter = MathUtils.getClosestCoordinatesOfLineFromPoint(allyQueenCoordinates, targetCoordinates, siteCoordinates);
+    	//System.err.println("closestCoordinatesOfMoveSegmentFromSiteCenter : (" + closestCoordinatesOfMoveSegmentFromSiteCenter.getX() + ", " + closestCoordinatesOfMoveSegmentFromSiteCenter.getY() + ")");
+    	List<Coordinates> intersectionsWithCircle = MathUtils.getIntersectionsOfLineWithCircle(siteCoordinates, closestCoordinatesOfMoveSegmentFromSiteCenter, siteCoordinates, siteToAvoid.getRadius());
+    	for (Coordinates intersection : intersectionsWithCircle) {
+        	//System.err.println("Intersection coordinates : (" + intersection.getX() + ", " + intersection.getY() + ")");
+    		intersectionDistance = MathUtils.getDistanceBetweenTwoCoordinates(intersection, closestCoordinatesOfMoveSegmentFromSiteCenter);
+    		if (intersectionDistance < smallestIntersectionDistance) {
+    			smallestIntersectionDistance = intersectionDistance;
+    			coordinates = intersection;
+    		}
+    	}
+    	return coordinates;
+    }
+    
+    /**
+     * Find the best Coordinates on the path to go from allyQueenCoordinates to targetCoordinates that avoid direct collisions with Sites :
+     * 	- find the closest Site that is on the path (if any, go straight forward)
+     * 	- then evaluate the Coordinates to go
+     * 
+     * @param allyQueenCoordinates
+     * @param targetCoordinates
+     * @param sites
+     * @return Coordinates
+     */
+    public static Coordinates getTargetCoordinatesAvoidingSitesCollisions(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
+    	System.err.println("Coordinates we want to go : (" + targetCoordinates.getX() + ", " + targetCoordinates.getY() + ")");
+    	
+    	Coordinates coordinatesToGo;
+    	Site closestCollidingSite = SitesUtils.getClosestSiteOnPath(allyQueenCoordinates, targetCoordinates, sites);
+    	if (closestCollidingSite == null) {
+    		coordinatesToGo = targetCoordinates;
+    	} else {
+    		System.err.println("Closest Site on path : " + closestCollidingSite.getId());
+    		coordinatesToGo = getCoordinatesToAvoidCollisionWithSite(allyQueenCoordinates, targetCoordinates, closestCollidingSite);
+    	}
+    	
+    	System.err.println("Coordinates to go : (" + coordinatesToGo.getX() + ", " + coordinatesToGo.getY() + ")");
+    	return coordinatesToGo;
     }
     	
 }

@@ -10,9 +10,9 @@ import com.mgaurat.model.Coordinates;
  * @author mgaurat
  *
  */
-public final class SystemOutUtils {
+public final class PrintUtils {
 	
-	private SystemOutUtils() {}
+	private PrintUtils() {}
 	
 	/**
 	 * Print a BUILD action thanks to a Site ID, a Structure type 

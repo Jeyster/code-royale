@@ -1,5 +1,6 @@
 package com.mgaurat.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import com.mgaurat.model.Coordinates;
@@ -96,6 +97,44 @@ public final class SitesUtils {
 	public static boolean isReallyCloseToCoordinates(Coordinates allyQueenCoordinates, Coordinates coordinates) {
 		final int REALLY_CLOSE = 150;
 		return MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, coordinates) <= REALLY_CLOSE;
+	}
+	
+	/**
+	 * Get the Sites that are on the path to go from allyQueenCoordinates to targetCoordinates.
+	 * For each sites, check if the site is between allyQueenCoordinates to targetCoordinates
+	 * and if the line between allyQueenCoordinates and targetCoordinates cross the site area.
+	 * 
+	 * @param allyQueenCoordinates
+	 * @param targetCoordinates
+	 * @param sites
+	 * @return Collection<Site>
+	 */
+	public static Collection<Site> getSitesOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
+		Collection<Site> sitesOnPath = new ArrayList<>();
+		for (Site site : sites) {
+			if (GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(site.getCoordinates(), targetCoordinates, allyQueenCoordinates) 
+					&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, targetCoordinates, site.getCoordinates(), site.getRadius())) {
+				sitesOnPath.add(site);
+			}
+		}
+		
+		return sitesOnPath;
+	}
+	
+	/**
+	 * Get the closest Coordinates that in on the path to go from allyQueenCoordinates to targetCoordinates.
+	 * 
+	 * @param allyQueenCoordinates
+	 * @param targetCoordinates
+	 * @param sites
+	 * @return Site
+	 */
+	public static Site getClosestSiteOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
+		Collection<Site> sitesOnPath = getSitesOnPath(allyQueenCoordinates, targetCoordinates, sites);
+//		for (Site site : sitesOnPath) {
+//			System.err.println("Site on path ID : " + site.getId());
+//		}
+		return getNearestSiteFromCoordinates(sitesOnPath, allyQueenCoordinates);
 	}
     
 }

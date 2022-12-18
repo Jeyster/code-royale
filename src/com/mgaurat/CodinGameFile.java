@@ -1,3 +1,6 @@
+//import java.awt.geom.AffineTransform;
+//import java.awt.geom.NoninvertibleTransformException;
+//import java.awt.geom.Point2D;
 //import java.util.ArrayList;
 //import java.util.Collection;
 //import java.util.HashMap;
@@ -132,7 +135,6 @@
 //            }
 //            
 //            /* --- Possible Site to MOVE or to BUILD -- */
-//            Site targetedSite;
 //            int targetedSiteId;
 //            Site nearestEmptySite;
 //            Site nearestSiteToBuildAMine;
@@ -196,10 +198,12 @@
 //            *		n) else if MOVE to the nearest empty Site and BUILD a TOWER
 //            *		o) else MOVE to a safe place
 //            */
+//            Coordinates coordinatesToGo;
 //            if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites)
 //            		&& towersBuilt > 0) {
 //            	System.err.println("Strategy a)");
 //            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
 //            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)) {
 //            		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
 //            			towersBuilt++;
@@ -209,7 +213,7 @@
 //            			SystemOutUtils.printMoveAction(safestCoordinates);            			
 //            		}
 //            	} else {
-//            		SystemOutUtils.printMoveAction(safestCoordinates);
+//            		SystemOutUtils.printMoveAction(coordinatesToGo);
 //            	}
 //            } else if (isTouchingAMineToImprove) {
 //            	System.err.println("Strategy b)");
@@ -221,8 +225,9 @@
 //        			&& !isTwoFirstMinesBuild) {
 //            	System.err.println("Strategy d)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
 //        		if (touchedSite != targetedSiteId) {
-//        			SystemOutUtils.printMoveAction(nearestSiteToBuildAMine.getCoordinates());
+//        			SystemOutUtils.printMoveAction(coordinatesToGo);
 //        		} else {
 //        			if (!isFirstBuildDone) {
 //        				isFirstBuildDone = true;
@@ -232,8 +237,9 @@
 //        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy e)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
 //        		if (touchedSite != targetedSiteId) {
-//        			SystemOutUtils.printMoveAction(nearestSiteToBuildAMine.getCoordinates());
+//        			SystemOutUtils.printMoveAction(coordinatesToGo);
 //        		} else {
 //        			if (!isFirstBuildDone) {
 //        				isFirstBuildDone = true;
@@ -242,10 +248,10 @@
 //        		}   
 //            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy f)");
-//            	targetedSite = nearestEmptySite;
-//            	targetedSiteId = targetedSite.getId();
+//            	targetedSiteId = nearestEmptySite.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestEmptySite.getCoordinates(), allSites);
 //            	if (touchedSite != targetedSiteId) {
-//                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//                	SystemOutUtils.printMoveAction(coordinatesToGo);
 //            	} else {
 //            		if (!isFirstKnightBarracksBuilt) {
 //            			isFirstKnightBarracksBuilt = true;
@@ -254,46 +260,47 @@
 //            	}
 //            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy g)");
-//            	targetedSite = nearestAllySiteNotInTraining;
-//            	targetedSiteId = targetedSite.getId();
+//            	targetedSiteId = nearestAllySiteNotInTraining.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestAllySiteNotInTraining.getCoordinates(), allSites);
 //            	if (touchedSite != targetedSiteId) {
-//                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//                	SystemOutUtils.printMoveAction(coordinatesToGo);
 //            	} else {
 //            		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
 //            	}
 //            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyTowersNumber, MIN_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy h)");
-//            	targetedSite = nearestEmptySite;
-//        		targetedSiteId = targetedSite.getId();
+//        		targetedSiteId = nearestEmptySite.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestEmptySite.getCoordinates(), allSites);
 //        		if (touchedSite != targetedSiteId) {
-//        			SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//        			SystemOutUtils.printMoveAction(coordinatesToGo);
 //        		} else {
 //        			towersBuilt++;
 //        			SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
 //        		}   
 //            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, enemyTowersNumber, allyBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, allyMineSites)) {
 //            	System.err.println("Strategy i)");
-//            	targetedSite = nearestEmptySite;
-//            	targetedSiteId = targetedSite.getId();
+//            	targetedSiteId = nearestEmptySite.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestEmptySite.getCoordinates(), allSites);
 //            	if (touchedSite != targetedSiteId) {
-//                	SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//                	SystemOutUtils.printMoveAction(coordinatesToGo);
 //            	} else {
 //            		SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.GIANT);
 //            	}
 //        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy j)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
 //    			if (touchedSite != targetedSiteId) {
-//    				SystemOutUtils.printMoveAction(nearestSiteToBuildAMine.getCoordinates());
+//    				SystemOutUtils.printMoveAction(coordinatesToGo);
 //    			} else {
 //    				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //    			}        			
 //            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyTowersNumber, MAX_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy k)");
-//            	targetedSite = nearestEmptySite;
-//    			targetedSiteId = targetedSite.getId();
+//    			targetedSiteId = nearestEmptySite.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestEmptySite.getCoordinates(), allSites);
 //    			if (touchedSite != targetedSiteId) {
-//    				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//    				SystemOutUtils.printMoveAction(coordinatesToGo);
 //    			} else {
 //        			towersBuilt++;
 //    				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
@@ -301,8 +308,9 @@
 //        	} else if (nearestSiteToBuildAMine != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy l)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
 //    			if (touchedSite != targetedSiteId) {
-//    				SystemOutUtils.printMoveAction(nearestSiteToBuildAMine.getCoordinates());
+//    				SystemOutUtils.printMoveAction(coordinatesToGo);
 //    			} else {
 //    				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //    			}  
@@ -310,13 +318,14 @@
 //        			&& (nearestSiteToBuildAMine == null || MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()) < MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates()))
 //        			&& (nearestEmptySite == null || MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()) < MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, nearestEmptySite.getCoordinates()))) {
 //            	System.err.println("Strategy m)");
-//        		SystemOutUtils.printMoveAction(nearestAllyTowerSiteWithNotSufficientLife.getCoordinates()); 
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestAllyTowerSiteWithNotSufficientLife.getCoordinates(), allSites);
+//        		SystemOutUtils.printMoveAction(coordinatesToGo); 
 //            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestEmptySite, allyTowersNumber, Integer.MAX_VALUE, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites)) {
 //            	System.err.println("Strategy n)");
-//            	targetedSite = nearestEmptySite;
-//    			targetedSiteId = targetedSite.getId();
+//    			targetedSiteId = nearestEmptySite.getId();
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestEmptySite.getCoordinates(), allSites);
 //    			if (touchedSite != targetedSiteId) {
-//    				SystemOutUtils.printMoveAction(targetedSite.getCoordinates());
+//    				SystemOutUtils.printMoveAction(coordinatesToGo);
 //    			} else {
 //        			towersBuilt++;
 //    				SystemOutUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
@@ -324,7 +333,8 @@
 //            } else {
 //            	System.err.println("Strategy o)");
 //            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates);
-//            	SystemOutUtils.printMoveAction(safestCoordinates);
+//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
+//            	SystemOutUtils.printMoveAction(coordinatesToGo);
 //        	}
 //
 //            /* 2) Second turn action is to TRAIN.
@@ -367,7 +377,6 @@
 //    }
 //    
 //}
-//
 //
 //class Site {
 //	
@@ -551,97 +560,6 @@
 // 
 //}
 //
-//final class UnitsUtils {
-//	
-//	private UnitsUtils() {}
-//	
-//	/**
-//	 * Get the QUEEN from the input map that provides a list of the Unit for each unit type.
-//	 * The list of QUEEN must be of size 1 because the input map must be for only one player.
-//	 * 
-//	 * @param unitsByType
-//	 * @return Unit
-//	 */
-//	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {
-//		List<Unit> queens = unitsByType.get(UnitEnum.QUEEN);
-//		if (queens.size() > 1) {
-//			return null;
-//		}
-//		
-//		return queens.get(0);
-//	}
-//	
-//	/**
-//	 * Check if the Coordinates is considered as safe regarding enemy KNIGHT.
-//	 * Safe distance is defined in a constant.
-//	 * 
-//	 * @param coordinates
-//	 * @param enemyUnitsByType
-//	 * @return boolean
-//	 */
-//	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, int safeDistance) {
-//		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > safeDistance;
-//	}
-//	
-//	/**
-//	 * Get the distance between the input Coordinates and the nearest KNIGHT form the input map.
-//	 * 
-//	 * @param coordinates
-//	 * @param unitsByType
-//	 * @return double
-//	 */
-//	public static double getDistanceBetweenNearestKnightAndCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> unitsByType) {
-//        double distanceToKnight;
-//        double distanceToNearestKnight = Double.MAX_VALUE;
-//		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
-//		Coordinates knightCoordinates;
-//		for (Unit knight : knights) {
-//			knightCoordinates = knight.getCoordinates();
-//			distanceToKnight = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, knightCoordinates);
-//			if (distanceToKnight < distanceToNearestKnight) {
-//				distanceToNearestKnight = distanceToKnight;
-//			}
-//		}
-//		
-//		return distanceToNearestKnight;
-//	}
-//	
-//	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {
-//        double distanceToUnit;
-//        double distanceToNearestUnit = Double.MAX_VALUE;
-//		Coordinates unitCoordinates;
-//		Unit nearestUnit = null;
-//		for (Unit unit : units) {
-//			unitCoordinates = unit.getCoordinates();
-//			distanceToUnit = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unitCoordinates);
-//			if (distanceToUnit < distanceToNearestUnit) {
-//				distanceToNearestUnit = distanceToUnit;
-//				nearestUnit = unit;
-//			}
-//		}
-//		
-//		return nearestUnit;
-//	}
-//	
-//	/**
-//	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
-//	 * 
-//	 * @param giants
-//	 * @param coordinates
-//	 * @return boolean
-//	 */
-//	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
-//		final int GIANT_SAFE_ZONE = 200;
-//		for (Unit giant : giants) {
-//			if (MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//	
-//}
-//
 //final class SitesUtils {
 //	
 //	private SitesUtils() {}
@@ -726,6 +644,44 @@
 //	public static boolean isReallyCloseToCoordinates(Coordinates allyQueenCoordinates, Coordinates coordinates) {
 //		final int REALLY_CLOSE = 150;
 //		return MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, coordinates) <= REALLY_CLOSE;
+//	}
+//	
+//	/**
+//	 * Get the Sites that are on the path to go from allyQueenCoordinates to targetCoordinates.
+//	 * For each sites, check if the site is between allyQueenCoordinates to targetCoordinates
+//	 * and if the line between allyQueenCoordinates and targetCoordinates cross the site area.
+//	 * 
+//	 * @param allyQueenCoordinates
+//	 * @param targetCoordinates
+//	 * @param sites
+//	 * @return Collection<Site>
+//	 */
+//	public static Collection<Site> getSitesOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
+//		Collection<Site> sitesOnPath = new ArrayList<>();
+//		for (Site site : sites) {
+//			if (GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(site.getCoordinates(), targetCoordinates, allyQueenCoordinates) 
+//					&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, targetCoordinates, site.getCoordinates(), site.getRadius())) {
+//				sitesOnPath.add(site);
+//			}
+//		}
+//		
+//		return sitesOnPath;
+//	}
+//	
+//	/**
+//	 * Get the closest Coordinates that in on the path to go from allyQueenCoordinates to targetCoordinates.
+//	 * 
+//	 * @param allyQueenCoordinates
+//	 * @param targetCoordinates
+//	 * @param sites
+//	 * @return Site
+//	 */
+//	public static Site getClosestSiteOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
+//		Collection<Site> sitesOnPath = getSitesOnPath(allyQueenCoordinates, targetCoordinates, sites);
+////		for (Site site : sitesOnPath) {
+////			System.err.println("Site on path ID : " + site.getId());
+////		}
+//		return getNearestSiteFromCoordinates(sitesOnPath, allyQueenCoordinates);
 //	}
 //    
 //}
@@ -1392,6 +1348,7 @@
 //			Site nearestSiteToBuildATower, Collection<Unit> enemyGiants) {
 //		if (nearestSiteToBuildATower == null
 //				|| UnitsUtils.isGiantCloseToCoordinates(enemyGiants, allyQueenCoordinates)) {
+//			System.err.println("No Site to build Tower when running away");
 //			return false;
 //		}
 //		
@@ -1403,13 +1360,14 @@
 //		final int Y_RANGE = 200;
 //		
 //		Coordinates nearestSiteToBuildATowerCoordinates = nearestSiteToBuildATower.getCoordinates();
+//    	System.err.println("nearestSiteToBuildATowerCoordinates : (" + nearestSiteToBuildATowerCoordinates.getX() + ", " + nearestSiteToBuildATowerCoordinates.getY() + ")");
 //		int xNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getX();
 //		int yNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getY();
 //		int xAllyQueenCoordinates = allyQueenCoordinates.getX();
 //		int yAllyQueenCoordinates = allyQueenCoordinates.getY();
 //		if (Math.abs(xNearestSiteToBuildATowerCoordinates - xAllyQueenCoordinates) <= X_RANGE
 //				&& Math.abs(yNearestSiteToBuildATowerCoordinates - yAllyQueenCoordinates) <= Y_RANGE
-//				&& GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(nearestSiteToBuildATowerCoordinates, allyQueenCoordinates, safestCoordinates)) {
+//				&& GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(nearestSiteToBuildATowerCoordinates, safestCoordinates, allyQueenCoordinates)) {
 //			return true;
 //		}
 //		
@@ -1672,15 +1630,17 @@
 //    	boolean isYcLessThanYb = yc < yb;
 //    	boolean isXaLessThanXb = xa < xb;
 //    	boolean isYaLessThanYb = ya < yb;
+//    	boolean isXcLessThanXa = xc < xa;
+//    	boolean isYcLessThanYa = yc < ya;
 //    	
 //    	if (isXcLessThanXb && isYcLessThanYb) {
-//    		return isXaLessThanXb && isYaLessThanYb;
+//    		return isXaLessThanXb && isYaLessThanYb && isXcLessThanXa && isYcLessThanYa;
 //    	} else if (isXcLessThanXb && !isYcLessThanYb) {
-//    		return isXaLessThanXb && !isYaLessThanYb;
+//    		return isXaLessThanXb && !isYaLessThanYb && isXcLessThanXa && !isYcLessThanYa;
 //    	} else if (!isXcLessThanXb && isYcLessThanYb) {
-//    		return !isXaLessThanXb && isYaLessThanYb;
+//    		return !isXaLessThanXb && isYaLessThanYb && !isXcLessThanXa && isYcLessThanYa;
 //    	} else {
-//    		return !isXaLessThanXb && !isYaLessThanYb;
+//    		return !isXaLessThanXb && !isYaLessThanYb && !isXcLessThanXa && !isYcLessThanYa;
 //    	}
 //    }
 //    
@@ -1706,6 +1666,59 @@
 //    		return GameBoardQuarterEnum.BOTTOMRIGHT;
 //    	}
 //    }
+//    
+//    /**
+//     * Find the best Coordinates that avoid a direct collision with the input siteToAvoid.
+//     * 
+//     * @param allyQueenCoordinates
+//     * @param targetCoordinates
+//     * @param siteToAvoid
+//     * @return Coordinates
+//     */
+//    public static Coordinates getCoordinatesToAvoidCollisionWithSite(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Site siteToAvoid) {
+//    	Coordinates coordinates = null;
+//    	double intersectionDistance;
+//    	double smallestIntersectionDistance = Double.MAX_VALUE;
+//    	Coordinates siteCoordinates = siteToAvoid.getCoordinates();
+//    	Coordinates closestCoordinatesOfMoveSegmentFromSiteCenter = MathUtils.getClosestCoordinatesOfLineFromPoint(allyQueenCoordinates, targetCoordinates, siteCoordinates);
+//    	//System.err.println("closestCoordinatesOfMoveSegmentFromSiteCenter : (" + closestCoordinatesOfMoveSegmentFromSiteCenter.getX() + ", " + closestCoordinatesOfMoveSegmentFromSiteCenter.getY() + ")");
+//    	List<Coordinates> intersectionsWithCircle = MathUtils.getIntersectionsOfLineWithCircle(siteCoordinates, closestCoordinatesOfMoveSegmentFromSiteCenter, siteCoordinates, siteToAvoid.getRadius());
+//    	for (Coordinates intersection : intersectionsWithCircle) {
+//        	//System.err.println("Intersection coordinates : (" + intersection.getX() + ", " + intersection.getY() + ")");
+//    		intersectionDistance = MathUtils.getDistanceBetweenTwoCoordinates(intersection, closestCoordinatesOfMoveSegmentFromSiteCenter);
+//    		if (intersectionDistance < smallestIntersectionDistance) {
+//    			smallestIntersectionDistance = intersectionDistance;
+//    			coordinates = intersection;
+//    		}
+//    	}
+//    	return coordinates;
+//    }
+//    
+//    /**
+//     * Find the best Coordinates on the path to go from allyQueenCoordinates to targetCoordinates that avoid direct collisions with Sites :
+//     * 	- find the closest Site that is on the path (if any, go straight forward)
+//     * 	- then evaluate the Coordinates to go
+//     * 
+//     * @param allyQueenCoordinates
+//     * @param targetCoordinates
+//     * @param sites
+//     * @return Coordinates
+//     */
+//    public static Coordinates getTargetCoordinatesAvoidingSitesCollisions(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
+//    	System.err.println("Coordinates we want to go : (" + targetCoordinates.getX() + ", " + targetCoordinates.getY() + ")");
+//    	
+//    	Coordinates coordinatesToGo;
+//    	Site closestCollidingSite = SitesUtils.getClosestSiteOnPath(allyQueenCoordinates, targetCoordinates, sites);
+//    	if (closestCollidingSite == null) {
+//    		coordinatesToGo = targetCoordinates;
+//    	} else {
+//    		System.err.println("Closest Site on path : " + closestCollidingSite.getId());
+//    		coordinatesToGo = getCoordinatesToAvoidCollisionWithSite(allyQueenCoordinates, targetCoordinates, closestCollidingSite);
+//    	}
+//    	
+//    	System.err.println("Coordinates to go : (" + coordinatesToGo.getX() + ", " + coordinatesToGo.getY() + ")");
+//    	return coordinatesToGo;
+//    }
 //    	
 //}
 //
@@ -1730,6 +1743,148 @@
 //		
 //		return new Coordinates(Math.abs(xb - xa), Math.abs(yb - ya));
 //	}
+//	
+//	/**
+//	 * Calculate the distance between the input point and the closest point of the line drawn by firstLinePoint and secondLinePoint.
+//	 * 
+//	 * @param firstLinePoint
+//	 * @param secondLinePoint
+//	 * @param point
+//	 * @return double
+//	 */
+//	public static double getDistanceBetweenLineAndPoint(Coordinates firstLinePoint, Coordinates secondLinePoint, Coordinates point) {
+//		int xFirstLinePoint = firstLinePoint.getX();
+//		int yFirstLinePoint = firstLinePoint.getY();
+//		int xSecondLinePoint = secondLinePoint.getX();
+//		int ySecondLinePoint = secondLinePoint.getY();
+//		int xPoint = point.getX();
+//		int yPoint = point.getY();
+//		double distanceBetweenTheTwoLinePoints = getDistanceBetweenTwoCoordinates(firstLinePoint, secondLinePoint);
+//		return Math.abs(((xSecondLinePoint - xFirstLinePoint)*(yFirstLinePoint - yPoint)) - ((xFirstLinePoint - xPoint)*(ySecondLinePoint - yFirstLinePoint))) / distanceBetweenTheTwoLinePoints;
+//	}
+//	
+//	/**
+//	 * Check if the line between firstLinePoint and secondLinePoint crosses the input circle.
+//	 * 
+//	 * @param firstLinePoint
+//	 * @param secondLinePoint
+//	 * @param circleCenter
+//	 * @param circleRadius
+//	 * @return boolean
+//	 */
+//	public static boolean isLineCrossingCircle(Coordinates firstLinePoint, Coordinates secondLinePoint, Coordinates circleCenter, int circleRadius) {
+//		double distanceBetweenLineAndCircleCenter = getDistanceBetweenLineAndPoint(firstLinePoint, secondLinePoint, circleCenter);
+//		if (distanceBetweenLineAndCircleCenter >= circleRadius) {
+//			return false;
+//		} else {
+//			return true;
+//		}
+//	}
+//	
+//	/**
+//	 * Get the closest Coordinates from p of the line drawn by a and b.
+//	 * 
+//	 * @param a
+//	 * @param b
+//	 * @param p
+//	 * @return Coordinates
+//	 */
+//	public static Coordinates getClosestCoordinatesOfLineFromPoint(Coordinates a, Coordinates b, Coordinates p) {
+//		int xa = a.getX();
+//		int ya = a.getY();
+//		int xb = b.getX();
+//		int yb = b.getY();
+//		int xp = p.getX();
+//		int yp = p.getY();
+//		
+//	    int xpMinusXa = xp - xa;
+//	    int ypMinusYa = yp - ya;
+//	    int xbMinusXa = xb - xa;
+//	    int ybMinusYa = yb - ya;
+//
+//	    int xCoordinate = xa + (xbMinusXa * ((xpMinusXa * xbMinusXa) + (ypMinusYa * ybMinusYa)) / ((xbMinusXa * xbMinusXa) + (ybMinusYa * ybMinusYa)));
+//		int yCoordinate = ya + (ybMinusYa * ((xpMinusXa * xbMinusXa) + (ypMinusYa * ybMinusYa)) / ((xbMinusXa * xbMinusXa) + (ybMinusYa * ybMinusYa)));
+//	    return new Coordinates(xCoordinate, yCoordinate);
+//	}
+//	
+//	/**
+//	 * Get the two Coordinates of the line drawn by firstLinePoint and secondLinePoint that crosses the input circle.
+//	 * It calls a method that I copy and that uses Point2D. I thus convert Point2D into Coordinates.
+//	 * 
+//	 * @param firstLinePoint
+//	 * @param secondLinePoint
+//	 * @param circleCenter
+//	 * @param circleRadius
+//	 * @return List<Coordinates>
+//	 */
+//	public static List<Coordinates> getIntersectionsOfLineWithCircle(Coordinates firstLinePoint, Coordinates secondLinePoint, Coordinates circleCenter, int circleRadius) {
+//		List<Coordinates> intersections = new ArrayList<>();
+//		Point2D firstLinePoint2D = new Point2D.Double(firstLinePoint.getX(), firstLinePoint.getY());
+//		Point2D secondLinePoint2D = new Point2D.Double(secondLinePoint.getX(), secondLinePoint.getY());
+//		Point2D circleCenter2D = new Point2D.Double(circleCenter.getX(), circleCenter.getY());
+//		try {
+//			List<Point2D> intersections2D = intersection(firstLinePoint2D, secondLinePoint2D, circleCenter2D, circleRadius, false);
+//			for (Point2D intersection2D : intersections2D) {
+//	        	//System.err.println("Intersection coordinates : (" + intersection2D.getX() + ", " + intersection2D.getY() + ")");
+//				intersections.add(new Coordinates((int) Math.round(intersection2D.getX()), (int) Math.round(intersection2D.getY())));
+//			}
+//		} catch (NoninvertibleTransformException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return intersections;
+//	}
+//
+//	/**
+//     * If center of the circle is at the origin and the line is horizontal,
+//     * it's easy to calculate the points of intersection, so to handle the
+//     * general case, we convert the input to a coordinate system where the
+//     * center of the circle is at the origin and the line is horizontal,
+//     * then convert the points of intersection back to the original
+//     * coordinate system.
+//     *
+//	 * @param p1
+//	 * @param p2
+//	 * @param center
+//	 * @param radius
+//	 * @param isSegment
+//	 * @return
+//	 * @throws NoninvertibleTransformException
+//	 */
+//    public static List<Point2D> intersection(Point2D p1, Point2D p2, Point2D center,
+//            double radius, boolean isSegment) throws NoninvertibleTransformException {
+//        List<Point2D> result = new ArrayList<>();
+//        double dx = p2.getX() - p1.getX();
+//        double dy = p2.getY() - p1.getY();
+//        AffineTransform trans = AffineTransform.getRotateInstance(dx, dy);
+//        trans.invert();
+//        trans.translate(-center.getX(), -center.getY());
+//        Point2D p1a = trans.transform(p1, null);
+//        Point2D p2a = trans.transform(p2, null);
+//        double y = p1a.getY();
+//        double minX = Math.min(p1a.getX(), p2a.getX());
+//        double maxX = Math.max(p1a.getX(), p2a.getX());
+//        if (y == radius || y == -radius) {
+//            if (!isSegment || (0 <= maxX && 0 >= minX)) {
+//                p1a.setLocation(0, y);
+//                trans.inverseTransform(p1a, p1a);
+//                result.add(p1a);
+//            }
+//        } else if (y < radius && y > -radius) {
+//            double x = Math.sqrt(radius * radius - y * y);
+//            if (!isSegment || (-x <= maxX && -x >= minX)) {
+//                p1a.setLocation(-x, y);
+//                trans.inverseTransform(p1a, p1a);
+//                result.add(p1a);
+//            }
+//            if (!isSegment || (x <= maxX && x >= minX)) {
+//                p2a.setLocation(x, y);
+//                trans.inverseTransform(p2a, p2a);
+//                result.add(p2a);
+//            }
+//        }
+//        return result;
+//    }
 //}
 //
 //final class InputUtils {
@@ -1993,6 +2148,97 @@
 //		System.out.println(sb.toString());
 //	}
 //
+//}
+//
+//final class UnitsUtils {
+//	
+//	private UnitsUtils() {}
+//	
+//	/**
+//	 * Get the QUEEN from the input map that provides a list of the Unit for each unit type.
+//	 * The list of QUEEN must be of size 1 because the input map must be for only one player.
+//	 * 
+//	 * @param unitsByType
+//	 * @return Unit
+//	 */
+//	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {
+//		List<Unit> queens = unitsByType.get(UnitEnum.QUEEN);
+//		if (queens.size() > 1) {
+//			return null;
+//		}
+//		
+//		return queens.get(0);
+//	}
+//	
+//	/**
+//	 * Check if the Coordinates is considered as safe regarding enemy KNIGHT.
+//	 * Safe distance is defined in a constant.
+//	 * 
+//	 * @param coordinates
+//	 * @param enemyUnitsByType
+//	 * @return boolean
+//	 */
+//	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, int safeDistance) {
+//		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > safeDistance;
+//	}
+//	
+//	/**
+//	 * Get the distance between the input Coordinates and the nearest KNIGHT form the input map.
+//	 * 
+//	 * @param coordinates
+//	 * @param unitsByType
+//	 * @return double
+//	 */
+//	public static double getDistanceBetweenNearestKnightAndCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> unitsByType) {
+//        double distanceToKnight;
+//        double distanceToNearestKnight = Double.MAX_VALUE;
+//		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
+//		Coordinates knightCoordinates;
+//		for (Unit knight : knights) {
+//			knightCoordinates = knight.getCoordinates();
+//			distanceToKnight = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, knightCoordinates);
+//			if (distanceToKnight < distanceToNearestKnight) {
+//				distanceToNearestKnight = distanceToKnight;
+//			}
+//		}
+//		
+//		return distanceToNearestKnight;
+//	}
+//	
+//	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {
+//        double distanceToUnit;
+//        double distanceToNearestUnit = Double.MAX_VALUE;
+//		Coordinates unitCoordinates;
+//		Unit nearestUnit = null;
+//		for (Unit unit : units) {
+//			unitCoordinates = unit.getCoordinates();
+//			distanceToUnit = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unitCoordinates);
+//			if (distanceToUnit < distanceToNearestUnit) {
+//				distanceToNearestUnit = distanceToUnit;
+//				nearestUnit = unit;
+//			}
+//		}
+//		
+//		return nearestUnit;
+//	}
+//	
+//	/**
+//	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
+//	 * 
+//	 * @param giants
+//	 * @param coordinates
+//	 * @return boolean
+//	 */
+//	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
+//		final int GIANT_SAFE_ZONE = 200;
+//		for (Unit giant : giants) {
+//			if (MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+//	
 //}
 //
 //enum GameBoardQuarterEnum {

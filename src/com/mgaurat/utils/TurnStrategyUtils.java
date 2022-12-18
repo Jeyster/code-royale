@@ -61,6 +61,7 @@ public final class TurnStrategyUtils {
 			Site nearestSiteToBuildATower, Collection<Unit> enemyGiants) {
 		if (nearestSiteToBuildATower == null
 				|| UnitsUtils.isGiantCloseToCoordinates(enemyGiants, allyQueenCoordinates)) {
+			//System.err.println("No Site to build Tower when running away");
 			return false;
 		}
 		
@@ -72,13 +73,14 @@ public final class TurnStrategyUtils {
 		final int Y_RANGE = 200;
 		
 		Coordinates nearestSiteToBuildATowerCoordinates = nearestSiteToBuildATower.getCoordinates();
+    	//System.err.println("nearestSiteToBuildATowerCoordinates : (" + nearestSiteToBuildATowerCoordinates.getX() + ", " + nearestSiteToBuildATowerCoordinates.getY() + ")");
 		int xNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getX();
 		int yNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getY();
 		int xAllyQueenCoordinates = allyQueenCoordinates.getX();
 		int yAllyQueenCoordinates = allyQueenCoordinates.getY();
 		if (Math.abs(xNearestSiteToBuildATowerCoordinates - xAllyQueenCoordinates) <= X_RANGE
 				&& Math.abs(yNearestSiteToBuildATowerCoordinates - yAllyQueenCoordinates) <= Y_RANGE
-				&& GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(nearestSiteToBuildATowerCoordinates, allyQueenCoordinates, safestCoordinates)) {
+				&& GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(nearestSiteToBuildATowerCoordinates, safestCoordinates, allyQueenCoordinates)) {
 			return true;
 		}
 		
