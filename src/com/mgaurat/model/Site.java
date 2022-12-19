@@ -44,5 +44,9 @@ public class Site {
 	public boolean isEmpty() {
 		return this.structure.getParam1() == -1;
 	}
+	
+	public boolean isItsCoordinates(Coordinates coordinates) {
+		return this.getCoordinates().equals(coordinates);
+	}
 
 }

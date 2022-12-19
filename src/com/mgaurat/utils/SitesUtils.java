@@ -113,7 +113,8 @@ public final class SitesUtils {
 		Collection<Site> sitesOnPath = new ArrayList<>();
 		for (Site site : sites) {
 			if (GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(site.getCoordinates(), targetCoordinates, allyQueenCoordinates) 
-					&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, targetCoordinates, site.getCoordinates(), site.getRadius())) {
+					&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, targetCoordinates, site.getCoordinates(), site.getRadius())
+					&& !site.isItsCoordinates(targetCoordinates)) {
 				sitesOnPath.add(site);
 			}
 		}
