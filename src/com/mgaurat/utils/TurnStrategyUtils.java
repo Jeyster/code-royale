@@ -39,10 +39,9 @@ public final class TurnStrategyUtils {
 	public static boolean isRunAwayStrategyOk(int queenHealth, Coordinates allyQueenCoordinates,
 			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites,
 			int emptySitesNumber, int enemyKnightsNumber, int safeDistance, Collection<Site> enemyKnightBarracksSites) {
-		return (queenHealth < LOW_HEALTH_QUEEN 
-        		&& !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites))
-				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN && !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
-    			|| StructuresUtils.isEnemyKnightBarracksDangerous(allyQueenCoordinates, enemyKnightBarracksSites)
+		return (queenHealth < LOW_HEALTH_QUEEN && !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites))
+				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN 
+					&& !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
 				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 	}
 	
