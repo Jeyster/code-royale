@@ -137,5 +137,15 @@ public final class SitesUtils {
 //		}
 		return getNearestSiteFromCoordinates(sitesOnPath, allyQueenCoordinates);
 	}
+	
+	public static boolean isSiteIdInCollection(Collection<Site> sites, int siteId) {
+		for (Site site : sites) {
+			if (site.getId() == siteId) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
     
 }

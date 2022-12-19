@@ -631,5 +631,33 @@ public final class StructuresUtils {
     		return (TRAINING_KNIGHT_TURNS_NUMBER + 1 - trainingTurnsRemaining) * SAFE_DISTANCE_PER_REMAINING_TURN;
     	}
     }
+    
+    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates) {
+    	Collection<Site> obsoleteAllyTowers = new ArrayList<>();
+    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	if (allyTowers.size() <= 3) {
+    		return obsoleteAllyTowers;
+    	}
+    	
+    	for (Site allyTower : allyTowers) {
+    		if (getTowerSitesInFrontOfCoordinates(allyTowers, allyTower.getCoordinates(), isLeftSide).size() >= 3) {
+    			obsoleteAllyTowers.add(allyTower);
+    		}
+    	}
+    	
+    	return obsoleteAllyTowers;
+    }
+    
+    public static Collection<Site> getTowerSitesInFrontOfCoordinates(Collection<Site> towers, Coordinates coordinates, boolean isStartingLeftSide) {
+    	Collection<Site> towersInFront = new ArrayList<>();
+    	for (Site tower : towers) {
+    		if ((isStartingLeftSide && tower.getCoordinates().getX() > coordinates.getX()) 
+    				|| (!isStartingLeftSide && tower.getCoordinates().getX() < coordinates.getX())) {
+    			towersInFront.add(tower);
+    		}
+    	}
+    	
+    	return towersInFront;
+    }
 	
 }
