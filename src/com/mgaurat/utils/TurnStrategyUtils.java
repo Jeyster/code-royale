@@ -152,6 +152,21 @@ public final class TurnStrategyUtils {
 		}
 	}
 	
+	public static boolean isTowerMoveOrBuildOnEnemyBarracksStrategyOk(int queenHealth, Site nearestSite,
+			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
+			int safeDistance, Collection<Site> enemyKnightBarracksSites, Coordinates allyQueenCoordinates) {
+		
+		if (nearestSite == null || !StructuresUtils.isEnemyKnightBarracksReachable(nearestSite, allyQueenCoordinates)) {
+			return false;
+		}
+		
+		if (queenHealth >= LOW_HEALTH_QUEEN) {
+			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
+		} else {
+			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites);
+		}
+	}
+
 	/**
 	 * Check if we choose to BUILD a KNIGHT BARRACKS. Depends on :
 	 *	- ally QUEEN health
@@ -239,5 +254,6 @@ public final class TurnStrategyUtils {
         		&& allyGiants.size() < 2
         		&& StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites);
 	}
+	
 
 }

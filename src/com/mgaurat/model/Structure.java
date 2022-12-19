@@ -84,7 +84,7 @@ public class Structure {
 		return this.getStructureTypeId() == StructureEnum.MINE.getId();
 	}
 	
-	public boolean isBarrack() {
+	public boolean isBarracks() {
 		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId();
 	}
 	
@@ -108,6 +108,6 @@ public class Structure {
 	}
 	
 	public boolean isBarracksInTraining() {
-		return this.isBarrack() && this.getParam1() > 0;
+		return this.getParam1() > 0;
 	}
 }

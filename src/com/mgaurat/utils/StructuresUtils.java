@@ -333,6 +333,16 @@ public final class StructuresUtils {
     	return knightBarracksSites;
     }
     
+    public static Collection<Site> getNotInTrainingBarracksSites(Collection<Site> barracksSites) {
+    	Collection<Site> notInTrainingBarracksSites = new ArrayList<>();
+    	for (Site barracksSite : barracksSites) {
+    		if (barracksSite.getStructure().isBarracks() && !barracksSite.getStructure().isBarracksInTraining()) {
+    			notInTrainingBarracksSites.add(barracksSite);
+    		}
+    	}
+    	return notInTrainingBarracksSites;
+    }
+    
     /**
      * Check if there is a enemy KNIGHT BARRACKS that is dangerous for my QUEEN.
      * It means that my QUEEN should not be close (< SAFE_DISTANCE) to a training enemy KNIGHT BARRACKS.
@@ -420,7 +430,7 @@ public final class StructuresUtils {
     	for (Site site : sites) {
     		structure = site.getStructure();
     		if (site.isEmpty() || structure.isMine() || 
-    				(structure.isBarrack() && !structure.isBarracksInTraining())) {
+    				(structure.isBarracks() && !structure.isBarracksInTraining())) {
     			emptyAndMineAndNotTrainingBarracks.add(site);
     		}
     	}
@@ -440,7 +450,7 @@ public final class StructuresUtils {
     	for (Site site : sites) {
     		structure = site.getStructure();
     		if (structure.isMine() || structure.isTower() || 
-    				(structure.isBarrack() && !structure.isBarracksInTraining())) {
+    				(structure.isBarracks() && !structure.isBarracksInTraining())) {
     			mineAndNotTrainingBarracksAndTowerSites.add(site);
     		}
     	}
@@ -658,6 +668,14 @@ public final class StructuresUtils {
     	}
     	
     	return towersInFront;
+    }
+    
+    public static boolean isEnemyKnightBarracksReachable(Site enemyKnightBarracksSite, Coordinates allyQueenCoordinates) {
+    	final int QUEEN_SPEED = 60;
+    	final int TRAINING_KNIGHT_TURNS = 5;
+    	double distanceFromQueenToSite = MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, enemyKnightBarracksSite.getCoordinates());
+    	
+    	return distanceFromQueenToSite < (QUEEN_SPEED * TRAINING_KNIGHT_TURNS);
     }
 	
 }
