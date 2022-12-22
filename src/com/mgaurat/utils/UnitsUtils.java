@@ -1,8 +1,10 @@
 package com.mgaurat.utils;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
@@ -55,20 +57,10 @@ public final class UnitsUtils {
 	}
 	
 	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {
-        double distanceToUnit;
-        double distanceToNearestUnit = Double.MAX_VALUE;
-		Coordinates unitCoordinates;
-		Unit nearestUnit = null;
-		for (Unit unit : units) {
-			unitCoordinates = unit.getCoordinates();
-			distanceToUnit = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unitCoordinates);
-			if (distanceToUnit < distanceToNearestUnit) {
-				distanceToNearestUnit = distanceToUnit;
-				nearestUnit = unit;
-			}
-		}
-		
-		return nearestUnit;
+		return units
+				.stream()
+				.collect(Collectors.minBy(Comparator.comparingDouble(unit -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unit.getCoordinates()))))
+				.orElse(null);
 	}
 	
 	/**
@@ -80,12 +72,9 @@ public final class UnitsUtils {
 	 */
 	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
 		final int GIANT_SAFE_ZONE = 200;
-		for (Unit giant : giants) {
-			if (MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE) {
-				return true;
-			}
-		}
-		return false;
+		return giants
+				.stream()
+				.anyMatch(giant -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE);
 	}
 	
 }

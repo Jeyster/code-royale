@@ -60,7 +60,6 @@ public final class TurnStrategyUtils {
 			Site nearestSiteToBuildATower, Collection<Unit> enemyGiants) {
 		if (nearestSiteToBuildATower == null
 				|| UnitsUtils.isGiantCloseToCoordinates(enemyGiants, allyQueenCoordinates)) {
-			//System.err.println("No Site to build Tower when running away");
 			return false;
 		}
 		

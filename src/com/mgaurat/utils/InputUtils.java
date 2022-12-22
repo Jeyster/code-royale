@@ -131,20 +131,31 @@ public final class InputUtils {
 	 * @return Map<OwnerEnum, Map<UnitEnum, List<Unit>>>
 	 */
 	public static Map<OwnerEnum, Map<UnitEnum, List<Unit>>> getUnitsByTypeAndOwnerFromTurnInput(Scanner in, int numUnits) {
-		Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = buildUnitsByTypeAndOwner();
+		Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = new HashMap<>();
 		
-		Map<UnitEnum, List<Unit>> allyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ALLY);
-		List<Unit> allyQueens = allyUnitsByType.get(UnitEnum.QUEEN);
-		List<Unit> allyKnights = allyUnitsByType.get(UnitEnum.KNIGHT);
-		List<Unit> allyArchers = allyUnitsByType.get(UnitEnum.ARCHER);
-		List<Unit> allyGiants = allyUnitsByType.get(UnitEnum.GIANT);
+		Map<UnitEnum, List<Unit>> allyUnitsByType = new HashMap<>();
+		List<Unit> allyQueens = new ArrayList<>();
+		List<Unit> allyKnights = new ArrayList<>();
+		List<Unit> allyArchers = new ArrayList<>();
+		List<Unit> allyGiants = new ArrayList<>();
+		allyUnitsByType.put(UnitEnum.QUEEN, allyQueens);
+		allyUnitsByType.put(UnitEnum.KNIGHT, allyKnights);
+		allyUnitsByType.put(UnitEnum.ARCHER, allyArchers);
+		allyUnitsByType.put(UnitEnum.GIANT, allyGiants);
 		
-		Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
-		List<Unit> enemyQueens = enemyUnitsByType.get(UnitEnum.QUEEN);
-		List<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
-		List<Unit> enemyArchers = enemyUnitsByType.get(UnitEnum.ARCHER);
-		List<Unit> enemyGiants = enemyUnitsByType.get(UnitEnum.GIANT);
+		Map<UnitEnum, List<Unit>> enemyUnitsByType = new HashMap<>();
+		List<Unit> enemyQueens = new ArrayList<>();
+		List<Unit> enemyKnights = new ArrayList<>();
+		List<Unit> enemyArchers = new ArrayList<>();
+		List<Unit> enemyGiants = new ArrayList<>();
+		enemyUnitsByType.put(UnitEnum.QUEEN, enemyQueens);
+		enemyUnitsByType.put(UnitEnum.KNIGHT, enemyKnights);
+		enemyUnitsByType.put(UnitEnum.ARCHER, enemyArchers);
+		enemyUnitsByType.put(UnitEnum.GIANT, enemyGiants);
 		
+		unitsByTypeAndOwner.put(OwnerEnum.ALLY, allyUnitsByType);
+		unitsByTypeAndOwner.put(OwnerEnum.ENEMY, enemyUnitsByType);
+
 		Coordinates unitCoordinates;
 		Unit unit;
         for (int i = 0; i < numUnits; i++) {
@@ -181,40 +192,6 @@ public final class InputUtils {
         }
         
         return unitsByTypeAndOwner;
-	}
-	
-	/**
-	 * Initialize the map used to get the Units from turns input.
-	 * 
-	 * @return
-	 */
-	private static Map<OwnerEnum, Map<UnitEnum, List<Unit>>> buildUnitsByTypeAndOwner() {
-		Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = new HashMap<>();
-		
-		Map<UnitEnum, List<Unit>> allyUnitsByType = new HashMap<>();
-		List<Unit> allyQueens = new ArrayList<>();
-		List<Unit> allyKnights = new ArrayList<>();
-		List<Unit> allyArchers = new ArrayList<>();
-		List<Unit> allyGiants = new ArrayList<>();
-		allyUnitsByType.put(UnitEnum.QUEEN, allyQueens);
-		allyUnitsByType.put(UnitEnum.KNIGHT, allyKnights);
-		allyUnitsByType.put(UnitEnum.ARCHER, allyArchers);
-		allyUnitsByType.put(UnitEnum.GIANT, allyGiants);
-		
-		Map<UnitEnum, List<Unit>> enemyUnitsByType = new HashMap<>();
-		List<Unit> enemyQueens = new ArrayList<>();
-		List<Unit> enemyKnights = new ArrayList<>();
-		List<Unit> enemyArchers = new ArrayList<>();
-		List<Unit> enemyGiants = new ArrayList<>();
-		enemyUnitsByType.put(UnitEnum.QUEEN, enemyQueens);
-		enemyUnitsByType.put(UnitEnum.KNIGHT, enemyKnights);
-		enemyUnitsByType.put(UnitEnum.ARCHER, enemyArchers);
-		enemyUnitsByType.put(UnitEnum.GIANT, enemyGiants);
-		
-		unitsByTypeAndOwner.put(OwnerEnum.ALLY, allyUnitsByType);
-		unitsByTypeAndOwner.put(OwnerEnum.ENEMY, enemyUnitsByType);
-		
-		return unitsByTypeAndOwner;
 	}
 
 }

@@ -5,6 +5,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.mgaurat.model.Coordinates;
 
@@ -106,10 +107,10 @@ public final class MathUtils {
 		Point2D secondLinePoint2D = new Point2D.Double(secondLinePoint.getX(), secondLinePoint.getY());
 		Point2D circleCenter2D = new Point2D.Double(circleCenter.getX(), circleCenter.getY());
 		try {
-			List<Point2D> intersections2D = intersection(firstLinePoint2D, secondLinePoint2D, circleCenter2D, circleRadius, false);
-			for (Point2D intersection2D : intersections2D) {
-				intersections.add(new Coordinates((int) Math.round(intersection2D.getX()), (int) Math.round(intersection2D.getY())));
-			}
+			intersections = intersection(firstLinePoint2D, secondLinePoint2D, circleCenter2D, circleRadius, false)
+					.stream()
+					.map(intersection -> new Coordinates((int) Math.round(intersection.getX()), (int) Math.round(intersection.getY())))
+					.collect(Collectors.toList());
 		} catch (NoninvertibleTransformException e) {
 			e.printStackTrace();
 		}

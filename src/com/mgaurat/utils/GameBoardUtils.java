@@ -1,8 +1,10 @@
 package com.mgaurat.utils;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.mgaurat.enums.GameBoardQuarterEnum;
 import com.mgaurat.enums.UnitEnum;
@@ -153,22 +155,13 @@ public final class GameBoardUtils {
      * @return Coordinates
      */
     public static Coordinates getCoordinatesToAvoidCollisionWithSite(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Site siteToAvoid) {
-    	Coordinates coordinates = null;
-    	double intersectionDistance;
-    	double smallestIntersectionDistance = Double.MAX_VALUE;
     	Coordinates siteCoordinates = siteToAvoid.getCoordinates();
     	Coordinates closestCoordinatesOfMoveSegmentFromSiteCenter = MathUtils.getClosestCoordinatesOfLineFromPoint(allyQueenCoordinates, targetCoordinates, siteCoordinates);
-    	//System.err.println("closestCoordinatesOfMoveSegmentFromSiteCenter : (" + closestCoordinatesOfMoveSegmentFromSiteCenter.getX() + ", " + closestCoordinatesOfMoveSegmentFromSiteCenter.getY() + ")");
     	List<Coordinates> intersectionsWithCircle = MathUtils.getIntersectionsOfLineWithCircle(siteCoordinates, closestCoordinatesOfMoveSegmentFromSiteCenter, siteCoordinates, siteToAvoid.getRadius());
-    	for (Coordinates intersection : intersectionsWithCircle) {
-        	//System.err.println("Intersection coordinates : (" + intersection.getX() + ", " + intersection.getY() + ")");
-    		intersectionDistance = MathUtils.getDistanceBetweenTwoCoordinates(intersection, closestCoordinatesOfMoveSegmentFromSiteCenter);
-    		if (intersectionDistance < smallestIntersectionDistance) {
-    			smallestIntersectionDistance = intersectionDistance;
-    			coordinates = intersection;
-    		}
-    	}
-    	return coordinates;
+        return intersectionsWithCircle
+        		.stream()
+        		.collect(Collectors.minBy(Comparator.comparingDouble(intersection -> MathUtils.getDistanceBetweenTwoCoordinates(intersection, closestCoordinatesOfMoveSegmentFromSiteCenter))))
+        		.orElse(null);
     }
     
     /**

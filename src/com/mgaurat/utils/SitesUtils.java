@@ -1,7 +1,8 @@
 package com.mgaurat.utils;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
@@ -25,21 +26,12 @@ public final class SitesUtils {
 	 * @return Site
 	 */
     public static Site getNearestSiteFromCoordinates(Collection<Site> sites, Coordinates coordinates) {
-        Site nearestSite = null;
-        double distanceToSite;
-        double distanceToNearestSite = Double.MAX_VALUE;
-        Coordinates siteCoordinates;
-        for (Site site : sites) {
-            siteCoordinates = site.getCoordinates();
-            distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, siteCoordinates);
-            if (distanceToSite < distanceToNearestSite) {
-                distanceToNearestSite = distanceToSite;
-                nearestSite = site;
-            }
-        }
-        return nearestSite;
+        return sites
+        		.stream()
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
+        		.orElse(null);
     }
-    
+        
     /**
      * Get the nearest Site that is towards the enemy camp.
      * 
@@ -49,26 +41,11 @@ public final class SitesUtils {
      * @return
      */
     public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
-        boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-        final int Y_GAP = 150;
-    	Site nearestSite = null;
-        double distanceToSite;
-        double distanceToNearestSite = Double.MAX_VALUE;
-        Coordinates siteCoordinates;
-        for (Site site : sites) {
-        	if ((isStartingLeftSide && (site.getCoordinates().getX() > startingAllyQueenCoordinates.getX()) 
-        			&& (site.getCoordinates().getY() < startingAllyQueenCoordinates.getY() + Y_GAP))
-        			|| (!isStartingLeftSide && (site.getCoordinates().getX() < startingAllyQueenCoordinates.getX()))
-        			&& (site.getCoordinates().getY() > startingAllyQueenCoordinates.getY() - Y_GAP)) {
-        		siteCoordinates = site.getCoordinates();
-        		distanceToSite = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, siteCoordinates);
-        		if (distanceToSite < distanceToNearestSite) {
-        			distanceToNearestSite = distanceToSite;
-        			nearestSite = site;
-        		}        		
-        	}
-        }
-        return nearestSite;
+        return sites
+        		.stream()
+        		.filter(site -> site.isInForwardDirection(startingAllyQueenCoordinates))
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
+        		.orElse(null);
     }
 	
 	public static boolean isReallyCloseToCoordinates(Coordinates allyQueenCoordinates, Coordinates coordinates) {
@@ -86,17 +63,13 @@ public final class SitesUtils {
 	 * @param sites
 	 * @return Collection<Site>
 	 */
-	public static Collection<Site> getSitesOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
-		Collection<Site> sitesOnPath = new ArrayList<>();
-		for (Site site : sites) {
-			if (GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(site.getCoordinates(), targetCoordinates, allyQueenCoordinates) 
-					&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, targetCoordinates, site.getCoordinates(), site.getRadius())
-					&& !site.isItsCoordinates(targetCoordinates)) {
-				sitesOnPath.add(site);
-			}
-		}
-		
-		return sitesOnPath;
+	public static Collection<Site> getSitesOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {		
+		return sites
+				.stream()
+				.filter(site -> GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(site.getCoordinates(), targetCoordinates, allyQueenCoordinates) 
+						&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, targetCoordinates, site.getCoordinates(), site.getRadius()) 
+						&& !site.isItsCoordinates(targetCoordinates))
+				.collect(Collectors.toList());
 	}
 	
 	/**
@@ -113,13 +86,9 @@ public final class SitesUtils {
 	}
 	
 	public static boolean isSiteIdInCollection(Collection<Site> sites, int siteId) {
-		for (Site site : sites) {
-			if (site.getId() == siteId) {
-				return true;
-			}
-		}
-		
-		return false;
+		return sites
+				.stream()
+				.anyMatch(site -> site.getId() == siteId);
 	}
     
 }
