@@ -72,7 +72,6 @@ public final class TurnStrategyUtils {
 		final int Y_RANGE = 200;
 		
 		Coordinates nearestSiteToBuildATowerCoordinates = nearestSiteToBuildATower.getCoordinates();
-    	//System.err.println("nearestSiteToBuildATowerCoordinates : (" + nearestSiteToBuildATowerCoordinates.getX() + ", " + nearestSiteToBuildATowerCoordinates.getY() + ")");
 		int xNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getX();
 		int yNearestSiteToBuildATowerCoordinates = nearestSiteToBuildATowerCoordinates.getY();
 		int xAllyQueenCoordinates = allyQueenCoordinates.getX();
@@ -208,14 +207,14 @@ public final class TurnStrategyUtils {
 	 * @param queenHealth
 	 * @param nearestEmptySite
 	 * @param enemyTowersNumber
-	 * @param allyBarracksSites
+	 * @param allyGiantBarracksSites
 	 * @param enemyUnitsByType
 	 * @param enemyTowerSites
 	 * @param enemyTowersNumberThreshold
 	 * @return boolean
 	 */
 	public static boolean isGiantBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int enemyTowersNumber,
-			Collection<Site> allyBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
+			Collection<Site> allyGiantBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
 			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold, int safeDistance, 
 			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMineSites, Collection<Site> allyMineSites) {
 		
@@ -226,10 +225,10 @@ public final class TurnStrategyUtils {
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
-			return !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
+			return allyGiantBarracksSites.isEmpty()
             		&& !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
-			return !StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites)
+			return allyGiantBarracksSites.isEmpty()
             		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites);
 		}
 	}
@@ -244,15 +243,15 @@ public final class TurnStrategyUtils {
 	 * @param enemyTowersNumberThreshold
 	 * @param allyMineSites
 	 * @param allyGiants
-	 * @param allyBarracksSites
+	 * @param allyGiantBarracksSites
 	 * @return boolean
 	 */
 	public static boolean isGiantTrainStrategyOk(int enemyTowersNumber, int enemyTowersNumberThreshold,
-			Collection<Site> allyMineSites, Collection<Unit> allyGiants, Collection<Site> allyBarracksSites) {
+			Collection<Site> allyMineSites, Collection<Unit> allyGiants, Collection<Site> allyGiantBarracksSites) {
 		return (enemyTowersNumber > enemyTowersNumberThreshold ||
         		(enemyTowersNumber > 1 && StructuresUtils.getGoldProduction(allyMineSites) >= 8))
         		&& allyGiants.size() < 2
-        		&& StructuresUtils.isAtLeastOneGiantBarracks(allyBarracksSites);
+        		&& !allyGiantBarracksSites.isEmpty();
 	}
 	
 

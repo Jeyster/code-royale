@@ -75,6 +75,7 @@ class Player {
     		Map<Integer, Site> allyBarracksSitesById = allySitesByIdAndStructure.get(StructureEnum.BARRACKS);
             Collection<Site> allyBarracksSites = allyBarracksSitesById.values();
             Collection<Site> allyKnightBarracksSites = StructuresUtils.getKnightBarracksSites(allyBarracksSites);
+            Collection<Site> allyGiantBarracksSites = StructuresUtils.getGiantBarracksSites(allyBarracksSites);
             Collection<Site> allySites = new ArrayList<>();
             allySites.addAll(allyMineSites);
             allySites.addAll(allyTowerSites);
@@ -310,7 +311,7 @@ class Player {
         			towersBuilt++;
         			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
         		}   
-            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, enemyTowersNumber, allyBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, allyMineSites)) {
+            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, enemyTowersNumber, allyGiantBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, allyMineSites)) {
             	System.err.println("Strategy i)");
             	targetedSiteId = nearestSite.getId();
         		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSite.getCoordinates(), allSites);
@@ -367,9 +368,9 @@ class Player {
             */
             Site siteToTrain = null;
             if (TurnStrategyUtils.isGiantTrainStrategyOk(enemyTowersNumber, ENEMY_TOWERS_NUMBER_THRESHOLD + 2, allyMineSites, allyGiants, allyBarracksSites)) {
-            	siteToTrain = StructuresUtils.getGiantSiteToTrain(allyBarracksSites);
-            } else if (StructuresUtils.isAtLeastOneKnightBarracks(allyBarracksSites)) {
-            	siteToTrain = StructuresUtils.getAKnightSiteToTrain(allyBarracksSites);            	
+            	siteToTrain = StructuresUtils.getGiantSiteToTrain(allyGiantBarracksSites);
+            } else if (!allyKnightBarracksSites.isEmpty()) {
+            	siteToTrain = StructuresUtils.getAKnightSiteToTrain(allyKnightBarracksSites);            	
             }
             
             if (siteToTrain != null) {

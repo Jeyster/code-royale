@@ -100,20 +100,20 @@ public final class InputUtils {
             
             if (structure.getOwner() == OwnerEnum.NOBODY.getId()) {
             	emptySitesById.put(siteId, site);
-            } else if (structure.getOwner() == OwnerEnum.ALLY.getId()) {
-            	if (structure.getStructureTypeId() == StructureEnum.MINE.getId()) {
+            } else if (structure.isOwnedByMe()) {
+            	if (structure.isMine()) {
             		allyMineSitesById.put(siteId, site);
-            	} else if (structure.getStructureTypeId() == StructureEnum.TOWER.getId()) {
+            	} else if (structure.isTower()) {
             		allyTowerSitesById.put(siteId, site);
-            	} else if (structure.getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
+            	} else if (structure.isBarracks()) {
             		allyBarracksSitesById.put(siteId, site);
             	}
             } else if (structure.getOwner() == OwnerEnum.ENEMY.getId()) {
-            	if (structure.getStructureTypeId() == StructureEnum.MINE.getId()) {
+            	if (structure.isMine()) {
             		enemyMineSitesById.put(siteId, site);
-            	} else if (structure.getStructureTypeId() == StructureEnum.TOWER.getId()) {
+            	} else if (structure.isTower()) {
             		enemyTowerSitesById.put(siteId, site);
-            	} else if (structure.getStructureTypeId() == StructureEnum.BARRACKS.getId()) {
+            	} else if (structure.isBarracks()) {
             		enemyBarracksSitesById.put(siteId, site);
             	}
             }

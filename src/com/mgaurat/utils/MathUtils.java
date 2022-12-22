@@ -26,15 +26,6 @@ public final class MathUtils {
 		
 		return Math.sqrt(Math.pow(xa - xb, 2) + Math.pow(ya - yb, 2));
 	}
-
-	public static Coordinates getMiddleCoordinatesOfTwoCoordinates(Coordinates a, Coordinates b) {
-		int xa = a.getX();
-		int ya = a.getY();
-		int xb = b.getX();
-		int yb = b.getY();
-		
-		return new Coordinates(Math.abs(xb - xa), Math.abs(yb - ya));
-	}
 	
 	/**
 	 * Calculate the distance between the input point and the closest point of the line drawn by firstLinePoint and secondLinePoint.
@@ -117,7 +108,6 @@ public final class MathUtils {
 		try {
 			List<Point2D> intersections2D = intersection(firstLinePoint2D, secondLinePoint2D, circleCenter2D, circleRadius, false);
 			for (Point2D intersection2D : intersections2D) {
-	        	//System.err.println("Intersection coordinates : (" + intersection2D.getX() + ", " + intersection2D.getY() + ")");
 				intersections.add(new Coordinates((int) Math.round(intersection2D.getX()), (int) Math.round(intersection2D.getY())));
 			}
 		} catch (NoninvertibleTransformException e) {

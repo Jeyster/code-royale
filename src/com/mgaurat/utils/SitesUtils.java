@@ -70,29 +70,6 @@ public final class SitesUtils {
         }
         return nearestSite;
     }
-
-	/**
-	 * Get from the input Sites collection the average Coordinates.
-	 * 
-	 * @param sites
-	 * @return Coordinates
-	 */
-	public static Coordinates getAverageSiteCoordinates(Collection<Site> sites) {
-		if (sites.isEmpty()) {
-			return null;
-		}
-
-		int xCoordinateSum = 0;
-		int yCoordinateSum = 0;
-		Coordinates siteCoordinates;
-		for (Site site : sites) {
-			siteCoordinates = site.getCoordinates();
-			xCoordinateSum += siteCoordinates.getX();
-			yCoordinateSum += siteCoordinates.getY();
-		}
-
-		return new Coordinates(xCoordinateSum/sites.size(), yCoordinateSum/sites.size());
-	}
 	
 	public static boolean isReallyCloseToCoordinates(Coordinates allyQueenCoordinates, Coordinates coordinates) {
 		final int REALLY_CLOSE = 150;
@@ -132,9 +109,6 @@ public final class SitesUtils {
 	 */
 	public static Site getClosestSiteOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
 		Collection<Site> sitesOnPath = getSitesOnPath(allyQueenCoordinates, targetCoordinates, sites);
-//		for (Site site : sitesOnPath) {
-//			System.err.println("Site on path ID : " + site.getId());
-//		}
 		return getNearestSiteFromCoordinates(sitesOnPath, allyQueenCoordinates);
 	}
 	

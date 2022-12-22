@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.mgaurat.enums.GameBoardQuarterEnum;
-import com.mgaurat.enums.StructureEnum;
-import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
 import com.mgaurat.model.Structure;
@@ -31,7 +29,7 @@ public final class StructuresUtils {
     public static int getGoldProduction(Collection<Site> sites) {
     	int goldProduction = 0;
     	for (Site site : sites) {
-    		if (site.getStructure().getStructureTypeId() == StructureEnum.MINE.getId()) {
+    		if (site.getStructure().isMine()) {
     			goldProduction += site.getStructure().getParam1();    			
     		}
     	}
@@ -40,7 +38,7 @@ public final class StructuresUtils {
     }
     
     public static boolean isMineNotInFullProduction(Structure structure) {
-    	if (structure.getStructureTypeId() != StructureEnum.MINE.getId()) {
+    	if (!structure.isMine()) {
     		return false;
     	}
     	
@@ -55,7 +53,7 @@ public final class StructuresUtils {
      * @return boolean
      */
     public static boolean isTowerLifeNotSufficient(Structure structure) {
-    	if (structure.getStructureTypeId() != StructureEnum.TOWER.getId()) {
+    	if (!structure.isTower()) {
     		return false;
     	}
     	
@@ -78,40 +76,6 @@ public final class StructuresUtils {
     	}
     	
     	return allyTowerSitesWithNotSufficientLife;
-    }
-    
-    /**
-     * Check if the input Sites collection holds a KNIGHT BARRACKS.
-     * 
-     * @param sites
-     * @return boolean
-     */
-    public static boolean isAtLeastOneKnightBarracks(Collection<Site> sites) {
-    	for (Site site : sites) {
-    		if (site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()
-    				&& site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()) {
-    			return true;
-    		}
-    	}
-    	
-    	return false;
-    }
-    
-    /**
-     * Check if the input Sites collection holds a GIANT BARRACKS.
-     * 
-     * @param sites
-     * @return boolean
-     */
-    public static boolean isAtLeastOneGiantBarracks(Collection<Site> sites) {
-    	for (Site site : sites) {
-    		if (site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()
-    				&& site.getStructure().getParam2() == UnitEnum.GIANT.getId()) {
-    			return true;
-    		}
-    	}
-    	
-    	return false;
     }
     
     /**
@@ -333,6 +297,16 @@ public final class StructuresUtils {
     	return knightBarracksSites;
     }
     
+    public static Collection<Site> getGiantBarracksSites(Collection<Site> barracksSites) {
+    	Collection<Site> giantBarracksSites = new ArrayList<>();
+    	for (Site barracksSite : barracksSites) {
+    		if (barracksSite.getStructure().isGiantBarracks()) {
+    			giantBarracksSites.add(barracksSite);
+    		}
+    	}
+    	return giantBarracksSites;
+    }
+    
     public static Collection<Site> getNotInTrainingBarracksSites(Collection<Site> barracksSites) {
     	Collection<Site> notInTrainingBarracksSites = new ArrayList<>();
     	for (Site barracksSite : barracksSites) {
@@ -367,14 +341,12 @@ public final class StructuresUtils {
     /**
      * Get the first KNIGHT BARRACKS Site of the input Sites collection that can be TRAIN.
      * 
-     * @param sites
+     * @param knightBarracksSites
      * @return Site
      */
-    public static Site getAKnightSiteToTrain(Collection<Site> sites) {
-        for (Site site : sites) {     
-        	if (site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()
-        			&& site.getStructure().getParam2() == UnitEnum.KNIGHT.getId()
-        			&& site.getStructure().getParam1() == 0) {
+    public static Site getAKnightSiteToTrain(Collection<Site> knightBarracksSites) {
+        for (Site site : knightBarracksSites) {     
+        	if (site.getStructure().getParam1() == 0) {
         		return site;
         	}
         }
@@ -384,14 +356,12 @@ public final class StructuresUtils {
     /**
      * Get the first GIANT BARRACKS Site of the input Sites collection that can be TRAIN.
      * 
-     * @param sites
+     * @param giantBarracksSites
      * @return Site
      */
-    public static Site getGiantSiteToTrain(Collection<Site> sites) {
-        for (Site site : sites) {     
-        	if (site.getStructure().getStructureTypeId() == StructureEnum.BARRACKS.getId()
-        			&& site.getStructure().getParam2() == UnitEnum.GIANT.getId()
-        			&& site.getStructure().getParam1() == 0) {
+    public static Site getGiantSiteToTrain(Collection<Site> giantBarracksSites) {
+        for (Site site : giantBarracksSites) {     
+        	if (site.getStructure().getParam1() == 0) {
         		return site;
         	}
         }
@@ -479,104 +449,8 @@ public final class StructuresUtils {
 				safestTowerSite = allyTowerSite;
 			}    			
     	}
-    	
-//    	Map<Integer, Site> safestTowersProtectedByTowers = new HashMap<>();
-//    	int safestXCoordinate = isLeftSide ? 1920 : 0;
-//    	int numberOfAllyTowersInRangeOfTower;
-//    	for (Site allyTowerSite : allyTowerSites) {
-//    		numberOfAllyTowersInRangeOfTower = StructuresUtils.getTowerSitesInRangeOfCoordinates(allyTowerSites, allyTowerSite.getCoordinates()).size();
-//			if ((isLeftSide && allyTowerSite.getCoordinates().getX() < safestXCoordinate)
-//					|| (!isLeftSide && allyTowerSite.getCoordinates().getX() > safestXCoordinate)) {
-//				safestXCoordinate = allyTowerSite.getCoordinates().getX();
-//    			safestTowersProtectedByTowers.put(numberOfAllyTowersInRangeOfTower, allyTowerSite);
-//			}    			
-//    	}
-//    	
-//    	int numberOfProtectedAllyTowerForSafestTower = -1;
-//    	Site safestTower = null;
-//    	for (Integer numberOfProtectedAllyTower : safestTowersProtectedByTowers.keySet()) {
-//    		if (numberOfProtectedAllyTower > numberOfProtectedAllyTowerForSafestTower) {
-//    			numberOfProtectedAllyTowerForSafestTower = numberOfProtectedAllyTower;
-//    			safestTower = safestTowersProtectedByTowers.get(numberOfProtectedAllyTower);
-//    		}
-//    	}
 
     	return safestTowerSite;
-    }
-    
-    /**
-     * Get a Coordinates to hide from enemies behind a TOWER.
-     * Choose a cardinal point (N, E, S or W) on the input TOWER that is opposite to the nearest enemy KNIGHT.
-     * 
-     * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
-     * 
-     * @param startingAllyQueenCoordinates
-     * @param towerSite
-     * @return Coordinates
-     */
-    public static Coordinates getCoordinatesBehindTower(Unit nearestEnemyKnight, Site towerSite, Coordinates startingAllyQueenCoordinates) {	
-    	if (towerSite == null) {
-    		return null;
-    	}
-    	
-    	if (nearestEnemyKnight != null) {
-    		int xCoordinate, yCoordinate;
-    		Coordinates towerCoordinates = towerSite.getCoordinates();
-    		Coordinates nearestEnemyKnightCoordinates = nearestEnemyKnight.getCoordinates();
-    		int towerXCoordinate = towerCoordinates.getX();
-    		int towerYCoordinate = towerCoordinates.getY();
-    		int towerRadius = towerSite.getRadius();
-    		GameBoardQuarterEnum boardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(nearestEnemyKnightCoordinates, towerCoordinates);
-    		switch (boardGameQuarter) {
-	    		case TOPLEFT: {
-	    			xCoordinate = towerXCoordinate + towerRadius;
-	    			yCoordinate = towerYCoordinate;
-	    			break;
-	    		}
-	    		case TOPRIGHT: {
-	    			xCoordinate = towerXCoordinate;
-	    			yCoordinate = towerYCoordinate + towerRadius;
-	    			break;
-	    		}
-	    		case BOTTOMRIGHT: {
-	    			xCoordinate = towerXCoordinate - towerRadius;
-	    			yCoordinate = towerYCoordinate;
-	    			break;
-	    		}
-	    		case BOTTOMLEFT: {
-	    			xCoordinate = towerXCoordinate;
-	    			yCoordinate = towerYCoordinate - towerRadius;
-	    			break;
-	    		}
-	    		// Should not happened
-	    		default: {
-	    			xCoordinate = towerXCoordinate;
-	    			yCoordinate = towerYCoordinate;
-	    		}
-    		}
-    		
-    		return new Coordinates(xCoordinate, yCoordinate);    		
-    	} else {
-        	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
-        	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
-        	int towerRadius = towerSite.getRadius();
-        	int xCoordinate = isLeftSide ? 
-        			towerSiteCoordinates.getX() - towerRadius : towerSiteCoordinates.getX() + towerRadius;
-        	
-        	return new Coordinates(xCoordinate, towerSiteCoordinates.getY());
-    	}
-    	
-    	
-//    	Coordinates towerSiteCoordinates = towerSite.getCoordinates();
-//    	int distanceBetweenQueenAndTower = (int) Math.round(MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, towerSiteCoordinates));
-//    	int towerRadius = towerSite.getRadius();
-//    	int xDifferenceBetweenQueenAndTower = towerSite.getCoordinates().getX() - allyQueenCoordinates.getX();
-//    	int yDifferenceBetweenQueenAndTower = towerSite.getCoordinates().getY() - allyQueenCoordinates.getY();
-//
-//    	int deltaX = towerRadius * xDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
-//    	int deltaY = towerRadius * yDifferenceBetweenQueenAndTower / distanceBetweenQueenAndTower;
-//    	
-//    	return new Coordinates(towerSiteCoordinates.getX() + deltaX, towerSiteCoordinates.getY() + deltaY);
     }
     
     /**

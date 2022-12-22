@@ -25,13 +25,8 @@ public final class UnitsUtils {
 	 * @param unitsByType
 	 * @return Unit
 	 */
-	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {
-		List<Unit> queens = unitsByType.get(UnitEnum.QUEEN);
-		if (queens.size() > 1) {
-			return null;
-		}
-		
-		return queens.get(0);
+	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {		
+		return unitsByType.get(UnitEnum.QUEEN).get(0);
 	}
 	
 	/**
@@ -54,19 +49,9 @@ public final class UnitsUtils {
 	 * @return double
 	 */
 	public static double getDistanceBetweenNearestKnightAndCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> unitsByType) {
-        double distanceToKnight;
-        double distanceToNearestKnight = Double.MAX_VALUE;
 		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
-		Coordinates knightCoordinates;
-		for (Unit knight : knights) {
-			knightCoordinates = knight.getCoordinates();
-			distanceToKnight = MathUtils.getDistanceBetweenTwoCoordinates(coordinates, knightCoordinates);
-			if (distanceToKnight < distanceToNearestKnight) {
-				distanceToNearestKnight = distanceToKnight;
-			}
-		}
-		
-		return distanceToNearestKnight;
+		Unit nearestKnight = getNearestUnit(coordinates, knights);
+		return nearestKnight == null ? Double.MAX_VALUE : MathUtils.getDistanceBetweenTwoCoordinates(coordinates, nearestKnight.getCoordinates());
 	}
 	
 	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {

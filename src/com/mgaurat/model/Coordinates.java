@@ -28,10 +28,6 @@ public class Coordinates {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Coordinates)) {
-			return false;
-		}
-		
 		Coordinates coordinates = (Coordinates) obj;
 		return this.getX() == coordinates.getX()
 				&& this.getY() == coordinates.getY();

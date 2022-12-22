@@ -89,17 +89,12 @@ public class Structure {
 	}
 	
 	public boolean isKnightBarracks() {
-		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+		return this.isBarracks()
 				&& this.getParam2() == UnitEnum.KNIGHT.getId();
 	}
 	
-	public boolean isArcherBarracks() {
-		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId()
-				&& this.getParam2() == UnitEnum.ARCHER.getId();
-	}
-	
 	public boolean isGiantBarracks() {
-		return this.getStructureTypeId() == StructureEnum.BARRACKS.getId()
+		return this.isBarracks()
 				&& this.getParam2() == UnitEnum.GIANT.getId();
 	}
 	
