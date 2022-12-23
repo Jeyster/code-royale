@@ -65,7 +65,7 @@ public class Site {
 	 * @return
 	 */
 	public boolean isInForwardDirection(Coordinates startingAllyQueenCoordinates) {
-		final int Y_GAP = 150;
+		final int Y_GAP = 100;
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
 		return (isStartingLeftSide && this.getCoordinates().getX() > startingAllyQueenCoordinates.getX() 
 				&& this.getCoordinates().getY() < startingAllyQueenCoordinates.getY() + Y_GAP)
@@ -82,7 +82,7 @@ public class Site {
 	 */
 	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold) {
 		return !this.isCloseToNearestEnemyKnightBarracksSite(enemyKnightBarrackSites) 
-				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 0));
+				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 5));
 	}
 	
     /**
