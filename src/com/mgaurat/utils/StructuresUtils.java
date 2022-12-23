@@ -374,7 +374,7 @@ public final class StructuresUtils {
      * @return Collection<Site>
      */
     public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates) {
-    	if (allyTowers.size() <= 3) {
+    	if (allyTowers.size() <= 4) {
     		return new ArrayList<>();
     	}
 
