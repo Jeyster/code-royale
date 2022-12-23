@@ -365,7 +365,7 @@ class Player {
             *		b) else TRAIN a KNIGHT
             */
             Optional<Site> siteToTrain = Optional.empty();
-            if (TurnStrategyUtils.isGiantTrainStrategyOk(enemyTowersNumber, ENEMY_TOWERS_NUMBER_THRESHOLD + 2, allyMineSites, allyGiants, allyBarracksSites)) {
+            if (TurnStrategyUtils.isGiantTrainStrategyOk(enemyTowersNumber, ENEMY_TOWERS_NUMBER_THRESHOLD + 2, allyMineSites, allyGiants, allyGiantBarracksSites)) {
             	siteToTrain = StructuresUtils.getBarracksSiteToTrain(allyGiantBarracksSites);
             } else if (!allyKnightBarracksSites.isEmpty()) {
             	siteToTrain = StructuresUtils.getBarracksSiteToTrain(allyKnightBarracksSites);            	
