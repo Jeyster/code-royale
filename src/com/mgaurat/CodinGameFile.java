@@ -127,12 +127,7 @@
 //            	startingAllyQueenCoordinates = allyQueenCoordinates;
 //            }
 //            
-//            int minAllyFirstMines;
-//            if (startingQueenHealth < 50) {
-//            	minAllyFirstMines = 1;
-//            } else {
-//            	minAllyFirstMines = 2;            	
-//            }
+//            int minAllyFirstMines = 2;
 //            
 //            if (!isTwoFirstMinesBuild) {
 //            	isTwoFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;
@@ -150,10 +145,20 @@
 //            	nearestSite = SitesUtils.getNearestSiteFromCoordinatesInForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);              		
 //            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMineInForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, startingAllyQueenCoordinates);
 //            } else {
-//            	if (towersBuilt == 0 && startingQueenHealth >= 50) {
-//            		nearestSite = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
+//            	if (towersBuilt == 0) {
+//            		if (startingQueenHealth >= 50) {
+//            			nearestSite = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
+//            		} else if (startingQueenHealth > 30) {
+//                    	nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
+//            		} else {
+//                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//            		}
 //            	} else if (towersBuilt <= 3) {
-//                	nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
+//            		if (startingQueenHealth > 30) {
+//            			nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
+//            		} else {
+//                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//            		}
 //            	} else {
 //            		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates);            	            		
 //            	}
@@ -161,14 +166,24 @@
 //            }
 //            
 //            Site nearestSiteToBuildATowerWhenRunningAway;
-//        	if (isFirstKnightBarracksBuilt && towersBuilt == 0  && startingQueenHealth >= 50) {
-//        		nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptyAndMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
+//        	if (isFirstKnightBarracksBuilt && towersBuilt == 0) {
+//        		if (startingQueenHealth >= 50) {
+//        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
+//        		} else if (startingQueenHealth > 30) {
+//                	nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
+//        		} else {
+//                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//        		}
 //        	} else if (isFirstKnightBarracksBuilt && towersBuilt <= 3) {
-//            	nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptyAndMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
+//        		if (startingQueenHealth > 30) {
+//        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
+//        		} else {
+//                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//        		}
 //        	} else {
 //                nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptyAndMineAndNotInTraingBarracksSites, allyQueenCoordinates);
-//                nearestEnemyBarracksSiteToBuildATower = SitesUtils.getNearestSiteFromCoordinates(enemyNotInTrainingBarracksSites, allyQueenCoordinates);
 //        	}
+//        	nearestEnemyBarracksSiteToBuildATower = SitesUtils.getNearestSiteFromCoordinates(enemyNotInTrainingBarracksSites, allyQueenCoordinates);
 //
 //            Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
 //            Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteFromCoordinates(allyMineAndNotTrainingBarracksAndTowerSites, allyQueenCoordinates);
@@ -353,7 +368,7 @@
 //            *		b) else TRAIN a KNIGHT
 //            */
 //            Optional<Site> siteToTrain = Optional.empty();
-//            if (TurnStrategyUtils.isGiantTrainStrategyOk(enemyTowersNumber, ENEMY_TOWERS_NUMBER_THRESHOLD + 2, allyMineSites, allyGiants, allyBarracksSites)) {
+//            if (TurnStrategyUtils.isGiantTrainStrategyOk(enemyTowersNumber, ENEMY_TOWERS_NUMBER_THRESHOLD + 2, allyMineSites, allyGiants, allyGiantBarracksSites)) {
 //            	siteToTrain = StructuresUtils.getBarracksSiteToTrain(allyGiantBarracksSites);
 //            } else if (!allyKnightBarracksSites.isEmpty()) {
 //            	siteToTrain = StructuresUtils.getBarracksSiteToTrain(allyKnightBarracksSites);            	
@@ -1086,7 +1101,7 @@
 //     * @return Collection<Site>
 //     */
 //    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates) {
-//    	if (allyTowers.size() <= 3) {
+//    	if (allyTowers.size() <= 4) {
 //    		return new ArrayList<>();
 //    	}
 //
@@ -1543,6 +1558,69 @@
 //    	
 //}
 //
+//final class UnitsUtils {
+//	
+//	private UnitsUtils() {}
+//	
+//	/**
+//	 * Get the QUEEN from the input map that provides a list of the Unit for each unit type.
+//	 * The list of QUEEN must be of size 1 because the input map must be for only one player.
+//	 * 
+//	 * @param unitsByType
+//	 * @return Unit
+//	 */
+//	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {		
+//		return unitsByType.get(UnitEnum.QUEEN).get(0);
+//	}
+//	
+//	/**
+//	 * Check if the Coordinates is considered as safe regarding enemy KNIGHT.
+//	 * Safe distance is defined in a constant.
+//	 * 
+//	 * @param coordinates
+//	 * @param enemyUnitsByType
+//	 * @return boolean
+//	 */
+//	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, int safeDistance) {
+//		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > safeDistance;
+//	}
+//	
+//	/**
+//	 * Get the distance between the input Coordinates and the nearest KNIGHT form the input map.
+//	 * 
+//	 * @param coordinates
+//	 * @param unitsByType
+//	 * @return double
+//	 */
+//	public static double getDistanceBetweenNearestKnightAndCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> unitsByType) {
+//		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
+//		Unit nearestKnight = getNearestUnit(coordinates, knights);
+//		return nearestKnight == null ? Double.MAX_VALUE : MathUtils.getDistanceBetweenTwoCoordinates(coordinates, nearestKnight.getCoordinates());
+//	}
+//	
+//	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {
+//		return units
+//				.stream()
+//				.collect(Collectors.minBy(Comparator.comparingDouble(unit -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unit.getCoordinates()))))
+//				.orElse(null);
+//	}
+//	
+//	/**
+//	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
+//	 * 
+//	 * @param giants
+//	 * @param coordinates
+//	 * @return boolean
+//	 */
+//	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
+//		final int GIANT_SAFE_ZONE = 200;
+//		return giants
+//				.stream()
+//				.anyMatch(giant -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE);
+//	}
+//	
+//}
+//
 //final class InputUtils {
 //	
 //	private InputUtils() {}
@@ -1717,69 +1795,6 @@
 //        return unitsByTypeAndOwner;
 //	}
 //
-//}
-//
-//final class UnitsUtils {
-//	
-//	private UnitsUtils() {}
-//	
-//	/**
-//	 * Get the QUEEN from the input map that provides a list of the Unit for each unit type.
-//	 * The list of QUEEN must be of size 1 because the input map must be for only one player.
-//	 * 
-//	 * @param unitsByType
-//	 * @return Unit
-//	 */
-//	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {		
-//		return unitsByType.get(UnitEnum.QUEEN).get(0);
-//	}
-//	
-//	/**
-//	 * Check if the Coordinates is considered as safe regarding enemy KNIGHT.
-//	 * Safe distance is defined in a constant.
-//	 * 
-//	 * @param coordinates
-//	 * @param enemyUnitsByType
-//	 * @return boolean
-//	 */
-//	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, int safeDistance) {
-//		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > safeDistance;
-//	}
-//	
-//	/**
-//	 * Get the distance between the input Coordinates and the nearest KNIGHT form the input map.
-//	 * 
-//	 * @param coordinates
-//	 * @param unitsByType
-//	 * @return double
-//	 */
-//	public static double getDistanceBetweenNearestKnightAndCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> unitsByType) {
-//		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
-//		Unit nearestKnight = getNearestUnit(coordinates, knights);
-//		return nearestKnight == null ? Double.MAX_VALUE : MathUtils.getDistanceBetweenTwoCoordinates(coordinates, nearestKnight.getCoordinates());
-//	}
-//	
-//	public static Unit getNearestUnit(Coordinates coordinates, Collection<Unit> units) {
-//		return units
-//				.stream()
-//				.collect(Collectors.minBy(Comparator.comparingDouble(unit -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unit.getCoordinates()))))
-//				.orElse(null);
-//	}
-//	
-//	/**
-//	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
-//	 * 
-//	 * @param giants
-//	 * @param coordinates
-//	 * @return boolean
-//	 */
-//	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
-//		final int GIANT_SAFE_ZONE = 200;
-//		return giants
-//				.stream()
-//				.anyMatch(giant -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE);
-//	}
-//	
 //}
 //
 //final class MathUtils {
