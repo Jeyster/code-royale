@@ -40,10 +40,18 @@ public final class SitesUtils {
      * @param startingAllyQueenCoordinates
      * @return
      */
+    public static Site getNearestSiteFromCoordinatesInBandForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
+        return sites
+        		.stream()
+        		.filter(site -> site.isInBandForwardDirection(startingAllyQueenCoordinates))
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
+        		.orElse(null);
+    }
+    
     public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
         return sites
         		.stream()
-        		.filter(site -> site.isInForwardDirection(startingAllyQueenCoordinates))
+        		.filter(site -> site.isInForwardDirection(coordinates, startingAllyQueenCoordinates))
         		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
         		.orElse(null);
     }

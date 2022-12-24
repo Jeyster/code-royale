@@ -111,10 +111,10 @@ public final class StructuresUtils {
 	 * @return Site
 	 */
     public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
-    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites) {    	
+    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Collection<Site> allyTowers) {    	
         return sites
         		.stream()
-        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId())))
+        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers))
         		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
         		.orElse(null);
     }
@@ -132,12 +132,11 @@ public final class StructuresUtils {
      * @param startingAllyQueenCoordinates
      * @return Site
      */
-    public static Site getNearestSiteFromCoordinatesToBuildAMineInForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
-    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates) { 
+    public static Site getNearestSiteFromCoordinatesToBuildAMineInBandForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
+    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowers) { 
         return sites
         		.stream()
-        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId())) 
-        				&& site.isInForwardDirection(startingAllyQueenCoordinates))
+        		.filter(site -> site.isInBandForwardDirection(startingAllyQueenCoordinates))
         		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
         		.orElse(null);
     }
@@ -210,10 +209,10 @@ public final class StructuresUtils {
      * @param enemyKnightBarracksSites
      * @return boolean
      */
-    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites) {
+    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
     	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
     	final double safeDistance = StructuresUtils.getSafeDistanceWithRespectToKnightBarracks(nearestEnemyKnightBarracksSite);
-    	if (nearestEnemyKnightBarracksSite == null) {
+    	if (nearestEnemyKnightBarracksSite == null || enemyGoldProduction == 0) {
     		return false;
     	}
     	

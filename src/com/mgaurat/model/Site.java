@@ -64,13 +64,19 @@ public class Site {
 	 * @param startingAllyQueenCoordinates
 	 * @return
 	 */
-	public boolean isInForwardDirection(Coordinates startingAllyQueenCoordinates) {
+	public boolean isInBandForwardDirection(Coordinates startingAllyQueenCoordinates) {
 		final int Y_GAP = 100;
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
 		return (isStartingLeftSide && this.getCoordinates().getX() > startingAllyQueenCoordinates.getX() 
 				&& this.getCoordinates().getY() < startingAllyQueenCoordinates.getY() + Y_GAP)
     			|| (!isStartingLeftSide && this.getCoordinates().getX() < startingAllyQueenCoordinates.getX()
     			&& this.getCoordinates().getY() > startingAllyQueenCoordinates.getY() - Y_GAP);
+	}
+	
+	public boolean isInForwardDirection(Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+        boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+		return (isStartingLeftSide && this.getCoordinates().getX() > allyQueenCoordinates.getX())
+    			|| (!isStartingLeftSide && this.getCoordinates().getX() < allyQueenCoordinates.getX());
 	}
 	
 	/**
@@ -80,9 +86,20 @@ public class Site {
 	 * @param remainingGold
 	 * @return boolean
 	 */
-	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold) {
-		return !this.isCloseToNearestEnemyKnightBarracksSite(enemyKnightBarrackSites) 
-				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 0));
+	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers) {
+		return this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers)
+				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 5));
+	}
+	
+	public boolean isAllyTowerProtection(Collection<Site> enemyKnightBarrackSites, Collection<Site> allyTowers) {
+		Site nearestEnemyKnightBarracks = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarrackSites, this.getCoordinates());
+		if (nearestEnemyKnightBarracks == null) {
+			return true;
+		}
+		
+		return allyTowers
+				.stream()
+				.anyMatch(tower -> GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(tower.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates(), this.getCoordinates()));
 	}
 	
     /**
