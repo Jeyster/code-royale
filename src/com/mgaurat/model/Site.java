@@ -128,5 +128,15 @@ public class Site {
 		return (isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.BOTTOMLEFT))
 				|| (!isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.TOPRIGHT));
     }
+    
+    public boolean isEnemyKnightBarracksDangerous(Coordinates safestCoordinates, Collection<Site> enemyKnightBarracksSites) {
+    	Site nearestEnemyKnightBarracks = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, this.getCoordinates());
+    	if (nearestEnemyKnightBarracks == null) {
+    		return false;
+    	}
+    	
+    	return nearestEnemyKnightBarracks.getStructure().isBarracksInTraining() 
+    			&& MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), safestCoordinates) >= MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates());
+    }
 
 }

@@ -140,7 +140,7 @@ class Player {
             }
             
             int minAllyFirstMines;
-            if (startingQueenHealth < 50) {
+            if (startingQueenHealth < 40) {
             	minAllyFirstMines = 1;
             } else {
             	minAllyFirstMines = 2;            	
@@ -154,6 +154,8 @@ class Player {
     		Collection<Site> obsoleteAllyTowerSites = StructuresUtils.getObsoleteAllyTowers(allyTowerSites, startingAllyQueenCoordinates);
             emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites.addAll(obsoleteAllyTowerSites);
             
+            Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
+
             int targetedSiteId;
             Site nearestSite;
             Site nearestSiteToBuildAMine;
@@ -167,9 +169,9 @@ class Player {
             	} else if (towersBuilt <= 3) {
                 	nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
             	} else {
-            		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates);            	            		
+            		nearestSite = StructuresUtils.getNearestSiteFromCoordinatesToBuildSafely(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, enemyKnightBarracksSites, safestCoordinates);            	            		
             	}
-            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites);
+            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, safestCoordinates);
             }
             
             Site nearestSiteToBuildATowerWhenRunningAway;
@@ -224,7 +226,6 @@ class Player {
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites)
             		&& towersBuilt > 0) {
             	System.err.println("Strategy a)");
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
         		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
             	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)) {
             		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
@@ -355,7 +356,6 @@ class Player {
     			} 
             } else {
             	System.err.println("Strategy o)");
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates);
         		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
             	PrintUtils.printMoveAction(coordinatesToGo);
         	}

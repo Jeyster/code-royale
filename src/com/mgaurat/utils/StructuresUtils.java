@@ -111,11 +111,20 @@ public final class StructuresUtils {
 	 * @return Site
 	 */
     public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
-    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites) {    	
+    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates safestCoordinates) {    	
         return sites
         		.stream()
-        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId())))
+        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId())) && !site.isEnemyKnightBarracksDangerous(safestCoordinates, enemyKnightBarrackSites))
         		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
+        		.orElse(null);
+    }
+    
+    public static Site getNearestSiteFromCoordinatesToBuildSafely(Collection<Site> sites, Coordinates coordinates,
+    		Collection<Site> enemyKnightBarrackSites, Coordinates safestCoordinates) {
+        return sites
+        		.stream()
+        		.filter(site -> !site.isEnemyKnightBarracksDangerous(safestCoordinates, enemyKnightBarrackSites))
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
         		.orElse(null);
     }
     
