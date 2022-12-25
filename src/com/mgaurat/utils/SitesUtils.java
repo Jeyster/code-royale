@@ -90,5 +90,14 @@ public final class SitesUtils {
 				.stream()
 				.anyMatch(site -> site.getId() == siteId);
 	}
+	
+	public static Collection<Site> getSitesInBackOfFirstTower(Site firstTower, Collection<Site> sites, Coordinates startingAllyQueenCoordinates) {
+    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	return sites
+    			.stream()
+    			.filter(site -> (isLeftSide && site.getCoordinates().getX() <= firstTower.getCoordinates().getX()) 
+    					|| (!isLeftSide && site.getCoordinates().getX() >= firstTower.getCoordinates().getX()))
+    			.collect(Collectors.toList());
+	}
     
 }
