@@ -99,9 +99,9 @@ public class Site {
 		
 		return allyTowers
 				.stream()
-				.anyMatch(tower -> GameBoardUtils.isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(tower.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates(), this.getCoordinates()));
+				.anyMatch(tower -> tower.getCoordinates().isBetweenTwoXCoordinates(this.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates()));
 	}
-	
+		
     /**
      * Check if site is close (distance <= SAFE_DISTANCE) to the nearest enemy KNIGHT BARRACKS.
      * 

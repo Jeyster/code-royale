@@ -141,7 +141,12 @@ class Player {
             	startingAllyQueenCoordinates = allyQueenCoordinates;
             }
             
-            int minAllyFirstMines = 2;
+            int minAllyFirstMines;
+            if (startingQueenHealth > 40) {
+            	minAllyFirstMines = 2;
+            } else {
+            	minAllyFirstMines = 1;
+            }
             
             if (!isTwoFirstMinesBuild) {
             	isTwoFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;

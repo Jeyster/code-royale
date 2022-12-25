@@ -25,6 +25,11 @@ public class Coordinates {
     public int getY() {
         return this.y;
     }
+    
+    public boolean isBetweenTwoXCoordinates(Coordinates a, Coordinates b) {
+    	return (this.getX() > a.getX() && this.getX() < b.getX())
+    			|| (this.getX() < a.getX() && this.getX() > b.getX());
+    }
 
 	@Override
 	public boolean equals(Object obj) {
@@ -32,6 +37,5 @@ public class Coordinates {
 		return this.getX() == coordinates.getX()
 				&& this.getY() == coordinates.getY();
 	}
-    
     
 }
