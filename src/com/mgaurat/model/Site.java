@@ -86,8 +86,8 @@ public class Site {
 	 * @param remainingGold
 	 * @return boolean
 	 */
-	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers) {
-		return this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers)
+	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers, Collection<Site> enemyTowers) {
+		return (this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers) || enemyTowers.isEmpty())
 				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 5));
 	}
 	

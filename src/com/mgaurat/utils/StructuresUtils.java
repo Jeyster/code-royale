@@ -111,10 +111,11 @@ public final class StructuresUtils {
 	 * @return Site
 	 */
     public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
-    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Collection<Site> allyTowers) {    	
+    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, 
+    		Collection<Site> allyTowers, Collection<Site> enemyMines) {    	
         return sites
         		.stream()
-        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers))
+        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers, enemyMines))
         		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
         		.orElse(null);
     }
@@ -209,10 +210,10 @@ public final class StructuresUtils {
      * @param enemyKnightBarracksSites
      * @return boolean
      */
-    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
+    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
     	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
     	final double safeDistance = StructuresUtils.getSafeDistanceWithRespectToKnightBarracks(nearestEnemyKnightBarracksSite);
-    	if (nearestEnemyKnightBarracksSite == null || enemyGoldProduction == 0) {
+    	if (nearestEnemyKnightBarracksSite == null || enemyMines.isEmpty()) {
     		return false;
     	}
     	
@@ -372,7 +373,11 @@ public final class StructuresUtils {
      * @param startingAllyQueenCoordinates
      * @return Collection<Site>
      */
-    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates) {
+    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates, Collection<Site> enemyMines) {
+    	if (enemyMines.isEmpty()) {
+    		return allyTowers;
+    	}
+    	
     	if (allyTowers.size() <= 4) {
     		return new ArrayList<>();
     	}

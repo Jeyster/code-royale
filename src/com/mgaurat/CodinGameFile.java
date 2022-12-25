@@ -75,7 +75,6 @@
 //            Map<StructureEnum, Map<Integer, Site>> enemySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ENEMY);
 //            Map<Integer, Site> enemyMineSitesById = enemySitesByIdAndStructure.get(StructureEnum.MINE);
 //            Collection<Site> enemyMineSites = enemyMineSitesById.values();
-//            int enemyGoldProduction = StructuresUtils.getGoldProduction(enemyMineSites);
 //            Map<Integer, Site> enemyTowerSitesById = enemySitesByIdAndStructure.get(StructureEnum.TOWER);
 //            Collection<Site> enemyTowerSites = enemyTowerSitesById.values();
 //            int enemyTowersNumber = enemyTowerSites.size();
@@ -141,7 +140,7 @@
 //            }
 //            
 //            /* --- Possible Site to MOVE or to BUILD -- */
-//    		Collection<Site> obsoleteAllyTowerSites = StructuresUtils.getObsoleteAllyTowers(allyTowerSites, startingAllyQueenCoordinates);
+//    		Collection<Site> obsoleteAllyTowerSites = StructuresUtils.getObsoleteAllyTowers(allyTowerSites, startingAllyQueenCoordinates, enemyMineSites);
 //            emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites.addAll(obsoleteAllyTowerSites);
 //            
 //            int targetedSiteId;
@@ -171,8 +170,8 @@
 //            	} else {
 //            		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates);   
 //            	}
-//            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites);
-//            	nearestSiteToBuildAMineOnObsoleteTowers = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites);
+//            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites, enemyMineSites);
+//            	nearestSiteToBuildAMineOnObsoleteTowers = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites, enemyMineSites);
 //            }
 //            nearestSiteToBuildTowerInForward = SitesUtils.getNearestSiteFromCoordinatesInForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
 //            
@@ -235,7 +234,7 @@
 //            *		o) else MOVE to a safe place
 //            */
 //            Coordinates coordinatesToGo;
-//            if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)
+//            if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
 //            		&& towersBuilt > 0) {
 //            	System.err.println("Strategy a)");
 //            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
@@ -254,7 +253,7 @@
 //            } else if (isTouchingAMineToImprove) {
 //            	System.err.println("Strategy b)");
 //        		PrintUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
-//            } else if (TurnStrategyUtils.isTowerMoveOrBuildOnEnemyBarracksStrategyOk(allyQueenHealth, nearestEnemyBarracksSiteToBuildATower, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, allyQueenCoordinates, enemyGoldProduction)) {
+//            } else if (TurnStrategyUtils.isTowerMoveOrBuildOnEnemyBarracksStrategyOk(allyQueenHealth, nearestEnemyBarracksSiteToBuildATower, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, allyQueenCoordinates, enemyMineSites)) {
 //            	System.err.println("Strategy c)");
 //        		targetedSiteId = nearestEnemyBarracksSiteToBuildATower.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestEnemyBarracksSiteToBuildATower.getCoordinates(), allSites);
@@ -267,7 +266,7 @@
 //        	} else if (isTouchingATowerToImprove) {
 //            	System.err.println("Strategy d)");
 //            	PrintUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
-//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)
+//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
 //        			&& !isTwoFirstMinesBuild) {
 //            	System.err.println("Strategy e)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
@@ -280,7 +279,7 @@
 //        			}
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //        		}   
-//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy f)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
@@ -292,7 +291,7 @@
 //        			}
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //        		}   
-//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMineOnObsoleteTowers, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMineOnObsoleteTowers, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy f)");
 //        		targetedSiteId = nearestSiteToBuildAMineOnObsoleteTowers.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), allSites);
@@ -304,7 +303,7 @@
 //        			}
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //        		}   
-//            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy g)");
 //            	targetedSiteId = nearestSite.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSite.getCoordinates(), allSites);
@@ -316,7 +315,7 @@
 //            		}
 //            		PrintUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
 //            	}
-//            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy h)");
 //            	targetedSiteId = nearestAllySiteNotInTraining.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestAllySiteNotInTraining.getCoordinates(), allSites);
@@ -325,7 +324,7 @@
 //            	} else {
 //            		PrintUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
 //            	}
-//            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyTowersNumber, MIN_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, enemyGoldProduction)) {
+//            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyTowersNumber, MIN_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy i)");
 //        		targetedSiteId = nearestSite.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSite.getCoordinates(), allSites);
@@ -335,7 +334,7 @@
 //        			towersBuilt++;
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.TOWER, null);
 //        		}   
-//            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, enemyTowersNumber, allyGiantBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, allyMineSites, enemyGoldProduction)) {
+//            } else if (TurnStrategyUtils.isGiantBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, enemyTowersNumber, allyGiantBarracksSites, enemyUnitsByType, enemyTowerSites, ENEMY_TOWERS_NUMBER_THRESHOLD, SAFE_DISTANCE, enemyKnightBarracksSites, allyMineSites, enemyMineSites)) {
 //            	System.err.println("Strategy j)");
 //            	targetedSiteId = nearestSite.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSite.getCoordinates(), allSites);
@@ -344,7 +343,7 @@
 //            	} else {
 //            		PrintUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.GIANT);
 //            	}
-//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy k)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
@@ -353,7 +352,7 @@
 //    			} else {
 //    				PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //    			}
-//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMineOnObsoleteTowers, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMineOnObsoleteTowers, allyMineSites, MAX_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //            	System.err.println("Strategy k)");
 //        		targetedSiteId = nearestSiteToBuildAMineOnObsoleteTowers.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), allSites);
@@ -362,7 +361,7 @@
 //    			} else {
 //    				PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //    			}
-//        	} else if (nearestSiteToBuildAMine != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (nearestSiteToBuildAMine != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //        		System.err.println("Strategy l)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
@@ -371,7 +370,7 @@
 //        		} else {
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //        		}
-//        	} else if (nearestSiteToBuildAMine != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (nearestSiteToBuildAMine != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
 //        		System.err.println("Strategy l)");
 //        		targetedSiteId = nearestSiteToBuildAMineOnObsoleteTowers.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), allSites);
@@ -380,7 +379,7 @@
 //        		} else {
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //        		} 
-//        	} else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildTowerInForward, allyTowersNumber, Integer.MAX_VALUE, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, enemyGoldProduction)) {
+//        	} else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildTowerInForward, allyTowersNumber, Integer.MAX_VALUE, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, enemyMineSites)) {
 //        		System.err.println("Strategy n1)");
 //        		targetedSiteId = nearestSiteToBuildTowerInForward.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildTowerInForward.getCoordinates(), allSites);
@@ -425,7 +424,6 @@
 //    }
 //
 //}
-//
 //
 //class Coordinates {
 //	
@@ -530,8 +528,8 @@
 //	 * @param remainingGold
 //	 * @return boolean
 //	 */
-//	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers) {
-//		return this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers)
+//	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers, Collection<Site> enemyTowers) {
+//		return (this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers) || enemyTowers.isEmpty())
 //				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 5));
 //	}
 //	
@@ -910,10 +908,11 @@
 //	 * @return Site
 //	 */
 //    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
-//    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Collection<Site> allyTowers) {    	
+//    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, 
+//    		Collection<Site> allyTowers, Collection<Site> enemyMines) {    	
 //        return sites
 //        		.stream()
-//        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers))
+//        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers, enemyMines))
 //        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
 //        		.orElse(null);
 //    }
@@ -1008,10 +1007,10 @@
 //     * @param enemyKnightBarracksSites
 //     * @return boolean
 //     */
-//    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
+//    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
 //    	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
 //    	final double safeDistance = StructuresUtils.getSafeDistanceWithRespectToKnightBarracks(nearestEnemyKnightBarracksSite);
-//    	if (nearestEnemyKnightBarracksSite == null || enemyGoldProduction == 0) {
+//    	if (nearestEnemyKnightBarracksSite == null || enemyMines.isEmpty()) {
 //    		return false;
 //    	}
 //    	
@@ -1171,7 +1170,11 @@
 //     * @param startingAllyQueenCoordinates
 //     * @return Collection<Site>
 //     */
-//    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates) {
+//    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates, Collection<Site> enemyMines) {
+//    	if (enemyMines.isEmpty()) {
+//    		return allyTowers;
+//    	}
+//    	
 //    	if (allyTowers.size() <= 4) {
 //    		return new ArrayList<>();
 //    	}
@@ -1239,8 +1242,8 @@
 //	public static boolean isRunAwayStrategyOk(int queenHealth, Coordinates allyQueenCoordinates,
 //			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites,
 //			int emptySitesNumber, int enemyKnightsNumber, int safeDistance, 
-//			Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
-//		return (queenHealth < LOW_HEALTH_QUEEN && !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyGoldProduction))
+//			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
+//		return (queenHealth < LOW_HEALTH_QUEEN && !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines))
 //				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN 
 //					&& !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
 //				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
@@ -1304,7 +1307,7 @@
 //	 */
 //	public static boolean isMineMoveOrBuildStrategyOk(int queenHealth, Site targetedSiteToBuildAMine, Collection<Site> allyMineSites, 
 //			int goldProductionIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
-//			Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
+//			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
 //		
 //		if (targetedSiteToBuildAMine == null || StructuresUtils.getGoldProduction(allyMineSites) >= goldProductionIWant ) {
 //			return false;
@@ -1314,7 +1317,7 @@
 //			return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, safeDistance)
 //					&& !StructuresUtils.isCoordinatesInRangeOfTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites, 2);			
 //		} else {
-//			return GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyGoldProduction);
+//			return GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //
@@ -1337,9 +1340,9 @@
 //	 */
 //	public static boolean isTowerMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int allyTowersNumber,
 //			int allyTowersNumberIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
-//			int safeDistance, Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
+//			int safeDistance, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
 //		
-//		if (nearestEmptySite == null || allyTowersNumber >= allyTowersNumberIWant) {
+//		if (nearestEmptySite == null || allyTowersNumber >= allyTowersNumberIWant || enemyMines.isEmpty()) {
 //			return false;
 //		}
 //		
@@ -1348,13 +1351,13 @@
 //		} else if (queenHealth >= LOW_HEALTH_QUEEN) {
 //			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 //		} else {
-//			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyGoldProduction);
+//			return GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //	
 //	public static boolean isTowerMoveOrBuildOnEnemyBarracksStrategyOk(int queenHealth, Site nearestSite,
 //			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
-//			int safeDistance, Collection<Site> enemyKnightBarracksSites, Coordinates allyQueenCoordinates, int enemyGoldProduction) {
+//			int safeDistance, Collection<Site> enemyKnightBarracksSites, Coordinates allyQueenCoordinates, Collection<Site> enemyMines) {
 //		
 //		if (nearestSite == null || !StructuresUtils.isEnemyKnightBarracksReachable(nearestSite, allyQueenCoordinates)) {
 //			return false;
@@ -1363,7 +1366,7 @@
 //		if (queenHealth >= LOW_HEALTH_QUEEN) {
 //			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
 //		} else {
-//			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyGoldProduction);
+//			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //
@@ -1384,7 +1387,7 @@
 //	 */
 //	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, Collection<Site> allyBarracksSites, 
 //			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
-//			Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
+//			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
 //		
 //		if (nearestSite == null || !allyBarracksSites.isEmpty()) {
 //			return false;
@@ -1393,7 +1396,7 @@
 //		if (queenHealth >= LOW_HEALTH_QUEEN) {
 //			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
 //		} else {
-//			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyGoldProduction);
+//			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //	
@@ -1418,7 +1421,7 @@
 //	public static boolean isGiantBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int enemyTowersNumber,
 //			Collection<Site> allyGiantBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
 //			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold, int safeDistance, 
-//			Collection<Site> enemyKnightBarracksSites, Collection<Site> allyMineSites, int enemyGoldProduction) {
+//			Collection<Site> enemyKnightBarracksSites, Collection<Site> allyMineSites, Collection<Site> enemyMines) {
 //		
 //		if (nearestEmptySite == null 
 //				|| enemyTowersNumber < enemyTowersNumberThreshold
@@ -1431,7 +1434,7 @@
 //            		&& !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
 //		} else {
 //			return allyGiantBarracksSites.isEmpty()
-//            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyGoldProduction);
+//            		&& GameBoardUtils.isItSafeAtCoordinates(nearestEmptySite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //	
@@ -1521,10 +1524,10 @@
 //	 * @return boolean
 //	 */
 //    public static boolean isItSafeAtCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
-//    		Collection<Site> enemyTowerSites, int safeDistance, Collection<Site> enemyKnightBarracksSites, int enemyGoldProduction) {
+//    		Collection<Site> enemyTowerSites, int safeDistance, Collection<Site> enemyKnightBarracksSites,Collection<Site> enemyMines) {
 //    	return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(coordinates, enemyUnitsByType, safeDistance)
 //    			&& !StructuresUtils.isCoordinatesInRangeOfTowers(coordinates, enemyTowerSites, 1)
-//    			&& !StructuresUtils.isEnemyKnightBarracksDangerous(coordinates, enemyKnightBarracksSites, enemyGoldProduction);
+//    			&& !StructuresUtils.isEnemyKnightBarracksDangerous(coordinates, enemyKnightBarracksSites, enemyMines);
 //    }
 //    
 //    /**
