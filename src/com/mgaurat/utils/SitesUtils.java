@@ -33,12 +33,12 @@ public final class SitesUtils {
     }
         
     /**
-     * Get the nearest Site that is towards the enemy camp.
+     * Get the nearest Site that is towards the enemy camp and limited in Y.
      * 
      * @param sites
      * @param coordinates
      * @param startingAllyQueenCoordinates
-     * @return
+     * @return Site
      */
     public static Site getNearestSiteFromCoordinatesInBandForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
         return sites
@@ -48,6 +48,14 @@ public final class SitesUtils {
         		.orElse(null);
     }
     
+    /**
+     * Get the nearest Site that is towards the enemy camp.
+     * 
+     * @param sites
+     * @param coordinates
+     * @param startingAllyQueenCoordinates
+     * @return Site
+     */
     public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
         return sites
         		.stream()

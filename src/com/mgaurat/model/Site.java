@@ -73,6 +73,14 @@ public class Site {
     			&& this.getCoordinates().getY() > startingAllyQueenCoordinates.getY() - Y_GAP);
 	}
 	
+	/**
+	 * Check if this is in a direction towards the enemy camp.
+	 * We consider that startingAllyQueenCoordinates determined the camps side.
+	 * 
+	 * @param allyQueenCoordinates
+	 * @param startingAllyQueenCoordinates
+	 * @return boolean
+	 */
 	public boolean isInForwardDirection(Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
         boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
 		return (isStartingLeftSide && this.getCoordinates().getX() > allyQueenCoordinates.getX())
@@ -91,6 +99,13 @@ public class Site {
 				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 5));
 	}
 	
+	/**
+	 * Check if there is there is ally TOWER between this and enemy KNIGHT BARRACKS.
+	 * 
+	 * @param enemyKnightBarrackSites
+	 * @param allyTowers
+	 * @return boolean
+	 */
 	public boolean isAllyTowerProtection(Collection<Site> enemyKnightBarrackSites, Collection<Site> allyTowers) {
 		Site nearestEnemyKnightBarracks = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarrackSites, this.getCoordinates());
 		if (nearestEnemyKnightBarracks == null) {
