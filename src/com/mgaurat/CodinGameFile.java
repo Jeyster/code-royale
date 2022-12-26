@@ -29,6 +29,8 @@
 //	private static boolean isTwoFirstMinesBuild = false;
 //	private static boolean isFirstKnightBarracksBuilt = false;
 //	private static int towersBuilt = 0;
+//	private static Site secondMineToBuild = null;
+//	private static Site firstKnightBarracksToBuild = null;
 //	
 //    // Constants
 //    private static final int MIN_ALLY_TOWERS_NUMBER = 3;
@@ -152,7 +154,7 @@
 //            Site nearestEnemyBarracksSiteToBuildATower = null;
 //            Site nearestSiteToBuildTowerInForward = null;
 //            if (!isFirstKnightBarracksBuilt && isFirstBuildDone) {
-//            	nearestSite = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);              		
+//            	nearestSite = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
 //            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMineInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, startingAllyQueenCoordinates, allyTowerSites);
 //            } else {
 //            	if (towersBuilt == 0) {
@@ -199,6 +201,27 @@
 //
 //            Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
 //            Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteFromCoordinates(allyMineAndNotTrainingBarracksAndTowerSites, allyQueenCoordinates);
+//            
+//            Coordinates coordinatesForSecondBuild = null;
+//            
+//            if (minAllyFirstMines == 2 && isFirstBuildDone && !isTwoFirstMinesBuild) {
+//            	if (secondMineToBuild == null) {
+//            		secondMineToBuild = nearestSiteToBuildAMine;            		
+//            		System.err.println("Second mine to build : " + secondMineToBuild.getId());
+//            	}
+//            	if (firstKnightBarracksToBuild == null) {
+//            		System.err.println(emptyAndEnemyMineAndNotInTraingBarracksSites.size());
+//            		Collection<Site> sites = emptyAndEnemyMineAndNotInTraingBarracksSites
+//            				.stream()
+//            				.filter(site -> site.getId() != secondMineToBuild.getId())
+//            				.collect(Collectors.toList());
+//            		System.err.println(sites.size());
+//            		firstKnightBarracksToBuild = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(sites, secondMineToBuild.getCoordinates(), startingAllyQueenCoordinates);            		
+//            		System.err.println("First barracks to buil : " + firstKnightBarracksToBuild.getId());
+//            	}
+//            	coordinatesForSecondBuild = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, firstKnightBarracksToBuild.getCoordinates(), allSites);
+//            	System.err.println("coordinatesForSecondBuild : (" + coordinatesForSecondBuild.getX() + ", " + coordinatesForSecondBuild.getY() + ")");
+//            }
 //            
 //            /* --- Booleans that could be use to choose what to do during this turn --- */
 //            boolean isCampMode = turn > 100 && allyQueenHealth > enemyQueen.getHealth()
@@ -274,7 +297,11 @@
 //        			&& !isTwoFirstMinesBuild && !isCampMode) {
 //            	System.err.println("Strategy e)");
 //        		targetedSiteId = nearestSiteToBuildAMine.getId();
-//        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
+//        		if (coordinatesForSecondBuild != null) {
+//        			coordinatesToGo = coordinatesForSecondBuild;
+//        		} else {
+//        			coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);        			
+//        		}
 //        		if (touchedSite != targetedSiteId) {
 //        			PrintUtils.printMoveAction(coordinatesToGo);
 //        		} else {
