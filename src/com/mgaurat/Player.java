@@ -290,31 +290,7 @@ class Player {
         				isFirstBuildDone = true;
         			}
         			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
-        		}   
-        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMine, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
-            	System.err.println("Strategy f)");
-        		targetedSiteId = nearestSiteToBuildAMine.getId();
-        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMine.getCoordinates(), allSites);
-        		if (touchedSite != targetedSiteId) {
-        			PrintUtils.printMoveAction(coordinatesToGo);
-        		} else {
-        			if (!isFirstBuildDone) {
-        				isFirstBuildDone = true;
-        			}
-        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
-        		}   
-        	} else if (TurnStrategyUtils.isMineMoveOrBuildStrategyOk(allyQueenHealth, nearestSiteToBuildAMineOnObsoleteTowers, allyMineSites, MIN_ALLY_GOLD_PRODUCTION, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
-            	System.err.println("Strategy f)");
-        		targetedSiteId = nearestSiteToBuildAMineOnObsoleteTowers.getId();
-        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), allSites);
-        		if (touchedSite != targetedSiteId) {
-        			PrintUtils.printMoveAction(coordinatesToGo);
-        		} else {
-        			if (!isFirstBuildDone) {
-        				isFirstBuildDone = true;
-        			}
-        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
-        		}   
+        		} 
             } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)) {
             	System.err.println("Strategy g)");
             	targetedSiteId = nearestSite.getId();
