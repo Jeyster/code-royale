@@ -17,6 +17,7 @@ import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
 import com.mgaurat.utils.GameBoardUtils;
 import com.mgaurat.utils.InputUtils;
+import com.mgaurat.utils.MathUtils;
 import com.mgaurat.utils.PrintUtils;
 import com.mgaurat.utils.SitesUtils;
 import com.mgaurat.utils.StructuresUtils;
@@ -280,7 +281,16 @@ class Player {
             			PrintUtils.printMoveAction(safestCoordinates);            			
             		}
             	} else {
-            		PrintUtils.printMoveAction(coordinatesToGo);
+            		Site safestTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
+            		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueenCoordinates, enemyKnights);
+            		if (safestTower != null && touchedSite == safestTower.getId()
+            				&& StructuresUtils.isTowerLifeNotSufficient(safestTower.getStructure())
+            				&& MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnight.getCoordinates(), allyQueenCoordinates) > 200
+            				&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, nearestEnemyKnight.getCoordinates(), safestTower.getCoordinates(), safestTower.getRadius())) {
+                		PrintUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
+            		} else {
+            			PrintUtils.printMoveAction(coordinatesToGo);            			
+            		}
             	}
             } else if (isTouchingAMineToImprove) {
             	System.err.println("Strategy b)");
