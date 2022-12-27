@@ -161,7 +161,8 @@ public final class TurnStrategyUtils {
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
-			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
+			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2)
+					&& enemyUnitsByType.get(UnitEnum.KNIGHT).size() < 2;			
 		} else {
 			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 		}

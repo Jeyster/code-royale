@@ -258,7 +258,7 @@
 //            if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
 //            		&& towersBuilt > 0) {
 //            	System.err.println("Strategy a)");
-//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
+//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates, allyQueen); 
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
 //            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)) {
 //            		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
@@ -269,8 +269,8 @@
 //            			PrintUtils.printMoveAction(safestCoordinates);            			
 //            		}
 //            	} else {
-//            		Site safestTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
 //            		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueenCoordinates, enemyKnights);
+//            		Site safestTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates, allyQueen, nearestEnemyKnight);
 //            		if (safestTower != null && touchedSite == safestTower.getId()
 //            				&& StructuresUtils.isTowerLifeNotSufficient(safestTower.getStructure())
 //            				&& MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnight.getCoordinates(), allyQueenCoordinates) > 200
@@ -279,7 +279,7 @@
 //            		} else {
 //            			PrintUtils.printMoveAction(coordinatesToGo);            			
 //            		}
-//        		}
+//            	}
 //            } else if (isTouchingAMineToImprove) {
 //            	System.err.println("Strategy b)");
 //        		PrintUtils.printBuildAction(touchedSite, StructureEnum.MINE, null);
@@ -425,7 +425,7 @@
 //        		} 
 //            } else {
 //            	System.err.println("Strategy q)");
-//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates);
+//            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates, allyQueen);
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
 //            	PrintUtils.printMoveAction(coordinatesToGo);
 //        	}
@@ -742,6 +742,7 @@
 //	private int unitType;
 //	
 //	private int health;
+//	private int speed;
 //
 //	public Unit(Coordinates coordinates, int owner, int unitType, int health) {
 //		super();
@@ -749,6 +750,7 @@
 //		this.owner = owner;
 //		this.unitType = unitType;
 //		this.health = health;
+//		this.speed = evaluateSpeed();
 //	}
 //
 //	public Coordinates getCoordinates() {
@@ -765,6 +767,31 @@
 //
 //	public int getHealth() {
 //		return health;
+//	}
+//	
+//	public int evaluateSpeed() {
+//		if (this.unitType == UnitEnum.QUEEN.getId()) {
+//			return 60;
+//		} else if (this.unitType == UnitEnum.KNIGHT.getId()) {
+//			return 100;
+//		} else if (this.unitType == UnitEnum.GIANT.getId()) {
+//			return 50;
+//		} else if (this.unitType == UnitEnum.ARCHER.getId()) {
+//			return 75;
+//		}
+//		return 0;
+//	}
+//	
+//	public int getSpeed() {
+//		return this.speed;
+//	}
+//	
+//	public boolean canReachSiteBeforeUnit(Site site, Unit unit) {
+//		double distanceFromSite = MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), site.getCoordinates());
+//		double distanceFromSiteForUnit = MathUtils.getDistanceBetweenTwoCoordinates(unit.getCoordinates(), site.getCoordinates());
+//		double timeToGo = distanceFromSite / this.getSpeed();
+//		double timeToGoForUnit = distanceFromSiteForUnit / unit.getSpeed();
+//		return timeToGo < timeToGoForUnit;
 //	}
 // 
 //}
@@ -1135,15 +1162,17 @@
 //     * @param startingAllyQueenCoordinates
 //     * @return Site
 //     */
-//    public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates) {
+//    public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates, Unit allyQueen, Unit nearestEnemyKnight) {
 //    	if (GameBoardUtils.isLeftSide(startingAllyQueenCoordinates)) {
 //    		return allyTowerSites
 //    				.stream()
+//    				.filter(site -> allyQueen.canReachSiteBeforeUnit(site, nearestEnemyKnight))
 //    				.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
 //    				.orElse(null);    		
 //    	} else {
 //    		return allyTowerSites
 //    				.stream()
+//    				.filter(site -> allyQueen.canReachSiteBeforeUnit(site, nearestEnemyKnight))
 //    				.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
 //    				.orElse(null);    
 //    	}
@@ -1534,12 +1563,14 @@
 //	 * @param allySites
 //	 * @return Coordinates
 //	 */
-//	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates) {
+//	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, 
+//			Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates, Unit allyQueen) {
 //		Coordinates safestCoordinates;
 //		if (allyTowerSites.size() >= 3) {
-//    		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
-//    		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights);
-//    		safestCoordinates = StructuresUtils.getCoordinatesBehindTowerOppositeToNearestEnemyKnight(nearestEnemyKnight, safestAllyTower, startingAllyQueenCoordinates);
+//    		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueen.getCoordinates(), enemyKnights);
+//    		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates, allyQueen, nearestEnemyKnight);
+//    		Unit nearestEnemyKnightFromTower = UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights);
+//    		safestCoordinates = StructuresUtils.getCoordinatesBehindTowerOppositeToNearestEnemyKnight(nearestEnemyKnightFromTower, safestAllyTower, startingAllyQueenCoordinates);
 //    	} else {
 //    		safestCoordinates = getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
 //    	}

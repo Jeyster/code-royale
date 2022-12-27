@@ -289,17 +289,36 @@ public final class StructuresUtils {
      * @param startingAllyQueenCoordinates
      * @return Site
      */
-    public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates) {
+    public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates, Unit allyQueen, Unit nearestEnemyKnight) {
+    	Collection<Site> reachableTowers = allyTowerSites
+				.stream()
+				.filter(site -> allyQueen.canReachSiteBeforeUnit(site, nearestEnemyKnight))
+				.collect(Collectors.toList());
+    	
     	if (GameBoardUtils.isLeftSide(startingAllyQueenCoordinates)) {
-    		return allyTowerSites
-    				.stream()
-    				.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
-    				.orElse(null);    		
+    		if (!reachableTowers.isEmpty()) {
+    			return reachableTowers
+    					.stream()
+    					.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+    					.orElse(null);    		    			
+    		} else {
+    			return allyTowerSites
+    					.stream()
+    					.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+    					.orElse(null); 
+			}
     	} else {
-    		return allyTowerSites
-    				.stream()
-    				.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
-    				.orElse(null);    
+    		if (!reachableTowers.isEmpty()) {
+    			return reachableTowers
+    					.stream()
+        				.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+    					.orElse(null);    		    			
+    		} else {
+    			return allyTowerSites
+    					.stream()
+    					.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+    					.orElse(SitesUtils.getNearestSiteFromCoordinates(allyTowerSites, allyQueen.getCoordinates()));    		    			
+    		}
     	}
     }
     

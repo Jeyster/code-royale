@@ -270,9 +270,10 @@ class Player {
             if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
             		&& towersBuilt > 0) {
             	System.err.println("Strategy a)");
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates); 
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates, allyQueen); 
         		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
-            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)) {
+            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)
+            			&& allyQueenHealth > 5) {
             		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
             			towersBuilt++;
                 		PrintUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
@@ -281,12 +282,13 @@ class Player {
             			PrintUtils.printMoveAction(safestCoordinates);            			
             		}
             	} else {
-            		Site safestTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
             		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueenCoordinates, enemyKnights);
+            		Site safestTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates, allyQueen, nearestEnemyKnight);
             		if (safestTower != null && touchedSite == safestTower.getId()
             				&& StructuresUtils.isTowerLifeNotSufficient(safestTower.getStructure())
             				&& MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnight.getCoordinates(), allyQueenCoordinates) > 200
-            				&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, nearestEnemyKnight.getCoordinates(), safestTower.getCoordinates(), safestTower.getRadius())) {
+            				&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, nearestEnemyKnight.getCoordinates(), safestTower.getCoordinates(), safestTower.getRadius())
+            				&& safestTower.getCoordinates().isBetweenTwoXCoordinates(allyQueenCoordinates, nearestEnemyKnight.getCoordinates())) {
                 		PrintUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
             		} else {
             			PrintUtils.printMoveAction(coordinatesToGo);            			
@@ -437,7 +439,7 @@ class Player {
         		} 
             } else {
             	System.err.println("Strategy q)");
-            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates);
+            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates, allyQueen);
         		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
             	PrintUtils.printMoveAction(coordinatesToGo);
         	}

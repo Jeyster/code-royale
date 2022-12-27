@@ -42,12 +42,14 @@ public final class GameBoardUtils {
 	 * @param allySites
 	 * @return Coordinates
 	 */
-	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates) {
+	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, 
+			Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates, Unit allyQueen) {
 		Coordinates safestCoordinates;
 		if (allyTowerSites.size() >= 3) {
-    		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates);
-    		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights);
-    		safestCoordinates = StructuresUtils.getCoordinatesBehindTowerOppositeToNearestEnemyKnight(nearestEnemyKnight, safestAllyTower, startingAllyQueenCoordinates);
+    		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueen.getCoordinates(), enemyKnights);
+    		Site safestAllyTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates, allyQueen, nearestEnemyKnight);
+    		Unit nearestEnemyKnightFromTower = UnitsUtils.getNearestUnit(safestAllyTower.getCoordinates(), enemyKnights);
+    		safestCoordinates = StructuresUtils.getCoordinatesBehindTowerOppositeToNearestEnemyKnight(nearestEnemyKnightFromTower, safestAllyTower, startingAllyQueenCoordinates);
     	} else {
     		safestCoordinates = getSafestCoordinatesFromStartingAllyQueen(startingAllyQueenCoordinates);
     	}
