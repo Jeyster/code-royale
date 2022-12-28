@@ -114,7 +114,8 @@ public class Site {
 		
 		return allyTowers
 				.stream()
-				.anyMatch(tower -> tower.getCoordinates().isBetweenTwoXCoordinates(this.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates()));
+				.filter(tower -> tower.getCoordinates().isBetweenTwoXCoordinates(this.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates()))
+				.count() >= 3;
 	}
 		
     /**
