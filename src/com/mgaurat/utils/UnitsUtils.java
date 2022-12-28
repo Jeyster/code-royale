@@ -83,12 +83,13 @@ public final class UnitsUtils {
 	
 	public static boolean canAllyQueenReachSiteSafely(Unit allyQueen, Coordinates startingAllyQueenCoordinates, Site site, 
 			Unit nearestEnemyKnight, Collection<Site> enemyTowers, boolean isNotMineBuild) {
-		return !site.isInForwardDirection(allyQueen.getCoordinates(), startingAllyQueenCoordinates)
+		return !site.isBehindEnemyLine(allyQueen, enemyTowers)
+				&& (!site.isInForwardDirection(allyQueen.getCoordinates(), startingAllyQueenCoordinates)
 				|| (allyQueen.getHealth() < LOW_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 1)
 				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? 0 : 8))
 				|| (allyQueen.getHealth() < MID_HEALTH_QUEEN && allyQueen.getHealth() >= LOW_HEALTH_QUEEN 
 				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? -1 : 1.5))
-				|| (allyQueen.getHealth() >= MID_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 2));
+				|| (allyQueen.getHealth() >= MID_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 2)));
 	}
 	
 }

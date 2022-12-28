@@ -161,5 +161,17 @@ public class Site {
 		return (isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.BOTTOMLEFT))
 				|| (!isLeftSide && siteBoardGameQuarter.equals(GameBoardQuarterEnum.TOPRIGHT));
     }
+    
+    public boolean isBehindEnemyLine(Unit allyQueen, Collection<Site> enemySites) {
+    	boolean output =  enemySites
+    			.stream()
+    			.anyMatch(site -> site.getCoordinates().isBetweenTwoXCoordinates(this.getCoordinates(), allyQueen.getCoordinates()));
+    	
+    	if (this.getId() == 10) {
+    		System.err.println(output);
+    	}
+    	
+    	return output;
+    }
 
 }

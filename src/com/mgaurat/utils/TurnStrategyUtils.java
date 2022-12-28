@@ -104,10 +104,14 @@ public final class TurnStrategyUtils {
 	 */
 	public static boolean isMineMoveOrBuildStrategyOk(int queenHealth, Site targetedSiteToBuildAMine, Collection<Site> allyMineSites, 
 			int goldProductionIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
-			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
+			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines, int touchedSite) {
 		
 		if (targetedSiteToBuildAMine == null || StructuresUtils.getGoldProduction(allyMineSites) >= goldProductionIWant ) {
 			return false;
+		}
+		
+		if (touchedSite == targetedSiteToBuildAMine.getId()) {
+			return true;
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
@@ -137,13 +141,13 @@ public final class TurnStrategyUtils {
 	 */
 	public static boolean isTowerMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int allyTowersNumber,
 			int allyTowersNumberIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
-			int safeDistance, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
+			int safeDistance, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines, int touchedSite) {
 		
 		if (nearestEmptySite == null || allyTowersNumber >= allyTowersNumberIWant || enemyMines.isEmpty()) {
 			return false;
 		}
 		
-		if (allyTowersNumber < 3) {
+		if (allyTowersNumber < 3 || touchedSite == nearestEmptySite.getId()) {
 			return true;
 		} else if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestEmptySite.getCoordinates(), enemyTowerSites, 2);			
@@ -153,11 +157,15 @@ public final class TurnStrategyUtils {
 	}
 	
 	public static boolean isTowerMoveOrBuildOnEnemyBarracksStrategyOk(int queenHealth, Site nearestSite,
-			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
-			int safeDistance, Collection<Site> enemyKnightBarracksSites, Coordinates allyQueenCoordinates, Collection<Site> enemyMines) {
+			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
+			Collection<Site> enemyKnightBarracksSites, Coordinates allyQueenCoordinates, Collection<Site> enemyMines, int touchedSite) {
 		
 		if (nearestSite == null || !StructuresUtils.isEnemyKnightBarracksReachable(nearestSite, allyQueenCoordinates)) {
 			return false;
+		}
+		
+		if (touchedSite == nearestSite.getId()) {
+			return true;
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
@@ -185,12 +193,16 @@ public final class TurnStrategyUtils {
 	 */
 	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, Collection<Site> allyBarracksSites, 
 			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
-			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
+			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines, int touchedSite) {
 		
 		if (nearestSite == null || !allyBarracksSites.isEmpty()) {
 			return false;
 		}
 		
+		if (touchedSite == nearestSite.getId()) {
+			return true;
+		}
+
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
 			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
 		} else {
@@ -217,14 +229,18 @@ public final class TurnStrategyUtils {
 	 * @return boolean
 	 */
 	public static boolean isGiantBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int enemyTowersNumber,
-			Collection<Site> allyGiantBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
-			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold, int safeDistance, 
-			Collection<Site> enemyKnightBarracksSites, Collection<Site> allyMineSites, Collection<Site> enemyMines) {
+			Collection<Site> allyGiantBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
+			int enemyTowersNumberThreshold, int safeDistance, Collection<Site> enemyKnightBarracksSites, Collection<Site> allyMineSites, 
+			Collection<Site> enemyMines, int touchedSite) {
 		
 		if (nearestEmptySite == null 
 				|| enemyTowersNumber < enemyTowersNumberThreshold
 				|| StructuresUtils.getGoldProduction(allyMineSites) < 10) {
 			return false;
+		}
+		
+		if (touchedSite == nearestEmptySite.getId()) {
+			return true;
 		}
 		
 		if (queenHealth >= LOW_HEALTH_QUEEN) {
