@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.mgaurat.model.Coordinates;
 import com.mgaurat.model.Site;
+import com.mgaurat.model.Unit;
 
 /**
  * Final class for static methods that manipulates Site.
@@ -15,7 +16,7 @@ import com.mgaurat.model.Site;
  *
  */
 public final class SitesUtils {
-	
+		
 	private SitesUtils() {}
 	
 	/**
@@ -29,6 +30,15 @@ public final class SitesUtils {
         return sites
         		.stream()
         		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
+        		.orElse(null);
+    }
+    
+    public static Site getNearestSiteToBuild(Collection<Site> sites, Unit allyQueen, Coordinates startingAllyQueenCoordinates,
+    		Collection<Site> enemyTowers, Unit nearestEnemyKnight) {
+        return sites
+        		.stream()
+        		.filter(site -> UnitsUtils.canAllyQueenReachSiteSafely(allyQueen, startingAllyQueenCoordinates, site, nearestEnemyKnight, enemyTowers, true))
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueen.getCoordinates(), site.getCoordinates()))))
         		.orElse(null);
     }
         
@@ -56,11 +66,13 @@ public final class SitesUtils {
      * @param startingAllyQueenCoordinates
      * @return Site
      */
-    public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
+    public static Site getNearestSiteToBuildInForwardDirection(Collection<Site> sites, Unit allyQueen, Coordinates startingAllyQueenCoordinates,
+    		Unit nearestEnemyKnight, Collection<Site> enemyTowers) {
         return sites
         		.stream()
-        		.filter(site -> site.isInForwardDirection(coordinates, startingAllyQueenCoordinates))
-        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
+        		.filter(site -> site.isInForwardDirection(allyQueen.getCoordinates(), startingAllyQueenCoordinates)
+        				&& UnitsUtils.canAllyQueenReachSiteSafely(allyQueen, startingAllyQueenCoordinates, site, nearestEnemyKnight, enemyTowers, true))
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueen.getCoordinates(), site.getCoordinates()))))
         		.orElse(null);
     }
 	

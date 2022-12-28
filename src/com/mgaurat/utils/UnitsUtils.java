@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.mgaurat.enums.UnitEnum;
 import com.mgaurat.model.Coordinates;
+import com.mgaurat.model.Site;
 import com.mgaurat.model.Unit;
 
 /**
@@ -17,6 +18,9 @@ import com.mgaurat.model.Unit;
  *
  */
 public final class UnitsUtils {
+	
+	private static final int LOW_HEALTH_QUEEN = 20;
+	private static final int MID_HEALTH_QUEEN = 40;
 	
 	private UnitsUtils() {}
 	
@@ -75,6 +79,16 @@ public final class UnitsUtils {
 		return giants
 				.stream()
 				.anyMatch(giant -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE);
+	}
+	
+	public static boolean canAllyQueenReachSiteSafely(Unit allyQueen, Coordinates startingAllyQueenCoordinates, Site site, 
+			Unit nearestEnemyKnight, Collection<Site> enemyTowers, boolean isNotMineBuild) {
+		return !site.isInForwardDirection(allyQueen.getCoordinates(), startingAllyQueenCoordinates)
+				|| (allyQueen.getHealth() < LOW_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 1)
+				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? 0 : 8))
+				|| (allyQueen.getHealth() < MID_HEALTH_QUEEN && allyQueen.getHealth() >= LOW_HEALTH_QUEEN 
+				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? -1 : 1.5))
+				|| (allyQueen.getHealth() >= MID_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 2));
 	}
 	
 }

@@ -12,15 +12,9 @@
 //import java.util.stream.Collectors;
 //import java.util.stream.Stream;
 //
-///**
-// * Main class
-// * 
-// * @author mgaurat
-// *
-// */
 //class Player {
 //	
-//	// Static attributes that refer to global game changes
+//	
 //	private static Integer turn = 0;
 //	private static Integer startingQueenHealth = null;
 //	private static Coordinates startingAllyQueenCoordinates = null;
@@ -32,7 +26,7 @@
 //	private static Site secondMineToBuild = null;
 //	private static Site firstKnightBarracksToBuild = null;
 //	
-//    // Constants
+//    
 //    private static final int MIN_ALLY_TOWERS_NUMBER = 3;
 //    private static final int MAX_ALLY_GOLD_PRODUCTION = 8;
 //    private static final int ENEMY_TOWERS_NUMBER_THRESHOLD = 3;
@@ -43,20 +37,20 @@
 //        Scanner in = new Scanner(System.in);
 //        int numSites = in.nextInt();
 //
-//        // Initialize Sites with start of game input
+//        
 //        Map<Integer, Site> sitesById = InputUtils.getSitesFromInitialInput(in, numSites);
 //
-//        // Game loop
+//        
 //        while (true) {
 //        	turn++;
 //            int gold = in.nextInt();
-//            int touchedSite = in.nextInt(); // -1 if none
+//            int touchedSite = in.nextInt(); 
 //
-//            /* --- Sites --- */
-//            // Update Sites by creating Structure thanks to the the turn input
+//            
+//            
 //            Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> sitesByIdAndStructureAndOwner = InputUtils.updateSitesFromTurnInput(in, sitesById);
 //            
-//            // Create Sites collections
+//            
 //            Map<Integer, Site> emptySitesById = sitesByIdAndStructureAndOwner.get(OwnerEnum.NOBODY).get(StructureEnum.NOTHING);
 //            Collection<Site> emptySites = emptySitesById.values();
 //            int emptySitesNumber = emptySites.size();
@@ -104,11 +98,11 @@
 //            		.collect(Collectors.toList());
 //            Collection<Site> emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites = new ArrayList<>(emptyAndEnemyMineAndNotInTraingBarracksSites);
 //            
-//            // Update the remaining gold in each known Site
+//            
 //            StructuresUtils.updateRemaingGoldBySiteId(remainingGoldBySiteId, allSites);
 //
-//            /* --- Units --- */
-//            // Get the Units thanks to the turn input
+//            
+//            
 //            int numUnits = in.nextInt();
 //            Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = InputUtils.getUnitsByTypeAndOwnerFromTurnInput(in, numUnits);
 //            
@@ -121,10 +115,11 @@
 //            Map<UnitEnum, List<Unit>> enemyUnitsByType = unitsByTypeAndOwner.get(OwnerEnum.ENEMY);
 //            Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
 //            int enemyKnightsNumber = enemyKnights.size();
+//    		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueenCoordinates, enemyKnights);
 //            Collection<Unit> enemyGiants = enemyUnitsByType.get(UnitEnum.GIANT);
 //            Unit enemyQueen = UnitsUtils.getQueen(enemyUnitsByType);
 //            
-//            /* --- Initialize start of game static parameters --- */
+//            
 //            if (startingQueenHealth == null) {
 //            	startingQueenHealth = allyQueenHealth;
 //            }
@@ -143,7 +138,7 @@
 //            	isFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;
 //            }
 //            
-//            /* --- Possible Site to MOVE or to BUILD -- */
+//            
 //    		Collection<Site> obsoleteAllyTowerSites = StructuresUtils.getObsoleteAllyTowers(allyTowerSites, startingAllyQueenCoordinates, enemyMineSites);
 //            emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites.addAll(obsoleteAllyTowerSites);
 //            
@@ -170,16 +165,16 @@
 //                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
 //            		}
 //            	} else {
-//            		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates);   
+//            		nearestSite = SitesUtils.getNearestSiteToBuild(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
 //            	}
-//            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites, enemyMineSites);
-//            	nearestSiteToBuildAMineOnObsoleteTowers = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites, enemyMineSites);
+//            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites, enemyTowerSites, enemyMineSites, nearestEnemyKnight);
+//            	nearestSiteToBuildAMineOnObsoleteTowers = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMine(emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, allyTowerSites, enemyTowerSites, enemyMineSites, nearestEnemyKnight);
 //            }
 //            
-//            Site nearestEnemyBarracksSiteToBuildATower = SitesUtils.getNearestSiteFromCoordinates(enemyNotInTrainingBarracksSites, allyQueenCoordinates);
-//            Site nearestSiteToBuildTowerInForward = SitesUtils.getNearestSiteFromCoordinatesInForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
-//            Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteFromCoordinates(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueenCoordinates);
-//            Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteFromCoordinates(allyMineAndNotTrainingBarracksAndTowerSites, allyQueenCoordinates);
+//            Site nearestEnemyBarracksSiteToBuildATower = SitesUtils.getNearestSiteToBuild(enemyNotInTrainingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
+//            Site nearestSiteToBuildTowerInForward = SitesUtils.getNearestSiteToBuildInForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, nearestEnemyKnight, enemyTowerSites);
+//            Site nearestAllyTowerSiteWithNotSufficientLife = SitesUtils.getNearestSiteToBuild(StructuresUtils.getAllyTowerSitesWithNotSufficientLife(allyTowerSites), allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
+//            Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteToBuild(allyMineAndNotTrainingBarracksAndTowerSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
 //            Site nearestSiteToBuildATowerWhenRunningAway;
 //        	if (isFirstKnightBarracksBuilt && towersBuilt == 0) {
 //        		if (startingQueenHealth > 50) {
@@ -196,10 +191,10 @@
 //                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
 //        		}
 //        	} else {
-//                nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptyAndMineAndNotInTraingBarracksSites, allyQueenCoordinates);
+//                nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteToBuild(emptyAndMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
 //        	}
 //            
-//            /* --- Calculate coordinates to go for the second MINE built --- */
+//            
 //            Coordinates coordinatesForSecondBuild = null;
 //            if (minAllyFirstMines == 2 && isFirstBuildDone && !isFirstMinesBuild) {
 //            	if (secondMineToBuild == null) {
@@ -215,7 +210,7 @@
 //            	coordinatesForSecondBuild = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, firstKnightBarracksToBuild.getCoordinates(), allSites);
 //            }
 //            
-//            /* --- Booleans that could be use to choose what to do during this turn --- */
+//            
 //            boolean isCampMode = turn > 100 && allyQueenHealth > enemyQueen.getHealth()
 //            		&& allyMineSites.size() < enemyMineSites.size();
 //            
@@ -234,33 +229,15 @@
 //            	}
 //            }
 //            
-//            /* 1) First turn action is to MOVE or BUILD. Generally, if ally QUEEN is low life, adopt a safest strategy.
-//            *		a) MOVE to a safe place when the ally QUEEN is in danger.
-//            *		   Can BUILD TOWER on the way to go.
-//            *		b) else if touching a MINE I owned not in full production, improve it
-//            *		c) else if MOVE to a reachable enemy BARRACKS Site and BUILD a TOWER
-//            *		d) else if touching a TOWER I owned not with full range, improve it
-//            *		e) else if MOVE to the chosen Site and BUILD a MINE until 1 or 2 MINE are built
-//            *		f) else if MOVE to the nearest empty Site and BUILD an only one KNIGHT BARRACKS
-//            *		g) else if MOVE to the chosen Site and BUILD an only one KNIGHT BARRACKS
-//            *		h) else if MOVE to the nearest empty Site and BUILD a TOWER until MIN_ALLY_TOWERS_NUMBER is reached
-//            *		i) else if MOVE to the nearest empty Site and BUILD an only one GIANT BARRACKS
-//            *		j) else if MOVE to the chosen Site and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
-//            *		k) else if MOVE to the chosen Site (could be obsolete TOWER) and BUILD a MINE until MAX_ALLY_GOLD_PRODUCTION is reached
-//            *		l) else if MOVE safely to the chosen Site and BUILD a MINE
-//            *		m) else if MOVE safely to the chosen Site (could be obsolete TOWER) and BUILD a MINE
-//            *		n) else if MOVE to the to the chosen Site in front and BUILD a TOWER
-//            *		o) else if MOVE to the nearest ally TOWER with not enough life points
-//            *		p) else if MOVE to the to the chosen Site and BUILD a TOWER
-//            *		q) else MOVE to a safe place
-//            */
+//            
 //            Coordinates coordinatesToGo;
 //            if (TurnStrategyUtils.isRunAwayStrategyOk(allyQueenHealth, allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, emptySitesNumber, enemyKnightsNumber, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
 //            		&& towersBuilt > 0) {
 //            	System.err.println("Strategy a)");
 //            	Coordinates safestCoordinates = GameBoardUtils.getSafestCoordinates(startingAllyQueenCoordinates, allyTowerSites, enemyKnights, allyQueenCoordinates, allyQueen); 
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, safestCoordinates, allSites);
-//            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)) {
+//            	if (TurnStrategyUtils.isBuildTowerWhenRunningAwayStrategyOk(allyQueenCoordinates, safestCoordinates, nearestSiteToBuildATowerWhenRunningAway, enemyGiants)
+//            			&& allyQueenHealth > 5) {
 //            		if (touchedSite == nearestSiteToBuildATowerWhenRunningAway.getId()) {
 //            			towersBuilt++;
 //                		PrintUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
@@ -269,12 +246,13 @@
 //            			PrintUtils.printMoveAction(safestCoordinates);            			
 //            		}
 //            	} else {
-//            		Unit nearestEnemyKnight = UnitsUtils.getNearestUnit(allyQueenCoordinates, enemyKnights);
 //            		Site safestTower = StructuresUtils.getSafestTower(allyTowerSites, startingAllyQueenCoordinates, allyQueen, nearestEnemyKnight);
 //            		if (safestTower != null && touchedSite == safestTower.getId()
 //            				&& StructuresUtils.isTowerLifeNotSufficient(safestTower.getStructure())
-//            				&& MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnight.getCoordinates(), allyQueenCoordinates) > 200
-//            				&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, nearestEnemyKnight.getCoordinates(), safestTower.getCoordinates(), safestTower.getRadius())) {
+//            				&& (nearestEnemyKnight == null || 
+//            				(MathUtils.getDistanceBetweenTwoCoordinates(nearestEnemyKnight.getCoordinates(), allyQueenCoordinates) > 200
+//            				&& MathUtils.isLineCrossingCircle(allyQueenCoordinates, nearestEnemyKnight.getCoordinates(), safestTower.getCoordinates(), safestTower.getRadius())
+//            				&& safestTower.getCoordinates().isBetweenTwoXCoordinates(allyQueenCoordinates, nearestEnemyKnight.getCoordinates())))) {
 //                		PrintUtils.printBuildAction(touchedSite, StructureEnum.TOWER, null);
 //            		} else {
 //            			PrintUtils.printMoveAction(coordinatesToGo);            			
@@ -336,7 +314,8 @@
 //            	} else {
 //            		PrintUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
 //            	}
-//            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyTowersNumber, MIN_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, enemyMineSites)) {
+//            } else if (TurnStrategyUtils.isTowerMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyTowersNumber, MIN_ALLY_TOWERS_NUMBER, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE_TO_BUILD_TOWER, enemyKnightBarracksSites, enemyMineSites)
+//            		&& towersBuilt < 3) {
 //            	System.err.println("Strategy h)");
 //        		targetedSiteId = nearestSite.getId();
 //        		coordinatesToGo = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, nearestSite.getCoordinates(), allSites);
@@ -386,7 +365,7 @@
 //        		} else {
 //        			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
 //        		}
-//        	} else if (nearestSiteToBuildAMine != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
+//        	} else if (nearestSiteToBuildAMineOnObsoleteTowers != null && GameBoardUtils.isItSafeAtCoordinates(nearestSiteToBuildAMineOnObsoleteTowers.getCoordinates(), enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites)
 //        			&& !isCampMode) {
 //        		System.err.println("Strategy m)");
 //        		targetedSiteId = nearestSiteToBuildAMineOnObsoleteTowers.getId();
@@ -430,10 +409,7 @@
 //            	PrintUtils.printMoveAction(coordinatesToGo);
 //        	}
 //
-//            /* 2) Second turn action is to TRAIN.
-//            *		a) TRAIN a GIANT id needed
-//            *		b) else TRAIN a KNIGHT
-//            */
+//            
 //            Optional<Site> siteToTrain = Optional.empty();
 //            if (TurnStrategyUtils.isGiantTrainStrategyOk(enemyTowersNumber, ENEMY_TOWERS_NUMBER_THRESHOLD + 2, allyMineSites, allyGiants, allyGiantBarracksSites)) {
 //            	siteToTrain = StructuresUtils.getBarracksSiteToTrain(allyGiantBarracksSites);
@@ -524,14 +500,7 @@
 //		return this.getCoordinates().equals(coordinates);
 //	}
 //	
-//	/**
-//	 * Check if this is in a direction towards the enemy camp.
-//	 * We consider that startingAllyQueenCoordinates determined the camps side.
-//	 * We stay in a narrow Y band defined by Y_GAP.
-//	 * 
-//	 * @param startingAllyQueenCoordinates
-//	 * @return
-//	 */
+//	
 //	public boolean isInBandForwardDirection(Coordinates startingAllyQueenCoordinates) {
 //		final int Y_GAP = 100;
 //        boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
@@ -541,39 +510,20 @@
 //    			&& this.getCoordinates().getY() > startingAllyQueenCoordinates.getY() - Y_GAP);
 //	}
 //	
-//	/**
-//	 * Check if this is in a direction towards the enemy camp.
-//	 * We consider that startingAllyQueenCoordinates determined the camps side.
-//	 * 
-//	 * @param allyQueenCoordinates
-//	 * @param startingAllyQueenCoordinates
-//	 * @return boolean
-//	 */
+//	
 //	public boolean isInForwardDirection(Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
 //        boolean isStartingLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
 //		return (isStartingLeftSide && this.getCoordinates().getX() > allyQueenCoordinates.getX())
 //    			|| (!isStartingLeftSide && this.getCoordinates().getX() < allyQueenCoordinates.getX());
 //	}
 //	
-//	/**
-//	 * Check if there is no gold left in the Site and if a enemy KNIGHT BARRACKS is too close.
-//	 * 
-//	 * @param enemyKnightBarrackSites
-//	 * @param remainingGold
-//	 * @return boolean
-//	 */
-//	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers, Collection<Site> enemyTowers) {
-//		return (this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers) || enemyTowers.isEmpty())
+//	
+//	public boolean isAllowedToBuildMine(Collection<Site> enemyKnightBarrackSites, Integer remainingGold, Collection<Site> allyTowers, Collection<Site> enemyMines) {
+//		return (this.isAllyTowerProtection(enemyKnightBarrackSites, allyTowers) || enemyMines.isEmpty())
 //				&& ((remainingGold == null && this.getStructure().getMineGold() != 0) || (remainingGold != null && remainingGold > 5));
 //	}
 //	
-//	/**
-//	 * Check if there is there is ally TOWER between this and enemy KNIGHT BARRACKS.
-//	 * 
-//	 * @param enemyKnightBarrackSites
-//	 * @param allyTowers
-//	 * @return boolean
-//	 */
+//	
 //	public boolean isAllyTowerProtection(Collection<Site> enemyKnightBarrackSites, Collection<Site> allyTowers) {
 //		Site nearestEnemyKnightBarracks = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarrackSites, this.getCoordinates());
 //		if (nearestEnemyKnightBarracks == null) {
@@ -582,15 +532,11 @@
 //		
 //		return allyTowers
 //				.stream()
-//				.anyMatch(tower -> tower.getCoordinates().isBetweenTwoXCoordinates(this.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates()));
+//				.filter(tower -> tower.getCoordinates().isBetweenTwoXCoordinates(this.getCoordinates(), nearestEnemyKnightBarracks.getCoordinates()))
+//				.count() >= 3;
 //	}
 //		
-//    /**
-//     * Check if site is close (distance <= SAFE_DISTANCE) to the nearest enemy KNIGHT BARRACKS.
-//     * 
-//     * @param enemyKnightBarracksSites
-//     * @return boolean
-//     */
+//    
 //    public boolean isCloseToNearestEnemyKnightBarracksSite(Collection<Site> enemyKnightBarracksSites) {
 //    	if (enemyKnightBarracksSites.isEmpty()) {
 //    		return false;
@@ -599,12 +545,7 @@
 //    	return this.isCloseToAnotherSite(SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, this.getCoordinates()));
 //    }
 //    
-//    /**
-//     * Check if the distance between 2 Sites is less or equal to constant SAFE_DISTANCE.
-//     * 
-//     * @param site
-//     * @return boolean
-//     */
+//    
 //    public boolean isCloseToAnotherSite(Site site) {
 //    	final double SAFE_DISTANCE = 300;
 //    	if (site == null) {
@@ -614,14 +555,7 @@
 //    	return MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), site.getCoordinates()) <= SAFE_DISTANCE;
 //    }
 //    
-//    /**
-//     * Check if this is in the corner we want to build the firsts TOWER.
-//     * If my QUEEN starts left, it is the bottom left corner.
-//     * If my QUEEN starts right, it is the top right corner.
-//     * 
-//     * @param startingAllyQueenCoordinates
-//     * @return boolean
-//     */
+//    
 //    public boolean isInFirstsTowersBuildCorner(Coordinates startingAllyQueenCoordinates, Coordinates boardGameCenter) {
 //    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
 //		GameBoardQuarterEnum siteBoardGameQuarter = GameBoardUtils.getQuarterOfCoordinatesWithRespectToAnotherCoordinates(this.getCoordinates(), boardGameCenter);
@@ -633,34 +567,34 @@
 //
 //class Structure {
 //	
-//    // Gold left in a MINE (-1 if unknown or N/A)
+//    
 //    private int mineGold;
 //    
-//    // Maximum MINE gold production (-1 if unknown or N/A)
+//    
 //    private int maxMineProduction;
 //    
-//    // -1 : nothing is built
-//    // 0 : MINE
-//    // 1 : TOWER 
-//    // 2 : BARRACKS
+//    
+//    
+//    
+//    
 //    int structureTypeId;
 //    
-//    // -1 : nothing is built
-//    // 0 : ALLY structure
-//    // 1 : ENEMY structure
+//    
+//    
+//    
 //    int owner;
 //    
-//    // if nothing is built = -1
-//    // if MINE = current gold production (-1 if ENEMY MINE)
-//    // if TOWER = life points
-//    // if BARRACKS = turns left before TRAIN ending (0 if ready to TRAIN)
+//    
+//    
+//    
+//    
 //    int param1;
 //    
-//    // if nothing or a MINE is built = -1
-//    // if TOWER = range radius
-//    // if BARRACKS = 0 if it produces KNIGHT
-//    //            = 1 if it produces ARCHER
-//    //            = 2 if it produces GIANT
+//    
+//    
+//    
+//    
+//    
 //    int param2;
 //
 //	public Structure(int mineGold, int maxMineProduction, int structureType, int owner, int param1, int param2) {
@@ -731,14 +665,14 @@
 //	
 //	private Coordinates coordinates;
 //	
-//    // 0 : ally
-//    // 1 : enemy	
+//    
+//    
 //	private int owner;
 //	
-//	// -1 : QUEEN
-//	// 0 : KNIGHT
-//	// 1 : ARCHER
-//	// 2 : GIANT
+//	
+//	
+//	
+//	
 //	private int unitType;
 //	
 //	private int health;
@@ -786,12 +720,16 @@
 //		return this.speed;
 //	}
 //	
-//	public boolean canReachSiteBeforeUnit(Site site, Unit unit) {
+//	public boolean canReachSiteSomeTurnsBeforeUnit(Site site, Unit unit, double turnsNumber) {
+//		if (unit == null) {
+//			return true;
+//		}
+//		
 //		double distanceFromSite = MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), site.getCoordinates());
-//		double distanceFromSiteForUnit = MathUtils.getDistanceBetweenTwoCoordinates(unit.getCoordinates(), site.getCoordinates());
+//		double distanceFromUnit = MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), unit.getCoordinates());
 //		double timeToGo = distanceFromSite / this.getSpeed();
-//		double timeToGoForUnit = distanceFromSiteForUnit / unit.getSpeed();
-//		return timeToGo < timeToGoForUnit;
+//		double timeToGoForUnit = distanceFromUnit / unit.getSpeed();
+//		return timeToGoForUnit - timeToGo > turnsNumber;
 //	}
 // 
 //}
@@ -800,28 +738,24 @@
 //	
 //	private SitesUtils() {}
 //	
-//	/**
-//	 * Get the nearest Site of the input Site collection from the input Coordinates.
-//	 * 
-//	 * @param sites
-//	 * @param coordinates
-//	 * @return Site
-//	 */
+//	
 //    public static Site getNearestSiteFromCoordinates(Collection<Site> sites, Coordinates coordinates) {
 //        return sites
 //        		.stream()
 //        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
 //        		.orElse(null);
 //    }
+//    
+//    public static Site getNearestSiteToBuild(Collection<Site> sites, Unit allyQueen, Coordinates startingAllyQueenCoordinates,
+//    		Collection<Site> enemyTowers, Unit nearestEnemyKnight) {
+//        return sites
+//        		.stream()
+//        		.filter(site -> UnitsUtils.canAllyQueenReachSiteSafely(allyQueen, startingAllyQueenCoordinates, site, nearestEnemyKnight, enemyTowers, true))
+//        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueen.getCoordinates(), site.getCoordinates()))))
+//        		.orElse(null);
+//    }
 //        
-//    /**
-//     * Get the nearest Site that is towards the enemy camp and limited in Y.
-//     * 
-//     * @param sites
-//     * @param coordinates
-//     * @param startingAllyQueenCoordinates
-//     * @return Site
-//     */
+//    
 //    public static Site getNearestSiteFromCoordinatesInBandForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
 //        return sites
 //        		.stream()
@@ -830,19 +764,14 @@
 //        		.orElse(null);
 //    }
 //    
-//    /**
-//     * Get the nearest Site that is towards the enemy camp.
-//     * 
-//     * @param sites
-//     * @param coordinates
-//     * @param startingAllyQueenCoordinates
-//     * @return Site
-//     */
-//    public static Site getNearestSiteFromCoordinatesInForwardDirection(Collection<Site> sites, Coordinates coordinates, Coordinates startingAllyQueenCoordinates) {
+//    
+//    public static Site getNearestSiteToBuildInForwardDirection(Collection<Site> sites, Unit allyQueen, Coordinates startingAllyQueenCoordinates,
+//    		Unit nearestEnemyKnight, Collection<Site> enemyTowers) {
 //        return sites
 //        		.stream()
-//        		.filter(site -> site.isInForwardDirection(coordinates, startingAllyQueenCoordinates))
-//        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, site.getCoordinates()))))
+//        		.filter(site -> site.isInForwardDirection(allyQueen.getCoordinates(), startingAllyQueenCoordinates)
+//        				&& UnitsUtils.canAllyQueenReachSiteSafely(allyQueen, startingAllyQueenCoordinates, site, nearestEnemyKnight, enemyTowers, true))
+//        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueen.getCoordinates(), site.getCoordinates()))))
 //        		.orElse(null);
 //    }
 //	
@@ -851,16 +780,7 @@
 //		return MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, coordinates) <= REALLY_CLOSE;
 //	}
 //	
-//	/**
-//	 * Get the Sites that are on the path to go from allyQueenCoordinates to targetCoordinates.
-//	 * For each sites, check if the site is between allyQueenCoordinates to targetCoordinates
-//	 * and if the line between allyQueenCoordinates and targetCoordinates cross the site area.
-//	 * 
-//	 * @param allyQueenCoordinates
-//	 * @param targetCoordinates
-//	 * @param sites
-//	 * @return Collection<Site>
-//	 */
+//	
 //	public static Collection<Site> getSitesOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {		
 //		return sites
 //				.stream()
@@ -870,14 +790,7 @@
 //				.collect(Collectors.toList());
 //	}
 //	
-//	/**
-//	 * Get the closest Coordinates that in on the path to go from allyQueenCoordinates to targetCoordinates.
-//	 * 
-//	 * @param allyQueenCoordinates
-//	 * @param targetCoordinates
-//	 * @param sites
-//	 * @return Site
-//	 */
+//	
 //	public static Site getClosestSiteOnPath(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
 //		Collection<Site> sitesOnPath = getSitesOnPath(allyQueenCoordinates, targetCoordinates, sites);
 //		return getNearestSiteFromCoordinates(sitesOnPath, allyQueenCoordinates);
@@ -897,12 +810,7 @@
 //	
 //	private StructuresUtils() {}
 //    
-//	/**
-//	 * Get the sum of the gold production of each MINE of the input collection.
-//	 * 
-//	 * @param sites
-//	 * @return int
-//	 */
+//	
 //    public static int getGoldProduction(Collection<Site> sites) {
 //    	return sites
 //    			.stream()
@@ -919,13 +827,7 @@
 //    	return structure.getParam1() < structure.getMaxMineProduction();
 //    }
 //    
-//    /**
-//     * Check if the input Structure is a TOWER and has enough life points.
-//     * The life points considered as sufficient is defined in a constant.
-//     * 
-//     * @param structure
-//     * @return boolean
-//     */
+//    
 //    public static boolean isTowerLifeNotSufficient(Structure structure) {
 //    	if (!structure.isTower()) {
 //    		return false;
@@ -935,12 +837,7 @@
 //    	return structure.getParam1() < SUFFICIENT_TOWER_LIFE;
 //    }
 //    
-//    /**
-//     * Get the ally TOWER Sites that do not have enough life points.
-//     * 
-//     * @param allyTowerSites
-//     * @return
-//     */
+//    
 //    public static Collection<Site> getAllyTowerSitesWithNotSufficientLife(Collection<Site> allyTowerSites) {
 //    	return allyTowerSites
 //    			.stream()
@@ -948,26 +845,12 @@
 //    			.collect(Collectors.toList());
 //    }
 //    
-//    /**
-//     * Check if Coordinates can be reached by a certain number of towers.
-//     * 
-//     * @param coordinates
-//     * @param towerSites
-//     * @param towerNumberInRangeMax
-//     * @return boolean
-//     */
+//    
 //    public static boolean isCoordinatesInRangeOfTowers(Coordinates coordinates, Collection<Site> towerSites, int towerNumberInRangeMax) {
 //    	return getTowerSitesInRangeOfCoordinates(towerSites, coordinates).size() >= towerNumberInRangeMax;
 //    }
 //
-//    /**
-//     * Get the collection of TOWER Sites that can reach the input Coordinates.
-//     * A TOWER can reach a coordinates if the distance between the TOWER and the coordinates is less or equal to the TOWER range.
-//     * 
-//     * @param towerSites
-//     * @param coordinates
-//     * @return Collection<Site>
-//     */
+//    
 //	public static Collection<Site> getTowerSitesInRangeOfCoordinates(Collection<Site> towerSites, Coordinates coordinates) {
 //		return towerSites
 //				.stream()
@@ -975,37 +858,19 @@
 //    			.collect(Collectors.toList());
 //	}
 //	
-//	/**
-//	 * Get the nearest Site from the input Coordinates of the ally QUEEN in which a MINE can be built.
-//	 * remainingGoldBySiteId tells us if we know the remaining gold in Sites.
-//	 * 
-//	 * @param sites
-//	 * @param myQueenCoordinates
-//	 * @return Site
-//	 */
-//    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
+//	
+//    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Unit allyQueen, Coordinates startingAllyQueenCoordinates,
 //    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, 
-//    		Collection<Site> allyTowers, Collection<Site> enemyMines) {    	
+//    		Collection<Site> allyTowers, Collection<Site> enemyTowers, Collection<Site> enemyMines, Unit nearestEnemyKnight) {    	
 //        return sites
 //        		.stream()
-//        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers, enemyMines))
-//        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
+//        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers, enemyMines)
+//        				&& UnitsUtils.canAllyQueenReachSiteSafely(allyQueen, startingAllyQueenCoordinates, site, nearestEnemyKnight, enemyTowers, false))
+//        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueen.getCoordinates(), site.getCoordinates()))))
 //        		.orElse(null);
 //    }
 //    
-//    /**
-//	 * Get the nearest Site from the input Coordinates of the ally QUEEN in which a MINE can be built.
-//	 * Only Sites that are towards the enemy camp are considered.
-//	 * If there is no gold left in the Site, a MINE cannot be built.
-//	 * remainingGoldBySiteId tells us if we know the remaining gold in Sites.
-//	 *
-//     * @param sites
-//     * @param myQueenCoordinates
-//     * @param remainingGoldBySiteId
-//     * @param enemyKnightBarrackSites
-//     * @param startingAllyQueenCoordinates
-//     * @return Site
-//     */
+//    
 //    public static Site getNearestSiteFromCoordinatesToBuildAMineInBandForwardDirection(Collection<Site> sites, Coordinates myQueenCoordinates, 
 //    		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowers) { 
 //        return sites
@@ -1015,15 +880,7 @@
 //        		.orElse(null);
 //    }
 //    
-//    /**
-//     * Get the Site to BUILD the first TOWER.
-//     * It would be the one that is the closest to the middle and in the "safe" game board corner.
-//     * 
-//     * @param sites
-//     * @param allyQueenCoordinates
-//     * @param startingAllyQueenCoordinates
-//     * @return Site
-//     */
+//    
 //    public static Site getFirstSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
 //        return sites
 //        		.stream()
@@ -1032,14 +889,7 @@
 //        		.orElse(null);
 //    }
 //    
-//    /**
-//     * Get the nearest Site to BUILD a TOWER in the "safe" game board corner.
-//     * 
-//     * @param sites
-//     * @param allyQueenCoordinates
-//     * @param startingAllyQueenCoordinates
-//     * @return Site
-//     */
+//    
 //    public static Site getNearestSiteToBuildTowerInCorner(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
 //        return sites
 //        		.stream()
@@ -1048,12 +898,7 @@
 //        		.orElse(null);
 //    }
 //    
-//    /**
-//     * Get the Sites from the input BARRACKS Sites that are KNIGHT BARRACKS.
-//     * 
-//     * @param barracksSites
-//     * @return Collection<Site>
-//     */
+//    
 //    public static Collection<Site> getKnightBarracksSites(Collection<Site> barracksSites) {
 //    	return barracksSites
 //    			.stream()
@@ -1075,14 +920,7 @@
 //    			.collect(Collectors.toList());
 //    }
 //    
-//    /**
-//     * Check if there is a enemy KNIGHT BARRACKS that is dangerous for my QUEEN.
-//     * It means that my QUEEN should not be close (< SAFE_DISTANCE) to a training enemy KNIGHT BARRACKS.
-//     * 
-//     * @param allyQueenCoordinates
-//     * @param enemyKnightBarracksSites
-//     * @return boolean
-//     */
+//    
 //    public static boolean isEnemyKnightBarracksDangerous(Coordinates allyQueenCoordinates, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
 //    	Site nearestEnemyKnightBarracksSite = SitesUtils.getNearestSiteFromCoordinates(enemyKnightBarracksSites, allyQueenCoordinates);
 //    	final double safeDistance = StructuresUtils.getSafeDistanceWithRespectToKnightBarracks(nearestEnemyKnightBarracksSite);
@@ -1096,12 +934,7 @@
 //    	return isNearestEnemyKnightBarracksSiteInTraining && distanceFromNearestEnemyKnightBarracksSite < safeDistance;
 //    }
 //        
-//    /**
-//     * Get the first BARRACKS Site of the input Sites collection that can be TRAIN.
-//     * 
-//     * @param barracksSites
-//     * @return Site
-//     */
+//    
 //    public static Optional<Site> getBarracksSiteToTrain(Collection<Site> barracksSites) {
 //    	return barracksSites
 //    			.stream()
@@ -1109,14 +942,7 @@
 //    			.findFirst();
 //    }
 //    
-//    /**
-//     * Update a map that lists siteId by remaining gold at each turn.
-//     * At the first turn of the game, the map is empty.
-//     * Each time a Site is sufficiently close to show its gold content, the Site is added or updated.
-//     * 
-//     * @param remainingGoldBySiteId
-//     * @param sites
-//     */
+//    
 //    public static void updateRemaingGoldBySiteId(Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> sites) {	
 //    	sites
 //    	.stream()
@@ -1124,12 +950,7 @@
 //    	.forEach(site -> remainingGoldBySiteId.put(site.getId(), site.getStructure().getMineGold()));
 //    }
 //    
-//    /**
-//     * Get Sites that are empty, or a MINE or a not training BARRACKS.
-//     * 
-//     * @param sites
-//     * @return Collection<Site>
-//     */
+//    
 //    public static Collection<Site> getEmptyAndMineAndNotTrainingBarracks(Collection<Site> sites) {
 //    	return sites
 //    			.stream()
@@ -1138,12 +959,7 @@
 //    			.collect(Collectors.toList());
 //    }
 //    
-//    /**
-//     * Get Sites that are a MINE or a TOWER or a not training BARRACKS.
-//     * 
-//     * @param sites
-//     * @return Collection<Site>
-//     */
+//    
 //    public static Collection<Site> getMineAndNotTrainingBarracksAndTowerSites(Collection<Site> sites) {
 //    	return sites
 //    			.stream()
@@ -1155,40 +971,41 @@
 //    			.collect(Collectors.toList());
 //	}
 //    
-//    /**
-//     * Get the safest TOWER Site that is at left or right most location depending on startingAllyQueenCoordinates.
-//     * 
-//     * @param allyTowerSites
-//     * @param startingAllyQueenCoordinates
-//     * @return Site
-//     */
+//    
 //    public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates, Unit allyQueen, Unit nearestEnemyKnight) {
+//    	Collection<Site> reachableTowers = allyTowerSites
+//				.stream()
+//				.filter(site -> allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, 0))
+//				.collect(Collectors.toList());
+//    	
 //    	if (GameBoardUtils.isLeftSide(startingAllyQueenCoordinates)) {
-//    		return allyTowerSites
-//    				.stream()
-//    				.filter(site -> allyQueen.canReachSiteBeforeUnit(site, nearestEnemyKnight))
-//    				.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
-//    				.orElse(null);    		
+//    		if (!reachableTowers.isEmpty()) {
+//    			return reachableTowers
+//    					.stream()
+//    					.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+//    					.orElse(null);    		    			
+//    		} else {
+//    			return allyTowerSites
+//    					.stream()
+//    					.collect(Collectors.minBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+//    					.orElse(null); 
+//			}
 //    	} else {
-//    		return allyTowerSites
-//    				.stream()
-//    				.filter(site -> allyQueen.canReachSiteBeforeUnit(site, nearestEnemyKnight))
-//    				.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
-//    				.orElse(null);    
+//    		if (!reachableTowers.isEmpty()) {
+//    			return reachableTowers
+//    					.stream()
+//        				.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+//    					.orElse(null);    		    			
+//    		} else {
+//    			return allyTowerSites
+//    					.stream()
+//    					.collect(Collectors.maxBy(Comparator.comparingInt(site -> site.getCoordinates().getX())))
+//    					.orElse(SitesUtils.getNearestSiteFromCoordinates(allyTowerSites, allyQueen.getCoordinates()));    		    			
+//    		}
 //    	}
 //    }
 //    
-//    /**
-//     * Get a Coordinates to hide from enemies behind a TOWER.
-//     * Choose the coordinates on the input TOWER Site circle that is opposite to the nearest enemy KNIGHT.
-//     * 
-//     * If there is no enemy, get the Coordinates that is just at the left side (or right side depending on startingAllyQueenCoordinates) of the input TOWER Site.
-//     * 
-//     * @param nearestEnemyKnight
-//     * @param towerSite
-//     * @param startingAllyQueenCoordinates
-//     * @return Coordinates
-//     */
+//    
 //    public static Coordinates getCoordinatesBehindTowerOppositeToNearestEnemyKnight(Unit nearestEnemyKnight, Site towerSite, Coordinates startingAllyQueenCoordinates) {	
 //    	if (towerSite == null) {
 //    		return null;
@@ -1217,13 +1034,7 @@
 //    	
 //    }
 //    
-//    /**
-//     * Evaluate a safe distance with a KNIGHT BARRACKS.
-//     * It depends on the turns that left to finish a TRAIN and on an arbitrary safe distance.
-//     * 
-//     * @param knightBarracksSite
-//     * @return int
-//     */
+//    
 //    public static int getSafeDistanceWithRespectToKnightBarracks(Site knightBarracksSite) {
 //    	final int TRAINING_KNIGHT_TURNS_NUMBER = 5;
 //    	final int SAFE_DISTANCE_PER_REMAINING_TURN = 100;
@@ -1240,14 +1051,7 @@
 //    	}
 //    }
 //    
-//    /**
-//     * Get TOWER on which we consider something else could be built.
-//     * We consider a TOWER as obsolete if there are 3 or more other TOWER in front of it.
-//     * 
-//     * @param allyTowers
-//     * @param startingAllyQueenCoordinates
-//     * @return Collection<Site>
-//     */
+//    
 //    public static Collection<Site> getObsoleteAllyTowers(Collection<Site> allyTowers, Coordinates startingAllyQueenCoordinates, Collection<Site> enemyMines) {
 //    	if (enemyMines.isEmpty()) {
 //    		return allyTowers;
@@ -1263,14 +1067,7 @@
 //    			.collect(Collectors.toList());
 //    }
 //    
-//    /**
-//     * Get TOWER in front of coordinates.
-//     * 
-//     * @param towers
-//     * @param coordinates
-//     * @param isStartingLeftSide
-//     * @return Collection<Site>
-//     */
+//    
 //    public static Collection<Site> getTowerSitesInFrontOfCoordinates(Collection<Site> towers, Coordinates coordinates, boolean isStartingLeftSide) {	
 //    	return towers
 //    			.stream()
@@ -1279,13 +1076,7 @@
 //    			.collect(Collectors.toList());
 //    }
 //    
-//    /**
-//     * Check if enemyKnightBarracksSite can be reach by the QUEEN before ending TRAIN.
-//     * 
-//     * @param enemyKnightBarracksSite
-//     * @param allyQueenCoordinates
-//     * @return boolean
-//     */
+//    
 //    public static boolean isEnemyKnightBarracksReachable(Site enemyKnightBarracksSite, Coordinates allyQueenCoordinates) {
 //    	final int QUEEN_SPEED = 60;
 //    	final int TRAINING_KNIGHT_TURNS = 5;
@@ -1303,20 +1094,7 @@
 //		
 //	private TurnStrategyUtils() {}
 //	
-//	/**
-//     * Check if we have to MOVE to a safe place. Depends on :
-//     *	- ally QUEEN health 
-//     *	- ally QUEEN coordinates
-//     *	- number of enemy KNIGHT
-//     *
-//	 * @param queenHealth
-//	 * @param allyQueenCoordinates
-//	 * @param enemyUnitsByType
-//	 * @param enemyTowerSites
-//	 * @param emptySitesNumber
-//	 * @param enemyKnightsNumber
-//	 * @return
-//	 */
+//	
 //	public static boolean isRunAwayStrategyOk(int queenHealth, Coordinates allyQueenCoordinates,
 //			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites,
 //			int emptySitesNumber, int enemyKnightsNumber, int safeDistance, 
@@ -1327,17 +1105,7 @@
 //				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;
 //	}
 //	
-//	/**
-//	 * Check if it is possible to BUILD a TOWER when running away.
-//	 * If an enemy GIANT is too close, do not BUILD a TOWER.
-//	 * If nearestSiteToBuildATower is not so far, do it.
-//	 * The distance "not so far" is defined by constants.
-//	 * 
-//	 * @param allyQueenCoordinates
-//	 * @param nearestSiteToBuildATower
-//	 * @param enemyGiants
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isBuildTowerWhenRunningAwayStrategyOk(Coordinates allyQueenCoordinates, Coordinates safestCoordinates,
 //			Site nearestSiteToBuildATower, Collection<Unit> enemyGiants) {
 //		if (nearestSiteToBuildATower == null
@@ -1366,23 +1134,7 @@
 //		return false;
 //	}
 //	
-//	/**
-//	 * Check if we choose to BUILD a MINE. Depends on :
-//	 *	- ally QUEEN health
-//     *	- current gold production
-//     *	- gold production we want
-//     *	- nearest empty Site where a MINE can be built (gold not depleted)
-//     *	- enemy UNIT location (because enemy KNIGHT destroy MINE)
-//     *	- enemy TOWER location
-//     *
-//	 * @param queenHealth
-//	 * @param targetedSiteToBuildAMine
-//	 * @param allyMineSites
-//	 * @param goldProductionIWant
-//	 * @param enemyUnitsByType
-//	 * @param enemyTowerSites
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isMineMoveOrBuildStrategyOk(int queenHealth, Site targetedSiteToBuildAMine, Collection<Site> allyMineSites, 
 //			int goldProductionIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
 //			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
@@ -1392,30 +1144,14 @@
 //		}
 //		
 //		if (queenHealth >= LOW_HEALTH_QUEEN) {
-//			return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, safeDistance)
+//			return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, 200)
 //					&& !StructuresUtils.isCoordinatesInRangeOfTowers(targetedSiteToBuildAMine.getCoordinates(), enemyTowerSites, 2);			
 //		} else {
 //			return GameBoardUtils.isItSafeAtCoordinates(targetedSiteToBuildAMine.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //
-//	/**
-//	 * Check if we choose to BUILD a TOWER. Depends on :
-//	 *	- ally QUEEN health
-//     *	- ally TOWER number
-//     *	- number of TOWER we want
-//     *	- nearest empty Site
-//     *	- enemy UNIT location
-//     *	- enemy TOWER location
-//     *
-//	 * @param queenHealth
-//	 * @param nearestEmptySite
-//	 * @param allyTowersNumber
-//	 * @param allyTowersNumberIWant
-//	 * @param enemyUnitsByType
-//	 * @param enemyTowerSites
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isTowerMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int allyTowersNumber,
 //			int allyTowersNumberIWant, Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, 
 //			int safeDistance, Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
@@ -1442,27 +1178,14 @@
 //		}
 //		
 //		if (queenHealth >= LOW_HEALTH_QUEEN) {
-//			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2);			
+//			return !StructuresUtils.isCoordinatesInRangeOfTowers(nearestSite.getCoordinates(), enemyTowerSites, 2)
+//					&& enemyUnitsByType.get(UnitEnum.KNIGHT).size() < 2;			
 //		} else {
 //			return GameBoardUtils.isItSafeAtCoordinates(nearestSite.getCoordinates(), enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines);
 //		}
 //	}
 //
-//	/**
-//	 * Check if we choose to BUILD a KNIGHT BARRACKS. Depends on :
-//	 *	- ally QUEEN health
-//     *	- nearest Site
-//     *	- ally KNIGHT BARRACKS Sites
-//     *	- enemy UNIT location
-//     *	- enemy TOWER location
-//     *
-//	 * @param queenHealth
-//	 * @param nearestSite
-//	 * @param allyBarracksSites
-//	 * @param enemyUnitsByType
-//	 * @param enemyTowerSites
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isKnightBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestSite, Collection<Site> allyBarracksSites, 
 //			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites, int safeDistance, 
 //			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
@@ -1478,24 +1201,7 @@
 //		}
 //	}
 //	
-//	/**
-//	 * Check if we choose to BUILD a GIANT BARRACKS. Depends on :
-//	 *	- ally QUEEN health
-//     *	- nearest empty Site
-//     *	- enemy TOWER number -> there is a threshold
-//     *	- ally GIANT BARRACKS Sites
-//     *	- enemy UNIT location
-//     *	- enemy TOWER location
-//	 * 
-//	 * @param queenHealth
-//	 * @param nearestEmptySite
-//	 * @param enemyTowersNumber
-//	 * @param allyGiantBarracksSites
-//	 * @param enemyUnitsByType
-//	 * @param enemyTowerSites
-//	 * @param enemyTowersNumberThreshold
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isGiantBarracksMoveOrBuildStrategyOk(int queenHealth, Site nearestEmptySite, int enemyTowersNumber,
 //			Collection<Site> allyGiantBarracksSites, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
 //			Collection<Site> enemyTowerSites, int enemyTowersNumberThreshold, int safeDistance, 
@@ -1516,19 +1222,7 @@
 //		}
 //	}
 //	
-//	/**
-//	 * We have to train a GIANT if :
-//	 * 	- there are more enemy TOWER than a given threshold or there is an enemy TOWER and we produce enough gold
-//	 * 	- there is less than 2 ally GIANT
-//	 * 	- there is at least 1 ally GIANT BARRACKS
-//	 * 
-//	 * @param enemyTowersNumber
-//	 * @param enemyTowersNumberThreshold
-//	 * @param allyMineSites
-//	 * @param allyGiants
-//	 * @param allyGiantBarracksSites
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isGiantTrainStrategyOk(int enemyTowersNumber, int enemyTowersNumberThreshold,
 //			Collection<Site> allyMineSites, Collection<Unit> allyGiants, Collection<Site> allyGiantBarracksSites) {
 //		return (enemyTowersNumber > enemyTowersNumberThreshold ||
@@ -1545,24 +1239,12 @@
 //	private final static int X_LENGTH = 1920;
 //	private final static int Y_LENGTH = 1000;
 //	
-//	/**
-//	 * Check if the input Coordinates in the left half side of the game board area.
-//	 * 
-//	 * @param coordinates
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isLeftSide(Coordinates coordinates) {
 //		return coordinates.getX() < X_LENGTH/2;
 //	}
 //	
-//	/**
-//	 * Get the Coordinates evaluated to be the safest regarding my starting ally QUEEN Coordinates, the ally TOWER and the enemy KNIGHT.
-//	 * 
-//	 * @param startingAllyQueenCoordinates
-//	 * @param allyTowerSites
-//	 * @param allySites
-//	 * @return Coordinates
-//	 */
+//	
 //	public static Coordinates getSafestCoordinates(Coordinates startingAllyQueenCoordinates, Collection<Site> allyTowerSites, 
 //			Collection<Unit> enemyKnights, Coordinates allyQueenCoordinates, Unit allyQueen) {
 //		Coordinates safestCoordinates;
@@ -1578,14 +1260,7 @@
 //    	return safestCoordinates;
 //	}
 //	
-//	/**
-//	 * Get the Coordinates evaluated to be the safest regarding the starting ally QUEEN Coordinates.
-//	 * If we start at left side, the safest Coordinates is the bottom left corner.
-//	 * If we start at right side, the safest Coordinates is the top right corner.
-//	 * 
-//	 * @param startingAllyQueenCoordinates
-//	 * @return Coordinates
-//	 */
+//	
 //	public static Coordinates getSafestCoordinatesFromStartingAllyQueen(Coordinates startingAllyQueenCoordinates) {
 //		if (isLeftSide(startingAllyQueenCoordinates)) {
 //			return new Coordinates(0, Y_LENGTH);
@@ -1594,15 +1269,7 @@
 //		}
 //	}
 //	
-//	/**
-//	 * Check if the input Coordinates is considered as safe.
-//	 * It depends on enemy KNIGHT, enemy TOWER and KNIGHT BARRACKS.
-//	 * 
-//	 * @param coordinates
-//	 * @param enemyUnitsByType
-//	 * @param enemyTowerSites
-//	 * @return boolean
-//	 */
+//	
 //    public static boolean isItSafeAtCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, 
 //    		Collection<Site> enemyTowerSites, int safeDistance, Collection<Site> enemyKnightBarracksSites,Collection<Site> enemyMines) {
 //    	return UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(coordinates, enemyUnitsByType, safeDistance)
@@ -1610,16 +1277,7 @@
 //    			&& !StructuresUtils.isEnemyKnightBarracksDangerous(coordinates, enemyKnightBarracksSites, enemyMines);
 //    }
 //    
-//    /**
-//     * a is the Coordinates to evaluate.
-//     * b is the Coordinates to go.
-//     * c is the QUEEN Coordinates.
-//     * 
-//     * @param a
-//     * @param b
-//     * @param c
-//     * @return boolean
-//     */
+//    
 //    public static boolean isCoordinatesOnTheWayOfTrajectoryBetweenTwoCoordinates(Coordinates a, Coordinates b, Coordinates c) {
 //    	int xa = a.getX();
 //    	int ya = a.getY();
@@ -1646,13 +1304,7 @@
 //    	}
 //    }
 //    
-//    /**
-//     * Says in which cardinal corner is the coordinates with respect to the referenceCoordinates.
-//     * 
-//     * @param coordinates
-//     * @param referenceCoordinates
-//     * @return GameBoardQuarterEnum
-//     */
+//    
 //    public static GameBoardQuarterEnum getQuarterOfCoordinatesWithRespectToAnotherCoordinates(Coordinates coordinates, Coordinates referenceCoordinates) {
 //    	int xCoordinate = coordinates.getX();  
 //    	int yCoordinate = coordinates.getY();
@@ -1669,14 +1321,7 @@
 //    	}
 //    }
 //    
-//    /**
-//     * Find the best Coordinates that avoid a direct collision with the input siteToAvoid.
-//     * 
-//     * @param allyQueenCoordinates
-//     * @param targetCoordinates
-//     * @param siteToAvoid
-//     * @return Coordinates
-//     */
+//    
 //    public static Coordinates getCoordinatesToAvoidCollisionWithSite(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Site siteToAvoid) {
 //    	Coordinates siteCoordinates = siteToAvoid.getCoordinates();
 //    	Coordinates closestCoordinatesOfMoveSegmentFromSiteCenter = MathUtils.getClosestCoordinatesOfLineFromPoint(allyQueenCoordinates, targetCoordinates, siteCoordinates);
@@ -1687,16 +1332,7 @@
 //        		.orElse(null);
 //    }
 //    
-//    /**
-//     * Find the best Coordinates on the path to go from allyQueenCoordinates to targetCoordinates that avoid direct collisions with Sites :
-//     * 	- find the closest Site that is on the path (if any, go straight forward)
-//     * 	- then evaluate the Coordinates to go
-//     * 
-//     * @param allyQueenCoordinates
-//     * @param targetCoordinates
-//     * @param sites
-//     * @return Coordinates
-//     */
+//    
 //    public static Coordinates getTargetCoordinatesAvoidingSitesCollisions(Coordinates allyQueenCoordinates, Coordinates targetCoordinates, Collection<Site> sites) {
 //    	System.err.println("Coordinates we want to go : (" + targetCoordinates.getX() + ", " + targetCoordinates.getY() + ")");
 //    	
@@ -1717,38 +1353,22 @@
 //
 //final class UnitsUtils {
 //	
+//	private static final int LOW_HEALTH_QUEEN = 20;
+//	private static final int MID_HEALTH_QUEEN = 40;
+//	
 //	private UnitsUtils() {}
 //	
-//	/**
-//	 * Get the QUEEN from the input map that provides a list of the Unit for each unit type.
-//	 * The list of QUEEN must be of size 1 because the input map must be for only one player.
-//	 * 
-//	 * @param unitsByType
-//	 * @return Unit
-//	 */
+//	
 //	public static Unit getQueen(Map<UnitEnum, List<Unit>> unitsByType) {		
 //		return unitsByType.get(UnitEnum.QUEEN).get(0);
 //	}
 //	
-//	/**
-//	 * Check if the Coordinates is considered as safe regarding enemy KNIGHT.
-//	 * Safe distance is defined in a constant.
-//	 * 
-//	 * @param coordinates
-//	 * @param enemyUnitsByType
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isItSafeAtCoordinatesRegardingEnemyKnights(Coordinates coordinates, Map<UnitEnum, List<Unit>> enemyUnitsByType, int safeDistance) {
 //		return UnitsUtils.getDistanceBetweenNearestKnightAndCoordinates(coordinates, enemyUnitsByType) > safeDistance;
 //	}
 //	
-//	/**
-//	 * Get the distance between the input Coordinates and the nearest KNIGHT form the input map.
-//	 * 
-//	 * @param coordinates
-//	 * @param unitsByType
-//	 * @return double
-//	 */
+//	
 //	public static double getDistanceBetweenNearestKnightAndCoordinates(Coordinates coordinates, Map<UnitEnum, List<Unit>> unitsByType) {
 //		List<Unit> knights = unitsByType.get(UnitEnum.KNIGHT);
 //		Unit nearestKnight = getNearestUnit(coordinates, knights);
@@ -1762,18 +1382,22 @@
 //				.orElse(null);
 //	}
 //	
-//	/**
-//	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
-//	 * 
-//	 * @param giants
-//	 * @param coordinates
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isGiantCloseToCoordinates(Collection<Unit> giants, Coordinates coordinates) {
 //		final int GIANT_SAFE_ZONE = 200;
 //		return giants
 //				.stream()
 //				.anyMatch(giant -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, giant.getCoordinates()) <= GIANT_SAFE_ZONE);
+//	}
+//	
+//	public static boolean canAllyQueenReachSiteSafely(Unit allyQueen, Coordinates startingAllyQueenCoordinates, Site site, 
+//			Unit nearestEnemyKnight, Collection<Site> enemyTowers, boolean isNotMineBuild) {
+//		return !site.isInForwardDirection(allyQueen.getCoordinates(), startingAllyQueenCoordinates)
+//				|| (allyQueen.getHealth() < LOW_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 1)
+//				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? 0 : 8))
+//				|| (allyQueen.getHealth() < MID_HEALTH_QUEEN && allyQueen.getHealth() >= LOW_HEALTH_QUEEN 
+//				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? -1 : 1.5))
+//				|| (allyQueen.getHealth() >= MID_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 2));
 //	}
 //	
 //}
@@ -1782,13 +1406,7 @@
 //	
 //	private InputUtils() {}
 //	
-//	/**
-//	 * Initialize the Sites at the start of the game thanks to input.
-//	 * 
-//	 * @param in
-//	 * @param numSites
-//	 * @return Map<Integer, Site>
-//	 */
+//	
 //	public static Map<Integer, Site> getSitesFromInitialInput(Scanner in, int numSites) {		
 //		Map<Integer, Site> sitesById = new HashMap<>();
 //        Coordinates coordinates;
@@ -1807,14 +1425,7 @@
 //        return sitesById;
 //	}
 //	
-//	/**
-//	 * Update the Sites of the game start thanks to turn input. Launched at the beginning of each turn.
-//	 * It classify the Sites by Site ID, Structure types and Owner.
-//	 * 
-//	 * @param in
-//	 * @param sitesById
-//	 * @return Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>>
-//	 */
+//	
 //	public static Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> updateSitesFromTurnInput(Scanner in, Map<Integer, Site> sitesById) {
 //		Map<OwnerEnum, Map<StructureEnum, Map<Integer, Site>>> sitesByIdAndStructureAndOwner = new HashMap<>();
 //		
@@ -1880,14 +1491,7 @@
 //		return sitesByIdAndStructureAndOwner;
 //	}
 //	
-//	/**
-//	 * Get all the Units thanks to turn input. Launched at the beginning of each turn.
-//	 * It classify the Units by Unit type and Owner.
-//	 * 
-//	 * @param in
-//	 * @param numUnits
-//	 * @return Map<OwnerEnum, Map<UnitEnum, List<Unit>>>
-//	 */
+//	
 //	public static Map<OwnerEnum, Map<UnitEnum, List<Unit>>> getUnitsByTypeAndOwnerFromTurnInput(Scanner in, int numUnits) {
 //		Map<OwnerEnum, Map<UnitEnum, List<Unit>>> unitsByTypeAndOwner = new HashMap<>();
 //		
@@ -1967,14 +1571,7 @@
 //		return Math.sqrt(Math.pow(xa - xb, 2) + Math.pow(ya - yb, 2));
 //	}
 //	
-//	/**
-//	 * Calculate the distance between the input point and the closest point of the line drawn by firstLinePoint and secondLinePoint.
-//	 * 
-//	 * @param firstLinePoint
-//	 * @param secondLinePoint
-//	 * @param point
-//	 * @return double
-//	 */
+//	
 //	public static double getDistanceBetweenLineAndPoint(Coordinates firstLinePoint, Coordinates secondLinePoint, Coordinates point) {
 //		int xFirstLinePoint = firstLinePoint.getX();
 //		int yFirstLinePoint = firstLinePoint.getY();
@@ -1986,15 +1583,7 @@
 //		return Math.abs(((xSecondLinePoint - xFirstLinePoint)*(yFirstLinePoint - yPoint)) - ((xFirstLinePoint - xPoint)*(ySecondLinePoint - yFirstLinePoint))) / distanceBetweenTheTwoLinePoints;
 //	}
 //	
-//	/**
-//	 * Check if the line between firstLinePoint and secondLinePoint crosses the input circle.
-//	 * 
-//	 * @param firstLinePoint
-//	 * @param secondLinePoint
-//	 * @param circleCenter
-//	 * @param circleRadius
-//	 * @return boolean
-//	 */
+//	
 //	public static boolean isLineCrossingCircle(Coordinates firstLinePoint, Coordinates secondLinePoint, Coordinates circleCenter, int circleRadius) {
 //		double distanceBetweenLineAndCircleCenter = getDistanceBetweenLineAndPoint(firstLinePoint, secondLinePoint, circleCenter);
 //		if (distanceBetweenLineAndCircleCenter >= circleRadius) {
@@ -2004,14 +1593,7 @@
 //		}
 //	}
 //	
-//	/**
-//	 * Get the closest Coordinates from p of the line drawn by a and b.
-//	 * 
-//	 * @param a
-//	 * @param b
-//	 * @param p
-//	 * @return Coordinates
-//	 */
+//	
 //	public static Coordinates getClosestCoordinatesOfLineFromPoint(Coordinates a, Coordinates b, Coordinates p) {
 //		int xa = a.getX();
 //		int ya = a.getY();
@@ -2030,16 +1612,7 @@
 //	    return new Coordinates(xCoordinate, yCoordinate);
 //	}
 //	
-//	/**
-//	 * Get the two Coordinates of the line drawn by firstLinePoint and secondLinePoint that crosses the input circle.
-//	 * It calls a method that I copy and that uses Point2D. I thus convert Point2D into Coordinates.
-//	 * 
-//	 * @param firstLinePoint
-//	 * @param secondLinePoint
-//	 * @param circleCenter
-//	 * @param circleRadius
-//	 * @return List<Coordinates>
-//	 */
+//	
 //	public static List<Coordinates> getIntersectionsOfLineWithCircle(Coordinates firstLinePoint, Coordinates secondLinePoint, Coordinates circleCenter, int circleRadius) {
 //		List<Coordinates> intersections = new ArrayList<>();
 //		Point2D firstLinePoint2D = new Point2D.Double(firstLinePoint.getX(), firstLinePoint.getY());
@@ -2057,22 +1630,7 @@
 //		return intersections;
 //	}
 //
-//	/**
-//     * If center of the circle is at the origin and the line is horizontal,
-//     * it's easy to calculate the points of intersection, so to handle the
-//     * general case, we convert the input to a coordinate system where the
-//     * center of the circle is at the origin and the line is horizontal,
-//     * then convert the points of intersection back to the original
-//     * coordinate system.
-//     *
-//	 * @param p1
-//	 * @param p2
-//	 * @param center
-//	 * @param radius
-//	 * @param isSegment
-//	 * @return
-//	 * @throws NoninvertibleTransformException
-//	 */
+//	
 //    public static List<Point2D> intersection(Point2D p1, Point2D p2, Point2D center,
 //            double radius, boolean isSegment) throws NoninvertibleTransformException {
 //        List<Point2D> result = new ArrayList<>();
@@ -2113,14 +1671,7 @@
 //	
 //	private PrintUtils() {}
 //	
-//	/**
-//	 * Print a BUILD action thanks to a Site ID, a Structure type 
-//	 * and eventually a Unit type (for BARRACKS Structure).
-//	 * 
-//	 * @param siteId
-//	 * @param structureType
-//	 * @param unitType
-//	 */
+//	
 //	public static void printBuildAction(int siteId, StructureEnum structureType, UnitEnum unitType) {
 //		StringBuilder sb = new StringBuilder();
 //		sb.append("BUILD");
@@ -2137,11 +1688,7 @@
 //		System.out.println(sb.toString());
 //	}
 //	
-//	/**
-//	 * Print a MOVE action thanks to input Coordinates.
-//	 * 
-//	 * @param coordinates
-//	 */
+//	
 //	public static void printMoveAction(Coordinates coordinates) {
 //		StringBuilder sb = new StringBuilder();
 //		sb.append("MOVE");
@@ -2153,12 +1700,7 @@
 //		System.out.println(sb.toString());
 //	}
 //	
-//	/**
-//	 * Print a TRAIN action thanks to input Site ID.
-//	 * If we do not want to TRAIN a Site, the input must be equal to -1;
-//	 * 
-//	 * @param siteId
-//	 */
+//	
 //	public static void printTrainAction(int siteId) {
 //		StringBuilder sb = new StringBuilder();
 //		sb.append("TRAIN");

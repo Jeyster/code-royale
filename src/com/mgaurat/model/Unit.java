@@ -69,16 +69,16 @@ public class Unit {
 		return this.speed;
 	}
 	
-	public boolean canReachSiteBeforeUnit(Site site, Unit unit) {
+	public boolean canReachSiteSomeTurnsBeforeUnit(Site site, Unit unit, double turnsNumber) {
 		if (unit == null) {
 			return true;
 		}
 		
 		double distanceFromSite = MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), site.getCoordinates());
-		double distanceFromSiteForUnit = MathUtils.getDistanceBetweenTwoCoordinates(unit.getCoordinates(), site.getCoordinates());
+		double distanceFromUnit = MathUtils.getDistanceBetweenTwoCoordinates(this.getCoordinates(), unit.getCoordinates());
 		double timeToGo = distanceFromSite / this.getSpeed();
-		double timeToGoForUnit = distanceFromSiteForUnit / unit.getSpeed();
-		return timeToGo < timeToGoForUnit;
+		double timeToGoForUnit = distanceFromUnit / unit.getSpeed();
+		return timeToGoForUnit - timeToGo > turnsNumber;
 	}
  
 }

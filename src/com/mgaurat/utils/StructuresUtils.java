@@ -110,13 +110,14 @@ public final class StructuresUtils {
 	 * @param myQueenCoordinates
 	 * @return Site
 	 */
-    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Coordinates myQueenCoordinates, 
+    public static Site getNearestSiteFromCoordinatesToBuildAMine(Collection<Site> sites, Unit allyQueen, Coordinates startingAllyQueenCoordinates,
     		Map<Integer, Integer> remainingGoldBySiteId, Collection<Site> enemyKnightBarrackSites, 
-    		Collection<Site> allyTowers, Collection<Site> enemyMines) {    	
+    		Collection<Site> allyTowers, Collection<Site> enemyTowers, Collection<Site> enemyMines, Unit nearestEnemyKnight) {    	
         return sites
         		.stream()
-        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers, enemyMines))
-        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(myQueenCoordinates, site.getCoordinates()))))
+        		.filter(site -> site.isAllowedToBuildMine(enemyKnightBarrackSites, remainingGoldBySiteId.get(site.getId()), allyTowers, enemyMines)
+        				&& UnitsUtils.canAllyQueenReachSiteSafely(allyQueen, startingAllyQueenCoordinates, site, nearestEnemyKnight, enemyTowers, false))
+        		.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueen.getCoordinates(), site.getCoordinates()))))
         		.orElse(null);
     }
     
@@ -292,7 +293,7 @@ public final class StructuresUtils {
     public static Site getSafestTower(Collection<Site> allyTowerSites, Coordinates startingAllyQueenCoordinates, Unit allyQueen, Unit nearestEnemyKnight) {
     	Collection<Site> reachableTowers = allyTowerSites
 				.stream()
-				.filter(site -> allyQueen.canReachSiteBeforeUnit(site, nearestEnemyKnight))
+				.filter(site -> allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, 0))
 				.collect(Collectors.toList());
     	
     	if (GameBoardUtils.isLeftSide(startingAllyQueenCoordinates)) {
