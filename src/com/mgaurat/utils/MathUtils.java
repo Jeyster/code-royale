@@ -168,4 +168,8 @@ public final class MathUtils {
         }
         return result;
     }
+    
+    public static Coordinates galileanTransformation(Coordinates coordinatesInRefA, Coordinates coordinatesRefBInRefA) {
+    	return new Coordinates(coordinatesInRefA.getX() - coordinatesRefBInRefA.getX(), coordinatesInRefA.getY() - coordinatesRefBInRefA.getY());
+    }
 }

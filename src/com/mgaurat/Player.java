@@ -41,8 +41,10 @@ class Player {
 	private static boolean isFirstMinesBuild = false;
 	private static boolean isFirstKnightBarracksBuilt = false;
 	private static int towersBuilt = 0;
-	private static Site secondMineToBuild = null;
-	private static Site firstKnightBarracksToBuild = null;
+	private static Site secondMine = null;
+	private static Site firstKnightBarracks = null;
+	private static Site firstTower = null;
+	private static Site secondTower = null;
 	
     // Constants
     private static final int MIN_ALLY_TOWERS_NUMBER = 3;
@@ -145,12 +147,12 @@ class Player {
             	startingAllyQueenCoordinates = allyQueenCoordinates;
             }
             
-            int minAllyFirstMines;
-            if (startingQueenHealth > 40) {
-            	minAllyFirstMines = 2;
-            } else {
-            	minAllyFirstMines = 1;
-            }
+//            int minAllyFirstMines;
+//            if (startingQueenHealth > 40) {
+            int	minAllyFirstMines = 2;
+//            } else {
+//            	minAllyFirstMines = 1;
+//            }
             
             if (!isFirstMinesBuild) {
             	isFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;
@@ -168,20 +170,19 @@ class Player {
             	nearestSite = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
             	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMineInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, startingAllyQueenCoordinates, allyTowerSites);
             } else {
-            	if (towersBuilt == 0) {
-            		if (startingQueenHealth > 50) {
-            			nearestSite = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
-            		} else if (startingQueenHealth > 40) {
-                    	nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
-            		} else {
-                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+            	if (isFirstKnightBarracksBuilt && towersBuilt == 0) {
+            		System.err.println("First tower");
+            		if (firstTower == null) {
+            			firstTower = StructuresUtils.getPerfectSiteForFirstTower(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
             		}
-            	} else if (towersBuilt <= 3) {
-            		if (startingQueenHealth > 40) {
-            			nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
-            		} else {
-                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+            		nearestSite = firstTower;
+            	} else if (towersBuilt == 1) {
+            		System.err.println("Second tower");
+
+            		if (secondTower == null) {
+            			secondTower = StructuresUtils.getPerfectSiteForSecondTower(emptySites, firstTower, startingAllyQueenCoordinates);
             		}
+            		nearestSite = secondTower;
             	} else {
             		nearestSite = SitesUtils.getNearestSiteToBuild(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
             	}
@@ -195,19 +196,12 @@ class Player {
             Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteToBuild(allyMineAndNotTrainingBarracksAndTowerSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
             Site nearestSiteToBuildATowerWhenRunningAway;
         	if (isFirstKnightBarracksBuilt && towersBuilt == 0) {
-        		if (startingQueenHealth > 50) {
-        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
-        		} else if (startingQueenHealth > 40) {
-                	nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
-        		} else {
-                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+        		if (firstTower == null) {
+        			firstTower = StructuresUtils.getPerfectSiteForFirstTower(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
         		}
+        		nearestSiteToBuildATowerWhenRunningAway = firstTower;
         	} else if (isFirstKnightBarracksBuilt && towersBuilt <= 3) {
-        		if (startingQueenHealth > 40) {
-        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
-        		} else {
-                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
-        		}
+                nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
         	} else {
                 nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteToBuild(emptyAndMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
         	}
@@ -215,17 +209,17 @@ class Player {
             /* --- Calculate coordinates to go for the second MINE built --- */
             Coordinates coordinatesForSecondBuild = null;
             if (minAllyFirstMines == 2 && isFirstBuildDone && !isFirstMinesBuild) {
-            	if (secondMineToBuild == null) {
-            		secondMineToBuild = nearestSiteToBuildAMine;            		
+            	if (secondMine == null) {
+            		secondMine = nearestSiteToBuildAMine;            		
             	}
-            	if (firstKnightBarracksToBuild == null) {
+            	if (firstKnightBarracks == null) {
             		Collection<Site> sites = emptyAndEnemyMineAndNotInTraingBarracksSites
             				.stream()
-            				.filter(site -> site.getId() != secondMineToBuild.getId())
+            				.filter(site -> site.getId() != secondMine.getId())
             				.collect(Collectors.toList());
-            		firstKnightBarracksToBuild = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(sites, secondMineToBuild.getCoordinates(), startingAllyQueenCoordinates);            		
+            		firstKnightBarracks = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(sites, secondMine.getCoordinates(), startingAllyQueenCoordinates);            		
             	}
-            	coordinatesForSecondBuild = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, firstKnightBarracksToBuild.getCoordinates(), allSites);
+            	coordinatesForSecondBuild = GameBoardUtils.getTargetCoordinatesAvoidingSitesCollisions(allyQueenCoordinates, firstKnightBarracks.getCoordinates(), allSites);
             }
             
             /* --- Booleans that could be use to choose what to do during this turn --- */

@@ -173,5 +173,16 @@ public class Site {
     	
     	return output;
     }
+    
+    public boolean isGoodAngleToBuildFirstTower(Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+    	final int X_LENGTH = 1920;
+    	final int Y_LENGTH = 1000;
+    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+    	Coordinates siteInRefOfQueen = MathUtils.galileanTransformation(coordinates, allyQueenCoordinates);
+    	return (isLeftSide && siteInRefOfQueen.getY() >= 0 
+    			&& (siteInRefOfQueen.getX() == 0 || (siteInRefOfQueen.getY() / siteInRefOfQueen.getX() >= Y_LENGTH / X_LENGTH)))
+    			|| (!isLeftSide && siteInRefOfQueen.getY() <= 0
+    			&& (siteInRefOfQueen.getX() == 0 || (siteInRefOfQueen.getY() / siteInRefOfQueen.getX() >= Y_LENGTH / X_LENGTH)));
+    }
 
 }

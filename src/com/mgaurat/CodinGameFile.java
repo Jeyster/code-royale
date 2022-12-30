@@ -25,6 +25,8 @@
 //	private static int towersBuilt = 0;
 //	private static Site secondMineToBuild = null;
 //	private static Site firstKnightBarracksToBuild = null;
+//	private static Site firstTower = null;
+//	private static Site secondTower = null;
 //	
 //    
 //    private static final int MIN_ALLY_TOWERS_NUMBER = 3;
@@ -127,18 +129,18 @@
 //            	startingAllyQueenCoordinates = allyQueenCoordinates;
 //            }
 //            
-//            int minAllyFirstMines;
-//            if (startingQueenHealth > 40) {
-//            	minAllyFirstMines = 2;
-//            } else {
-//            	minAllyFirstMines = 1;
-//            }
+////          int minAllyFirstMines;
+////          if (startingQueenHealth > 40) {
+//          int	minAllyFirstMines = 2;
+////          } else {
+////          	minAllyFirstMines = 1;
+////          }
 //            
 //            if (!isFirstMinesBuild) {
 //            	isFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;
 //            }
-//            
-//            
+//
+//            /* --- Possible Site to MOVE or to BUILD -- */
 //    		Collection<Site> obsoleteAllyTowerSites = StructuresUtils.getObsoleteAllyTowers(allyTowerSites, startingAllyQueenCoordinates, enemyMineSites);
 //            emptyAndEnemyMineAndObsoleteAllyTowerAndNotInTraingBarracksSites.addAll(obsoleteAllyTowerSites);
 //            
@@ -150,20 +152,35 @@
 //            	nearestSite = SitesUtils.getNearestSiteFromCoordinatesInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, startingAllyQueenCoordinates);
 //            	nearestSiteToBuildAMine = StructuresUtils.getNearestSiteFromCoordinatesToBuildAMineInBandForwardDirection(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueenCoordinates, remainingGoldBySiteId, enemyKnightBarracksSites, startingAllyQueenCoordinates, allyTowerSites);
 //            } else {
-//            	if (towersBuilt == 0) {
-//            		if (startingQueenHealth > 50) {
-//            			nearestSite = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
-//            		} else if (startingQueenHealth > 40) {
-//                    	nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
-//            		} else {
-//                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//            	if (isFirstKnightBarracksBuilt && towersBuilt == 0) {
+//            		System.err.println("First tower");
+//            		if (firstTower == null) {
+//            			firstTower = StructuresUtils.getPerfectSiteForFirstTower(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
 //            		}
-//            	} else if (towersBuilt <= 3) {
-//            		if (startingQueenHealth > 40) {
-//            			nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
-//            		} else {
-//                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//            		nearestSite = firstTower;
+////            		if (startingQueenHealth > 50) {
+////            			nearestSite = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
+////            		} else if (startingQueenHealth > 40) {
+////                    	nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
+////            		} else {
+////                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+////            		}
+//            	} else if (towersBuilt == 1) {
+//            		System.err.println("Second tower");
+//
+//            		if (secondTower == null) {
+//            			secondTower = StructuresUtils.getPerfectSiteForSecondTower(emptySites, firstTower, startingAllyQueenCoordinates);
 //            		}
+//            		nearestSite = secondTower;
+////            	} else if (towersBuilt == 2) {
+////            		System.err.println("Third tower");
+////            		nearestSite = StructuresUtils.getPerfectSiteForSecondTower(emptySites, secondTower, startingAllyQueenCoordinates);
+////            	} else if (towersBuilt <= 3) {
+////            		if (startingQueenHealth > 40) {
+////            			nearestSite = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);            			
+////            		} else {
+////                		nearestSite = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+////            		}
 //            	} else {
 //            		nearestSite = SitesUtils.getNearestSiteToBuild(emptyAndEnemyMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
 //            	}
@@ -177,23 +194,22 @@
 //            Site nearestAllySiteNotInTraining = SitesUtils.getNearestSiteToBuild(allyMineAndNotTrainingBarracksAndTowerSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
 //            Site nearestSiteToBuildATowerWhenRunningAway;
 //        	if (isFirstKnightBarracksBuilt && towersBuilt == 0) {
-//        		if (startingQueenHealth > 50) {
-//        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
-//        		} else if (startingQueenHealth > 40) {
-//                	nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
-//        		} else {
-//                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+//        		if (firstTower == null) {
+//        			firstTower = StructuresUtils.getPerfectSiteForFirstTower(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
 //        		}
+//        		nearestSiteToBuildATowerWhenRunningAway = firstTower;
+////        		if (startingQueenHealth > 50) {
+////        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getFirstSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
+////        		} else if (startingQueenHealth > 40) {
+////                	nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);
+////        		} else {
+////                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
+////        		}
 //        	} else if (isFirstKnightBarracksBuilt && towersBuilt <= 3) {
-//        		if (startingQueenHealth > 40) {
-//        			nearestSiteToBuildATowerWhenRunningAway = StructuresUtils.getNearestSiteToBuildTowerInCorner(emptySites, allyQueenCoordinates, startingAllyQueenCoordinates);        			
-//        		} else {
-//                    nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
-//        		}
+//                nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteFromCoordinates(emptySites, allyQueenCoordinates);
 //        	} else {
 //                nearestSiteToBuildATowerWhenRunningAway = SitesUtils.getNearestSiteToBuild(emptyAndMineAndNotInTraingBarracksSites, allyQueen, startingAllyQueenCoordinates, enemyTowerSites, nearestEnemyKnight);
 //        	}
-//            
 //            
 //            Coordinates coordinatesForSecondBuild = null;
 //            if (minAllyFirstMines == 2 && isFirstBuildDone && !isFirstMinesBuild) {
@@ -573,6 +589,17 @@
 //    	}
 //    	
 //    	return output;
+//    }
+//    
+//    public boolean isGoodAngleToBuildFirstTower(Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+//    	final int X_LENGTH = 1920;
+//    	final int Y_LENGTH = 1000;
+//    	boolean isLeftSide = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+//    	Coordinates siteInRefOfQueen = MathUtils.galileanTransformation(coordinates, allyQueenCoordinates);
+//    	return (isLeftSide && siteInRefOfQueen.getY() >= 0 
+//    			&& (siteInRefOfQueen.getX() == 0 || (siteInRefOfQueen.getY() / siteInRefOfQueen.getX() >= Y_LENGTH / X_LENGTH)))
+//    			|| (!isLeftSide && siteInRefOfQueen.getY() <= 0
+//    			&& (siteInRefOfQueen.getX() == 0 || (siteInRefOfQueen.getY() / siteInRefOfQueen.getX() >= Y_LENGTH / X_LENGTH)));
 //    }
 //
 //}
@@ -1096,6 +1123,23 @@
 //    	
 //    	return distanceFromQueenToSite < (QUEEN_SPEED * TRAINING_KNIGHT_TURNS);
 //    }
+//    
+//	public static Site getPerfectSiteForFirstTower(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+//		return sites
+//				.stream()
+//				.filter(site -> site.isGoodAngleToBuildFirstTower(allyQueenCoordinates, startingAllyQueenCoordinates))
+//				.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, site.getCoordinates()))))
+//				.orElse(null);
+//	}
+//	
+//	public static Site getPerfectSiteForSecondTower(Collection<Site> sites, Site firstOrSecondTower,Coordinates startingAllyQueenCoordinates) {
+//		boolean isLeftSite = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+//		return sites
+//				.stream()
+//				.filter(site -> isLeftSite ? site.getCoordinates().getX() <= firstOrSecondTower.getCoordinates().getX() : site.getCoordinates().getX() >= firstOrSecondTower.getCoordinates().getX())
+//				.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(site.getCoordinates(), firstOrSecondTower.getCoordinates()))))
+//				.orElse(null);
+//	}
 //	
 //}
 //
@@ -1692,6 +1736,10 @@
 //            }
 //        }
 //        return result;
+//    }
+//    
+//    public static Coordinates galileanTransformation(Coordinates coordinatesInRefA, Coordinates coordinatesRefBInRefA) {
+//    	return new Coordinates(coordinatesInRefA.getX() - coordinatesRefBInRefA.getX(), coordinatesInRefA.getY() - coordinatesRefBInRefA.getY());
 //    }
 //}
 //

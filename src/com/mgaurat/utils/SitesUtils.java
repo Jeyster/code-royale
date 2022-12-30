@@ -118,5 +118,5 @@ public final class SitesUtils {
 				.stream()
 				.anyMatch(site -> site.getId() == siteId);
 	}
-    
+	
 }

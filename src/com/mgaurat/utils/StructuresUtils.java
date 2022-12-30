@@ -438,5 +438,22 @@ public final class StructuresUtils {
     	
     	return distanceFromQueenToSite < (QUEEN_SPEED * TRAINING_KNIGHT_TURNS);
     }
+    
+	public static Site getPerfectSiteForFirstTower(Collection<Site> sites, Coordinates allyQueenCoordinates, Coordinates startingAllyQueenCoordinates) {
+		return sites
+				.stream()
+				.filter(site -> site.isGoodAngleToBuildFirstTower(allyQueenCoordinates, startingAllyQueenCoordinates))
+				.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(allyQueenCoordinates, site.getCoordinates()))))
+				.orElse(null);
+	}
+	
+	public static Site getPerfectSiteForSecondTower(Collection<Site> sites, Site firstOrSecondTower,Coordinates startingAllyQueenCoordinates) {
+		boolean isLeftSite = GameBoardUtils.isLeftSide(startingAllyQueenCoordinates);
+		return sites
+				.stream()
+				.filter(site -> isLeftSite ? site.getCoordinates().getX() <= firstOrSecondTower.getCoordinates().getX() : site.getCoordinates().getX() >= firstOrSecondTower.getCoordinates().getX())
+				.collect(Collectors.minBy(Comparator.comparingDouble(site -> MathUtils.getDistanceBetweenTwoCoordinates(site.getCoordinates(), firstOrSecondTower.getCoordinates()))))
+				.orElse(null);
+	}
 	
 }
