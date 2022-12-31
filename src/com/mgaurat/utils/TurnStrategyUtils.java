@@ -40,7 +40,11 @@ public final class TurnStrategyUtils {
 			Map<UnitEnum, List<Unit>> enemyUnitsByType, Collection<Site> enemyTowerSites,
 			int emptySitesNumber, int enemyKnightsNumber, int safeDistance, 
 			Collection<Site> enemyKnightBarracksSites, Collection<Site> enemyMines) {
-		return (queenHealth < LOW_HEALTH_QUEEN && !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines))
+		Collection<Unit> enemyKnights = enemyUnitsByType.get(UnitEnum.KNIGHT);
+		return UnitsUtils.getNearestUnits(allyQueenCoordinates, enemyKnights, 200).size() > 0
+				|| UnitsUtils.getNearestUnits(allyQueenCoordinates, enemyKnights, 500).size() > 2
+				|| UnitsUtils.getNearestUnits(allyQueenCoordinates, enemyKnights, 1200).size() > 4
+				|| (queenHealth < LOW_HEALTH_QUEEN && !GameBoardUtils.isItSafeAtCoordinates(allyQueenCoordinates, enemyUnitsByType, enemyTowerSites, safeDistance, enemyKnightBarracksSites, enemyMines))
 				|| (queenHealth < 40 && queenHealth >= LOW_HEALTH_QUEEN 
 					&& !UnitsUtils.isItSafeAtCoordinatesRegardingEnemyKnights(allyQueenCoordinates, enemyUnitsByType, 100))
 				|| enemyKnightsNumber > ENEMY_KNIGHTS_THRESHOLD;

@@ -67,6 +67,13 @@ public final class UnitsUtils {
 				.orElse(null);
 	}
 	
+	public static Collection<Unit> getNearestUnits(Coordinates coordinates, Collection<Unit> units, int distance) {
+		return units
+				.stream()
+				.filter(unit -> MathUtils.getDistanceBetweenTwoCoordinates(coordinates, unit.getCoordinates()) <= distance)
+				.collect(Collectors.toList());
+	}
+	
 	/**
 	 * Check if a GIANT is close to the Coordinates. The distance considered as "close to" is defined in a constant.
 	 * 
@@ -91,5 +98,6 @@ public final class UnitsUtils {
 				&& allyQueen.canReachSiteSomeTurnsBeforeUnit(site, nearestEnemyKnight, isNotMineBuild ? -1 : 1.5))
 				|| (allyQueen.getHealth() >= MID_HEALTH_QUEEN && !StructuresUtils.isCoordinatesInRangeOfTowers(site.getCoordinates(), enemyTowers, 2)));
 	}
+	
 	
 }
