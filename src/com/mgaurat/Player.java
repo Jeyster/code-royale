@@ -78,6 +78,7 @@ class Player {
             Map<StructureEnum, Map<Integer, Site>> allySitesByIdAndStructure = sitesByIdAndStructureAndOwner.get(OwnerEnum.ALLY);
     		Map<Integer, Site> allyMineSitesById = allySitesByIdAndStructure.get(StructureEnum.MINE);
             Collection<Site> allyMineSites = allyMineSitesById.values();
+            int goldProduction = StructuresUtils.getGoldProduction(allyMineSites);
     		Map<Integer, Site> allyTowerSitesById = allySitesByIdAndStructure.get(StructureEnum.TOWER);
     		Collection<Site> allyTowerSites = allyTowerSitesById.values();
     		int allyTowersNumber = allyTowerSites.size();
@@ -147,12 +148,12 @@ class Player {
             	startingAllyQueenCoordinates = allyQueenCoordinates;
             }
             
-//            int minAllyFirstMines;
-//            if (startingQueenHealth > 40) {
-            int	minAllyFirstMines = 2;
-//            } else {
-//            	minAllyFirstMines = 1;
-//            }
+            int minAllyFirstMines;
+            if (startingQueenHealth > 40) {
+            	minAllyFirstMines = 2;
+            } else {
+            	minAllyFirstMines = 1;
+            }
             
             if (!isFirstMinesBuild) {
             	isFirstMinesBuild = allyMineSites.size() == minAllyFirstMines;
@@ -322,7 +323,7 @@ class Player {
         			}
         			PrintUtils.printBuildAction(targetedSiteId, StructureEnum.MINE, null);
         		}
-            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, touchedSite)
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestSite, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, touchedSite, goldProduction)
             		&& !isCampMode) {
             	System.err.println("Strategy f)");
             	targetedSiteId = nearestSite.getId();
@@ -335,7 +336,7 @@ class Player {
             		}
             		PrintUtils.printBuildAction(targetedSiteId, StructureEnum.BARRACKS, UnitEnum.KNIGHT);
             	}
-            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, touchedSite)
+            } else if (TurnStrategyUtils.isKnightBarracksMoveOrBuildStrategyOk(allyQueenHealth, nearestAllySiteNotInTraining, allyKnightBarracksSites, enemyUnitsByType, enemyTowerSites, SAFE_DISTANCE, enemyKnightBarracksSites, enemyMineSites, touchedSite, goldProduction)
             		&& !isCampMode) {
             	System.err.println("Strategy g)");
             	targetedSiteId = nearestAllySiteNotInTraining.getId();
